@@ -1,193 +1,262 @@
 <?php
 /**
- * IMDB PHP Parser
- *
- * This class can be used to retrieve data from IMDB.com with PHP. This script will fail once in
- * a while, when IMDB changes *anything* on their HTML. Guys, it's time to provide an API!
- *
- * Original idea by David Walsh (http://davidwalsh.name).
- *
- *
- * @link http://fabian-beiner.de
- * @copyright 2009 Fabian Beiner
- * @author Fabian Beiner (mail [AT] fabian-beiner [DOT] de)
- * @license MIT License
- *
- * @version 3.1 (2009-09-30)
- */
+* IMDB PHP Parser.
+*
+* This class can be used to retrieve data from IMDB.com with PHP. This script will fail once in
+* a while, when IMDB changes *anything* on their HTML. Guys, it's time to provide an API!
+*
+* Original idea by David Walsh (http://davidwalsh.name).
+*
+*
+* @link http://fabian-beiner.de
+* @copyright 2009 Fabian Beiner
+* @author Fabian Beiner (mail [AT] fabian-beiner [DOT] de)
+* @license MIT License
+*
+* @version 3.4 (2009-10-04)
+*/
 
 class IMDB {
-    private $strSource;
-    private $strURL;
+	private $_sSource = null;
+	private $_sUrl    = null;
+	private $_sId     = null;
+	public  $_bFound  = false;
 
-    public function __construct($strSearch) {
-        $this->strSource = $this->imdbHandler($strSearch);
-    }
+	// Latest update: 2009-10-04
+	const IMDB_COUNTRY      = '#<h5>Country:</h5><a href="(.*)">(.*)</a></div>#Uis';
+	const IMDB_DIRECTOR     = '#<a href="/name/(.*)/" onclick="\(new Image\(\)\).src=\'/rg/directorlist/position-1/images/b.gif\?link=name/(.*)/\';">(.*)</a><br/>#Uis';
+	const IMDB_MPAA         = '#<h5><a href="/mpaa">MPAA</a>:</h5> (.*)</div>#Uis';
+	const IMDB_PLOT         = '#<h5>Plot:</h5>(.*) <a#Uis';
+	const IMDB_RATING       = '#<div class="meta"><b>(.*)</b>#Uis';
+	const IMDB_RELEASE_DATE = '#<h5>Release Date:</h5> (.*) \((.*)\) <a#Uis';
+	const IMDB_RUNTIME      = '#Runtime:</h5>(.*) (.*)</div>#Uis';
+	const IMDB_POSTER       = '#<a name="poster" href="(.*)" title="(.*)"><img border="0" alt="(.*)" title="(.*)" src="(.*)" /></a>#Uis';
+	const IMDB_TITLE        = '#<title>(.*) \((.*)\)</title>#Uis';
+	const IMDB_VOTES        = '#&nbsp;&nbsp;<a href="ratings" class="tn15more">(.*) votes</a>#Uis';
+	const IMDB_URL          = '#http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)#i';
+	const IMDB_SEARCH       = '#<b>Media from&nbsp;<a href="/title/tt(\d+)/"#i';
 
-    private function imdbHandler($strSearch) {
-        $strSearch = trim($strSearch);
-        if (($arrURL = $this->getMatch('#http://(.*\.|.*)imdb.com/title/tt(\d+)/#i', $strSearch, null)) OR ($arrURL = $this->getMatch('#http://(.*\.|.*)imdb.com/Title\?(\d+)#i', $strSearch, null))) {
-            if (empty($arrURL[1])) {
-                $strSuffix = 'www.';
-            } else {
-                $strSuffix = $arrURL[1];
-            }
-            $this->strURL = 'http://' . $strSuffix . 'imdb.com/title/tt' . $arrURL[2] .'/';
-        } else {
-            $strTmpURL = 'http://www.imdb.com/find?s=all&q=' . str_replace(' ', '+', $strSearch) . '&x=0&y=0';
-            $strSource = $this->fetchUrl($strTmpURL);
-            $strMatch  = $this->getMatch('|<b>Media from&nbsp;<a href="/title/tt(\d+)/"|i', $strSource);
-            if ($strMatch) {
-                $this->strURL = 'http://www.imdb.com/title/tt' . $strMatch . '/';
-            } else {
-                return false;
-            }
-        }
-        unset($strSource);
-        $strSource = $this->fetchUrl($this->strURL);
-        if ($strSource) {
-            return str_replace("\n",'',(string)$strSource);
-        }
-        return false;
-    }
+	/**
+	 * Public constructor.
+	 *
+	 * @param string $sSearch
+	 */
+	public function __construct($sSearch) {
+		$sUrl = $this->findUrl($sSearch);
+		if ($sUrl) {
+			$bFetch        = $this->fetchUrl($this->_sUrl);
+			$this->_bFound = true;
+		}
+	}
 
-    private function fetchUrl($strURL, $intTimeout = 5) {
-        $strURL = trim($strURL);
-        if ($this->getMatch('|^http://(.*)$|i', $strURL)) {
-            if (extension_loaded('curl') AND function_exists('curl_init')) {
-                $objCurl = curl_init($strURL);
-                curl_setopt_array($objCurl, array(CURLOPT_VERBOSE => 0,
-                                                  CURLOPT_NOBODY => 0,
-                                                  CURLOPT_HEADER => 0,
-                                                  CURLOPT_FRESH_CONNECT => true,
-                                                  CURLOPT_RETURNTRANSFER => 1,
-                                                  CURLOPT_TIMEOUT => (int)$intTimeout,
-                                                  CURLOPT_CONNECTTIMEOUT => (int)$intTimeout
-                                                 )
-                                 );
-                $strSource     = curl_exec($objCurl);
-                $strResponse   = curl_getinfo($objCurl);
-                curl_close($objCurl);
-                if(intval($strResponse['http_code']) == 200) {
-                    return str_replace("\n",'',(string)$strSource);
-                }
-                return false;
-            } else {
-                if(false == ($strSource = file_get_contents($strUrl))) {
-                    return false;
-                }
-                return str_replace("\n",'',(string)$strSource);
-            }
-        }
-        return false;
-    }
+	/**
+	 * Little REGEX helper.
+	 *
+	 * @param string $sRegex
+	 * @param string $sContent
+	 * @param int    $iIndex;
+	 */
+	private function getMatch($sRegex, $sContent, $iIndex = 1) {
+		preg_match($sRegex, $sContent, $aMatches);
+		if ($iIndex > count($aMatches)) return;
+		if ($iIndex == null) {
+			return $aMatches;
+		}
+		return $aMatches[(int)$iIndex];
+	}
 
-    private function getMatch($strRegex, $strContent, $intIndex = 1) {
-        preg_match($strRegex, $strContent, $arrMatches);
-        if ($intIndex == null) {
-            return $arrMatches;
-        }
-        return $arrMatches[(int)$intIndex];
-    }
+	/**
+	 * Find a valid Url out of the passed argument.
+	 *
+	 * @param string $sSearch
+	 */
+	private function findUrl($sSearch) {
+		$sSearch = trim($sSearch);
+		if ($aUrl = $this->getMatch(self::IMDB_URL, $sSearch, 4)) {
+			$this->_sId  = 'tt' . ereg_replace('[^0-9]', '', $aUrl);
+			$this->_sUrl = 'http://www.imdb.com/title/' . $this->_sId .'/';
+			return true;
+		} else {
+			$sTemp    = 'http://www.imdb.com/find?s=all&q=' . str_replace(' ', '+', $sSearch) . '&x=0&y=0';
+			$bFetch   = $this->fetchUrl($sTemp);
+			if ($bFetch) {
+				if ($strMatch = $this->getMatch(self::IMDB_SEARCH, $this->_sSource)) {
+					$this->_sUrl = 'http://www.imdb.com/title/tt' . $strMatch . '/';
+					unset($this->_sSource);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
-    public function getFullInfo() {
-        return $this->getInfo('full');
-    }
+	/**
+	* Fetch data from given Url.
+	* Uses cURL if installed, otherwise falls back to file_get_contents.
+	*
+	* @param string $sUrl
+	* @param int    $iTimeout;
+	*/
+	private function fetchUrl($sUrl, $iTimeout = 15) {
+		$sUrl = trim($sUrl);
+		if (function_exists('curl_init')) {
+			$oCurl = curl_init($sUrl);
+			curl_setopt_array($oCurl, array (
+											CURLOPT_VERBOSE => 0,
+											CURLOPT_HEADER => 0,
+											CURLOPT_FRESH_CONNECT => true,
+											CURLOPT_RETURNTRANSFER => 1,
+											CURLOPT_TIMEOUT => (int)$iTimeout,
+											CURLOPT_CONNECTTIMEOUT => (int)$iTimeout,
+											CURLOPT_REFERER => $sUrl));
+			$sOutput = curl_exec($oCurl);
 
-    public function getInfo($strWhat) {
-        switch (strtolower(trim($strWhat))) {
-            case 'country':
-                return ($strOutput = trim($this->getMatch('|<h5>Country:</h5><a href="(.*)">(.*)</a></div>|Uis', $this->strSource, 2))) ? $strOutput : false;
-                break;
-            case 'country_url':
-                return ($strOutput = 'http://www.imdb.com' . trim($this->getMatch('|<h5>Country:</h5><a href="(.*)">(.*)</a></div>|Uis', $this->strSource))) ? $strOutput : false;
-                break;
-            case 'director':
-                return ($strOutput = trim($this->getMatch('|<a href="/name/(.*)/" onclick="\(new Image\(\)\).src=\'/rg/directorlist/position-1/images/b.gif\?link=name/(.*)/\';">(.*)</a><br/>|Uis', $this->strSource, 3))) ? $strOutput : false;
-                break;
-            case 'director_url':
-                return ($strOutput = 'http://www.imdb.com/name/' . trim($this->getMatch('|<a href="/name/(.*)/" onclick="\(new Image\(\)\).src=\'/rg/directorlist/position-1/images/b.gif\?link=name/(.*)/\';">(.*)</a><br/>|Uis', $this->strSource, 1)) . '/') ? $strOutput : false;
-                break;
-            case 'mpaa':
-                return ($strOutput = trim($this->getMatch('|<h5><a href="/mpaa">MPAA</a>:</h5> (.*)</div>|Uis', $this->strSource))) ? $strOutput : false;
-                break;
-            case 'plot':
-                return ($strOutput = trim($this->getMatch('|<h5>Plot:</h5>(.*) <a|Uis', $this->strSource))) ? $strOutput : false;
-                break;
-            case 'rating':
-                return ($strOutput = trim($this->getMatch('|<div class="meta"><b>(.*)</b>|Uis', $this->strSource))) ? $strOutput : false;
-                break;
-            case 'release_date':
-                return ($strOutput = trim($this->getMatch('|<h5>Release Date:</h5> (.*) \((.*)\) <a|Uis', $this->strSource))) ? $strOutput : false;
-                break;
-            case 'runtime':
-                return ($strOutput = trim($this->getMatch('|Runtime:</h5>(.*) (.*)</div>|Uis', $this->strSource))) ? $strOutput : false;
-                break;
-            case 'thumb':
-                return ($strOutput = trim($this->getMatch('|<a name="poster" href="(.*)" title="(.*)"><img border="0" alt="(.*)" title="(.*)" src="(.*)" /></a>|Uis', $this->strSource, 5))) ? $strOutput : false;
-                break;
-            case 'title':
-                return ($strOutput = trim($this->getMatch('|<title>(.*) \((.*)\)</title>|Uis', $this->strSource))) ? $strOutput : false;
-                break;
-            case 'url':
-                return ($strOutput = $this->strURL) ? $strOutput : 'Sorry, nothing found';
-                break;
-            case 'votes':
-                return ($strOutput = trim($this->getMatch('|&nbsp;&nbsp;<a href="ratings" class="tn15more">(.*) votes</a>|Uis', $this->strSource))) ? $strOutput : false;
-                break;
-            case 'full':
-                return array(
-                    'country'      => ($strOutput = trim($this->getMatch('|<h5>Country:</h5><a href="(.*)">(.*)</a></div>|Uis', $this->strSource, 2))) ? $strOutput : '',
-                    'country_url'  => ($strOutput = 'http://www.imdb.com' . trim($this->getMatch('|<h5>Country:</h5><a href="(.*)">(.*)</a></div>|Uis', $this->strSource))) ? $strOutput : '',
-                    'director'     => ($strOutput = trim($this->getMatch('|<a href="/name/(.*)/" onclick="\(new Image\(\)\).src=\'/rg/directorlist/position-1/images/b.gif\?link=name/(.*)/\';">(.*)</a><br/>|Uis', $this->strSource, 3))) ? $strOutput : '',
-                    'director_url' => ($strOutput = 'http://www.imdb.com/name/' . trim($this->getMatch('|<a href="/name/(.*)/" onclick="\(new Image\(\)\).src=\'/rg/directorlist/position-1/images/b.gif\?link=name/(.*)/\';">(.*)</a><br/>|Uis', $this->strSource, 1)) . '/') ? $strOutput : '',
-                    'mpaa'         => ($strOutput = trim($this->getMatch('|<h5><a href="/mpaa">MPAA</a>:</h5> (.*)</div>|Uis', $this->strSource))) ? $strOutput : '',
-                    'plot'         => ($strOutput = trim($this->getMatch('|<h5>Plot:</h5>(.*) <a|Uis', $this->strSource))) ? $strOutput : '',
-                    'rating'       => ($strOutput = trim($this->getMatch('|<div class="meta"><b>(.*)</b>|Uis', $this->strSource))) ? $strOutput : '',
-                    'release_date' => ($strOutput = trim($this->getMatch('|<h5>Release Date:</h5> (.*) \((.*)\) <a|Uis', $this->strSource))) ? $strOutput : '',
-                    'runtime'      => ($strOutput = trim($this->getMatch('|Runtime:</h5>(.*) (.*)</div>|Uis', $this->strSource))) ? $strOutput : '',
-                    'thumb'        => ($strOutput = trim($this->getMatch('|<a name="poster" href="(.*)" title="(.*)"><img border="0" alt="(.*)" title="(.*)" src="(.*)" /></a>|Uis', $this->strSource, 5))) ? $strOutput : '',
-                    'title'        => ($strOutput = trim($this->getMatch('|<title>(.*) \((.*)\)</title>|Uis', $this->strSource))) ? $strOutput : '',
-                    'url'          => ($strOutput = $this->strURL) ? $strOutput : '',
-                    'votes'        => ($strOutput = trim($this->getMatch('|&nbsp;&nbsp;<a href="ratings" class="tn15more">(.*) votes</a>|Uis', $this->strSource))) ? $strOutput : ''
-                );
-                break;
-            default:
-                return false;
-        }
-        return false;
-    }
-}
+			if ($sOutput === false) {
+				return false;
+			}
 
-// Case #1: With NAME:
-$objIMDB = new IMDB('Cruel Intentions');
-$arrIMDB = $objIMDB->getFullInfo();
-if ($arrIMDB['title']) {
-    echo '<pre>';
-    print_r($arrIMDB);
-    echo '</pre>';
-} else {
-    echo 'Sorry, nothing found!';
-}
+			$aInfo = curl_getinfo($oCurl);
+			if ($aInfo['http_code'] != 200) {
+				return false;
+			}
+			$this->_sSource = str_replace("\n", '', (string)$sOutput);
+			curl_close($oCurl);
+			return true;
+		} else {
+			$sOutput = @file_get_contents($sUrl, 0);
+			if (strpos($http_response_header[0], '200') === false){
+				return false;
+			}
+			$this->_sSource = str_replace("\n", '', (string)$sOutput);
+			return true;
+		}
+	}
+
+	/**
+	 * Get the country of the current movie.
+	 */
+	public function getCountry() {
+		if ($this->_sSource) {
+			return $this->getMatch(self::IMDB_COUNTRY, $this->_sSource, 2);
+		}
+		return false;
+	}
+
+	/**
+	 * Get the country url of the current movie.
+	 */
+	public function getCountryUrl() {
+		if ($this->_sSource) {
+			return 'http://www.imdb.com' . $this->getMatch(self::IMDB_COUNTRY, $this->_sSource);
+		}
+		return false;
+	}
+
+	/**
+	 * Get the director of the current movie.
+	 */
+	public function getDirector() {
+		if ($this->_sSource) {
+			return $this->getMatch(self::IMDB_DIRECTOR, $this->_sSource, 3);
+		}
+		return false;
+	}
+
+	/**
+	 * Get the director of the current movie.
+	 */
+	public function getDirectorUrl() {
+		if ($this->_sSource) {
+			return 'http://www.imdb.com/name/' . $this->getMatch(self::IMDB_DIRECTOR, $this->_sSource);
+		}
+		return false;
+	}
+
+	/**
+	 * Get the mpaa of the current movie.
+	 */
+	public function getMpaa() {
+		if ($this->_sSource) {
+			return $this->getMatch(self::IMDB_MPAA, $this->_sSource);
+		}
+		return false;
+	}
+
+	/**
+	 * Get the plot of the current movie.
+	 */
+	public function getPlot() {
+		if ($this->_sSource) {
+			return $this->getMatch(self::IMDB_PLOT, $this->_sSource);
+		}
+		return false;
+	}
+
+	/**
+	 * Get the rating of the current movie.
+	 */
+	public function getRating() {
+		if ($this->_sSource) {
+			return $this->getMatch(self::IMDB_RATING, $this->_sSource);
+		}
+		return false;
+	}
 
 
-echo '<hr>';
+	/**
+	 * Get the release date of the current movie.
+	 */
+	public function getReleaseDate() {
+		if ($this->_sSource) {
+			return $this->getMatch(self::IMDB_RELEASE_DATE, $this->_sSource);
+		}
+		return false;
+	}
 
-// Case #2: With URL:
-$objIMDB = new IMDB('http://us.imdb.com/Title?0118883');
-if ($objIMDB->getInfo('title')) {
-    echo $objIMDB->getInfo('title') . ' (' . $objIMDB->getInfo('url') . ') got ' . $objIMDB->getInfo('votes') . ' votes!';
-} else {
-    echo 'Sorry, nothing found!';
-}
+	/**
+	 * Get the runtime of the current movie.
+	 */
+	public function getRuntime() {
+		if ($this->_sSource) {
+			return $this->getMatch(self::IMDB_RUNTIME, $this->_sSource);
+		}
+		return false;
+	}
 
+	/**
+	 * Get the release date of the current movie.
+	 */
+	public function getTitle() {
+		if ($this->_sSource) {
+			return $this->getMatch(self::IMDB_TITLE, $this->_sSource);
+		}
+		return false;
+	}
 
-echo '<hr>';
+	/**
+	 * Get the url of the current movie.
+	 */
+	public function getUrl() {
+		return $this->_sUrl;
+	}
 
-// Case #3: Movie doesn't exists:
-$objIMDB = new IMDB('I guess this movie name doesnt exists 123');
-if ($objIMDB->getInfo('title')) {
-    echo $objIMDB->getInfo('title') . ' (' . $objIMDB->getInfo('url') . ') got ' . $objIMDB->getInfo('votes') . ' votes!';
-} else {
-    echo 'Sorry, nothing found!';
+	/**
+	 * Get the votes of the current movie.
+	 */
+	public function getVotes() {
+		if ($this->_sSource) {
+			return $this->getMatch(self::IMDB_VOTES, $this->_sSource);
+		}
+		return false;
+	}
+
+	/**
+	 * Download the poster, cache it and return the local path of the current movie.
+	 */
+	public function getPoster() {
+		if ($this->_sSource) {
+			return $this->getMatch(self::IMDB_POSTER, $this->_sSource, 5);
+		}
+		return false;
+	}
 }
