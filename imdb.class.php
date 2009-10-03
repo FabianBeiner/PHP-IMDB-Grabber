@@ -33,6 +33,7 @@ class IMDB {
 	const IMDB_POSTER       = '#<a name="poster" href="(.*)" title="(.*)"><img border="0" alt="(.*)" title="(.*)" src="(.*)" /></a>#Uis';
 	const IMDB_TITLE        = '#<title>(.*) \((.*)\)</title>#Uis';
 	const IMDB_VOTES        = '#&nbsp;&nbsp;<a href="ratings" class="tn15more">(.*) votes</a>#Uis';
+	const IMDB_TAGLINE      = '#Tagline:<\/h5>([^<]+)<#';
 	const IMDB_URL          = '#http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)#i';
 	const IMDB_SEARCH       = '#<b>Media from&nbsp;<a href="/title/tt(\d+)/"#i';
 
@@ -246,6 +247,26 @@ class IMDB {
 	public function getVotes() {
 		if ($this->_sSource) {
 			return $this->getMatch(self::IMDB_VOTES, $this->_sSource);
+		}
+		return false;
+	}
+
+	/**
+	 * Get the tagline of the current movie.
+	 */
+	public function getTagline() {
+		if ($this->_sSource) {
+			return $this->getMatch(self::IMDB_TAGLINE, $this->_sSource);
+		}
+		return false;
+	}
+
+	/**
+	 * Get the year of the current movie.
+	 */
+	public function getYear() {
+		if ($this->_sSource) {
+			return $this->getMatch(self::IMDB_TITLE, $this->_sSource, 2);
 		}
 		return false;
 	}

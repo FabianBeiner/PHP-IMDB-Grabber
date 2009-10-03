@@ -16,6 +16,8 @@ if ($oIMDB->_bFound) {
 	echo 'Url: ' . $oIMDB->getUrl() . '<br>';
 	echo 'Votes: ' . $oIMDB->getVotes() . '<br>';
 	echo 'Poster Url: ' . $oIMDB->getPoster() . '<br>';
+	echo 'Tagline: ' . $oIMDB->getTagline() . '<br>';
+	echo 'Year: ' . $oIMDB->getYear() . '<br>';
 } else {
 	echo 'Movie not found!';
 }
