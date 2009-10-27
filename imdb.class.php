@@ -13,7 +13,7 @@
 * @author Fabian Beiner (mail [AT] fabian-beiner [DOT] de)
 * @license MIT License
 *
-* @version 3.4 (2009-10-04)
+* @version 3.5 (2009-10-26)
 */
 
 class IMDB {
@@ -64,6 +64,51 @@ class IMDB {
 			return $aMatches;
 		}
 		return $aMatches[(int)$iIndex];
+	}
+
+	/**
+	 * Save an image.
+	 *
+	 * @param string $sUrl
+	 */
+	private function saveImage($sUrl) {
+		$sUrl   = trim($sUrl);
+		$bolDir = false;
+		if (!is_dir(getcwd() . '/posters')) {
+			if (mkdir(getcwd() . '/posters', 0777)) {
+				$bolDir = true;
+			}
+		}
+		$sFilename = getcwd() . '/posters/' . ereg_replace("[^0-9]", "", basename($this->_sUrl)) . '.jpg';
+		if (file_exists($sFilename)) {
+			return 'posters/' . basename($sFilename);
+		}
+		if (is_dir(getcwd() . '/posters') OR $bolDir) {
+			if (function_exists('curl_init')) {
+				
+				$oCurl = curl_init($sUrl);
+				curl_setopt_array($oCurl, array (
+												CURLOPT_VERBOSE => 0,
+												CURLOPT_HEADER => 0,
+												CURLOPT_RETURNTRANSFER => 1,
+												CURLOPT_TIMEOUT => 5,
+												CURLOPT_CONNECTTIMEOUT => 5,
+												CURLOPT_REFERER => $sUrl,
+												CURLOPT_BINARYTRANSFER => 1));
+				$sOutput = curl_exec($oCurl);
+				curl_close($oCurl);
+				$oFile = fopen($sFilename, 'x');
+				fwrite($oFile, $sOutput);
+				fclose($oFile);
+				return 'posters/' . basename($sFilename);
+			} else {
+				$oImg = imagecreatefromjpeg($sUrl);
+				imagejpeg($oImg, $sFilename);
+				return 'posters/' . basename($sFilename);
+			}
+			return false;
+		}
+		return false;
 	}
 
 	/**
@@ -131,6 +176,7 @@ class IMDB {
 			$this->_sSource = str_replace("\n", '', (string)$sOutput);
 			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -276,6 +322,9 @@ class IMDB {
 	 */
 	public function getPoster() {
 		if ($this->_sSource) {
+			if ($sPoster = $this->saveImage($this->getMatch(self::IMDB_POSTER, $this->_sSource, 5), 'poster.jpg')) {
+				return $sPoster;
+			}
 			return $this->getMatch(self::IMDB_POSTER, $this->_sSource, 5);
 		}
 		return false;
