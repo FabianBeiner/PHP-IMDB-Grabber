@@ -22,18 +22,18 @@ class IMDB {
 	private $_sId     = null;
 	public  $_bFound  = false;
 
-	// Latest update: 2009-10-04
-	const IMDB_COUNTRY      = '#<h5>Country:</h5><a href="(.*)">(.*)</a></div>#Uis';
+	// Latest update: 2009-11-12
+	const IMDB_COUNTRY      = '#<a href="/Sections/Countries/(.*)/">#Uis';
 	const IMDB_DIRECTOR     = '#<a href="/name/(.*)/" onclick="\(new Image\(\)\).src=\'/rg/directorlist/position-1/images/b.gif\?link=name/(.*)/\';">(.*)</a><br/>#Uis';
-	const IMDB_MPAA         = '#<h5><a href="/mpaa">MPAA</a>:</h5> (.*)</div>#Uis';
-	const IMDB_PLOT         = '#<h5>Plot:</h5>(.*) <a#Uis';
-	const IMDB_RATING       = '#<div class="meta"><b>(.*)</b>#Uis';
-	const IMDB_RELEASE_DATE = '#<h5>Release Date:</h5> (.*) \((.*)\) <a#Uis';
-	const IMDB_RUNTIME      = '#Runtime:</h5>(.*) (.*)</div>#Uis';
+	const IMDB_MPAA         = '#<h5><a href="/mpaa">MPAA</a>:</h5>\s*<p>\s*(.*)\s*</p>#Uis';
+	const IMDB_PLOT         = '#<h5>Plot:</h5>\s*<p>\s*(.*)\s*<a#Uis';
+	const IMDB_RATING       = '#<b>(\d\.\d/10)</b>#Uis';
+	const IMDB_RELEASE_DATE = '#<h5>Release Date:</h5>\s*\s*<p>\s*(.*) \((.*)\)#Uis';
+	const IMDB_RUNTIME      = '#<h5>Runtime:</h5>\s*<p>\s*(.*)\s*</p>#Uis';
 	const IMDB_POSTER       = '#<a name="poster" href="(.*)" title="(.*)"><img border="0" alt="(.*)" title="(.*)" src="(.*)" /></a>#Uis';
 	const IMDB_TITLE        = '#<title>(.*) \((.*)\)</title>#Uis';
 	const IMDB_VOTES        = '#&nbsp;&nbsp;<a href="ratings" class="tn15more">(.*) votes</a>#Uis';
-	const IMDB_TAGLINE      = '#Tagline:<\/h5>([^<]+)<#';
+	const IMDB_TAGLINE      = '#<h5>Tagline:</h5>\s*<p>\s*(.*)\s*</p></div>#Uis';
 	const IMDB_URL          = '#http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)#i';
 	const IMDB_SEARCH       = '#<b>Media from&nbsp;<a href="/title/tt(\d+)/"#i';
 
@@ -184,7 +184,7 @@ class IMDB {
 	 */
 	public function getCountry() {
 		if ($this->_sSource) {
-			return $this->getMatch(self::IMDB_COUNTRY, $this->_sSource, 2);
+			return $this->getMatch(self::IMDB_COUNTRY, $this->_sSource, 1);
 		}
 		return false;
 	}
@@ -194,7 +194,7 @@ class IMDB {
 	 */
 	public function getCountryUrl() {
 		if ($this->_sSource) {
-			return 'http://www.imdb.com' . $this->getMatch(self::IMDB_COUNTRY, $this->_sSource);
+			return 'http://www.imdb.com/Sections/Countries/' . $this->getMatch(self::IMDB_COUNTRY, $this->_sSource) . '/';
 		}
 		return false;
 	}
@@ -214,7 +214,7 @@ class IMDB {
 	 */
 	public function getDirectorUrl() {
 		if ($this->_sSource) {
-			return 'http://www.imdb.com/name/' . $this->getMatch(self::IMDB_DIRECTOR, $this->_sSource);
+			return 'http://www.imdb.com/name/' . $this->getMatch(self::IMDB_DIRECTOR, $this->_sSource) . '/';
 		}
 		return false;
 	}
