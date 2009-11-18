@@ -22,18 +22,18 @@ class IMDB {
 	private $_sId     = null;
 	public  $_bFound  = false;
 
-	// Latest update: 2009-11-12
+	// Latest update: 2009-11-18
 	const IMDB_COUNTRY      = '#<a href="/Sections/Countries/(.*)/">#Uis';
 	const IMDB_DIRECTOR     = '#<a href="/name/(.*)/" onclick="\(new Image\(\)\).src=\'/rg/directorlist/position-1/images/b.gif\?link=name/(.*)/\';">(.*)</a><br/>#Uis';
-	const IMDB_MPAA         = '#<h5><a href="/mpaa">MPAA</a>:</h5>\s*<p>\s*(.*)\s*</p>#Uis';
-	const IMDB_PLOT         = '#<h5>Plot:</h5>\s*<p>\s*(.*)\s*<a#Uis';
+	const IMDB_MPAA         = '#<h5><a href="/mpaa">MPAA</a>:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Uis';
+	const IMDB_PLOT         = '#<h5>Plot:</h5>\s*<div class="info-content">\s*(.*)\s*<a#Uis';
 	const IMDB_RATING       = '#<b>(\d\.\d/10)</b>#Uis';
-	const IMDB_RELEASE_DATE = '#<h5>Release Date:</h5>\s*\s*<p>\s*(.*) \((.*)\)#Uis';
-	const IMDB_RUNTIME      = '#<h5>Runtime:</h5>\s*<p>\s*(.*)\s*</p>#Uis';
+	const IMDB_RELEASE_DATE = '#<h5>Release Date:</h5>\s*\s*<div class="info-content">\s*(.*) \((.*)\)#Uis';
+	const IMDB_RUNTIME      = '#<h5>Runtime:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Uis';
 	const IMDB_POSTER       = '#<a name="poster" href="(.*)" title="(.*)"><img border="0" alt="(.*)" title="(.*)" src="(.*)" /></a>#Uis';
 	const IMDB_TITLE        = '#<title>(.*) \((.*)\)</title>#Uis';
 	const IMDB_VOTES        = '#&nbsp;&nbsp;<a href="ratings" class="tn15more">(.*) votes</a>#Uis';
-	const IMDB_TAGLINE      = '#<h5>Tagline:</h5>\s*<p>\s*(.*)\s*</p></div>#Uis';
+	const IMDB_TAGLINE      = '#<h5>Tagline:</h5>\s*<div class="info-content">\s*(.*)\s*<a#Uis';
 	const IMDB_URL          = '#http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)#i';
 	const IMDB_SEARCH       = '#<b>Media from&nbsp;<a href="/title/tt(\d+)/"#i';
 
@@ -85,7 +85,7 @@ class IMDB {
 		}
 		if (is_dir(getcwd() . '/posters') OR $bolDir) {
 			if (function_exists('curl_init')) {
-				
+
 				$oCurl = curl_init($sUrl);
 				curl_setopt_array($oCurl, array (
 												CURLOPT_VERBOSE => 0,
