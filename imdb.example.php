@@ -1,7 +1,7 @@
 <?php
 include_once 'imdb.class.php';
 
-$oIMDB = new IMDB('Cruel Intentions');
+$oIMDB = new IMDB('Valkyrie');
 if ($oIMDB->_bFound) {
 	echo 'Title: ' . $oIMDB->getTitle() . '<br>';
 	echo 'Country: ' . $oIMDB->getCountry() . '<br>';
@@ -18,6 +18,7 @@ if ($oIMDB->_bFound) {
 	echo 'Poster Url: ' . $oIMDB->getPoster() . '<br>';
 	echo 'Tagline: ' . $oIMDB->getTagline() . '<br>';
 	echo 'Year: ' . $oIMDB->getYear() . '<br>';
+	echo 'Genre: ' . $oIMDB->getGenre() . '<br>';
 } else {
 	echo 'Movie not found!';
 }

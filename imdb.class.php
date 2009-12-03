@@ -22,7 +22,7 @@ class IMDB {
 	private $_sId     = null;
 	public  $_bFound  = false;
 
-	// Latest update: 2009-11-18
+	// Latest update: 2009-12-03
 	const IMDB_COUNTRY      = '#<a href="/Sections/Countries/(.*)/">#Uis';
 	const IMDB_DIRECTOR     = '#<a href="/name/(.*)/" onclick="\(new Image\(\)\).src=\'/rg/directorlist/position-1/images/b.gif\?link=name/(.*)/\';">(.*)</a><br/>#Uis';
 	const IMDB_MPAA         = '#<h5><a href="/mpaa">MPAA</a>:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Uis';
@@ -33,9 +33,10 @@ class IMDB {
 	const IMDB_POSTER       = '#<a name="poster" href="(.*)" title="(.*)"><img border="0" alt="(.*)" title="(.*)" src="(.*)" /></a>#Uis';
 	const IMDB_TITLE        = '#<title>(.*) \((.*)\)</title>#Uis';
 	const IMDB_VOTES        = '#&nbsp;&nbsp;<a href="ratings" class="tn15more">(.*) votes</a>#Uis';
-	const IMDB_TAGLINE      = '#<h5>Tagline:</h5>\s*<div class="info-content">\s*(.*)\s*<a#Uis';
+	const IMDB_TAGLINE      = '#<h5>Tagline:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Uis';
 	const IMDB_URL          = '#http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)#i';
 	const IMDB_SEARCH       = '#<b>Media from&nbsp;<a href="/title/tt(\d+)/"#i';
+	const IMDB_GENRE        = '#<a href="/Sections/Genres/(\w+)/">(\w+)</a>#i';
 
 	/**
 	 * Public constructor.
@@ -326,6 +327,19 @@ class IMDB {
 				return $sPoster;
 			}
 			return $this->getMatch(self::IMDB_POSTER, $this->_sSource, 5);
+		}
+		return false;
+	}
+
+	/**
+	 * Get the genres of the current movie.
+	 */
+	public function getGenre() {
+		if ($this->_sSource) {
+			preg_match_all(self::IMDB_GENRE, $this->_sSource, $arrGenre);
+			if (count($arrGenre)) {
+				return implode("/", $arrGenre[1]);
+			}
 		}
 		return false;
 	}
