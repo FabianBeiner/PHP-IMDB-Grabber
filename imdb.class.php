@@ -1,19 +1,17 @@
 <?php
 /**
-* IMDB PHP Parser.
+* IMDB PHP Parser
 *
 * This class can be used to retrieve data from IMDB.com with PHP. This script will fail once in
 * a while, when IMDB changes *anything* on their HTML. Guys, it's time to provide an API!
 *
-* Original idea by David Walsh (http://davidwalsh.name).
-*
-*
 * @link http://fabian-beiner.de
-* @copyright 2009 Fabian Beiner
+* @copyright 2010 Fabian Beiner
 * @author Fabian Beiner (mail [AT] fabian-beiner [DOT] de)
 * @license MIT License
 *
-* @version 3.5 (2009-10-26)
+* @version 4.0 (January 30th, 2010)
+*
 */
 
 class IMDB {
@@ -22,21 +20,22 @@ class IMDB {
 	private $_sId     = null;
 	public  $_bFound  = false;
 
-	// Latest update: 2009-12-03
-	const IMDB_COUNTRY      = '#<a href="/Sections/Countries/(.*)/">#Uis';
-	const IMDB_DIRECTOR     = '#<a href="/name/(.*)/" onclick="\(new Image\(\)\).src=\'/rg/directorlist/position-1/images/b.gif\?link=name/(.*)/\';">(.*)</a><br/>#Uis';
-	const IMDB_MPAA         = '#<h5><a href="/mpaa">MPAA</a>:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Uis';
-	const IMDB_PLOT         = '#<h5>Plot:</h5>\s*<div class="info-content">\s*(.*)\s*<a#Uis';
-	const IMDB_RATING       = '#<b>(\d\.\d/10)</b>#Uis';
-	const IMDB_RELEASE_DATE = '#<h5>Release Date:</h5>\s*\s*<div class="info-content">\s*(.*) \((.*)\)#Uis';
-	const IMDB_RUNTIME      = '#<h5>Runtime:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Uis';
-	const IMDB_POSTER       = '#<a name="poster" href="(.*)" title="(.*)"><img border="0" alt="(.*)" title="(.*)" src="(.*)" /></a>#Uis';
-	const IMDB_TITLE        = '#<title>(.*) \((.*)\)</title>#Uis';
-	const IMDB_VOTES        = '#&nbsp;&nbsp;<a href="ratings" class="tn15more">(.*) votes</a>#Uis';
-	const IMDB_TAGLINE      = '#<h5>Tagline:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Uis';
-	const IMDB_URL          = '#http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)#i';
+	const IMDB_CAST         = '#<a href="/name/(\w+)/" onclick="\(new Image\(\)\)\.src=\'/rg/castlist/position-(\d|\d\d)/images/b\.gif\?link=/name/(\w+)/\';">(.*)</a>#Ui';
+	const IMDB_COUNTRY      = '#<a href="/Sections/Countries/(\w+)/">#Ui';
+	const IMDB_DIRECTOR     = '#<a href="/name/(\w+)/" onclick="\(new Image\(\)\)\.src=\'/rg/directorlist/position-(\d|\d\d)/images/b.gif\?link=name/(\w+)/\';">(.*)</a><br/>#Ui';
+	const IMDB_GENRE        = '#<a href="/Sections/Genres/(\w+)/">(\w+)</a>#Ui';
+	const IMDB_MPAA         = '#<h5><a href="/mpaa">MPAA</a>:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Ui';
+	const IMDB_PLOT         = '#<h5>Plot:</h5>\s*<div class="info-content">\s*(.*)\s*<a#Ui';
+	const IMDB_POSTER       = '#<a name="poster" href="(.*)" title="(.*)"><img border="0" alt="(.*)" title="(.*)" src="(.*)" /></a>#Ui';
+	const IMDB_RATING       = '#<b>(\d\.\d/10)</b>#Ui';
+	const IMDB_RELEASE_DATE = '#<h5>Release Date:</h5>\s*\s*<div class="info-content">\s*(.*) \((.*)\)#Ui';
+	const IMDB_RUNTIME      = '#<h5>Runtime:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Ui';
 	const IMDB_SEARCH       = '#<b>Media from&nbsp;<a href="/title/tt(\d+)/"#i';
-	const IMDB_GENRE        = '#<a href="/Sections/Genres/(\w+)/">(\w+)</a>#i';
+	const IMDB_TAGLINE      = '#<h5>Tagline:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Ui';
+	const IMDB_TITLE        = '#<title>(.*) \((.*)\)</title>#Ui';
+	const IMDB_URL          = '#http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)#i';
+	const IMDB_VOTES        = '#&nbsp;&nbsp;<a href="ratings" class="tn15more">(.*) votes</a>#Ui';
+	const IMDB_WRITER       = '#<a href="/name/(\w+)/" onclick="\(new Image\(\)\)\.src=\'/rg/writerlist/position-(\d|\d\d)/images/b\.gif\?link=name/(\w+)/\';">(.*)</a> \((\w+)\)<br/>#Ui';
 
 	/**
 	 * Public constructor.
@@ -65,6 +64,19 @@ class IMDB {
 			return $aMatches;
 		}
 		return $aMatches[(int)$iIndex];
+	}
+
+	/**
+	 * Little REGEX helper.
+	 *
+	 * @param string $sRegex
+	 * @param string $sContent
+	 * @param int    $iIndex;
+	 */
+	private function getMatches($sRegex, $iIndex = null) {
+		preg_match_all($sRegex, $this->_sSource, $aMatches);
+		if ((int)$iIndex) return $aMatches[$iIndex];
+		return $aMatches;
 	}
 
 	/**
@@ -181,94 +193,213 @@ class IMDB {
 	}
 
 	/**
-	 * Get the country of the current movie.
+	 * Returns the cast.
+	 */
+	public function getCast($iOutput = null, $bMore = true) {
+		if ($this->_sSource) {
+			$sReturned = $this->getMatches(self::IMDB_CAST, 4);
+			if (is_array($sReturned)) {
+				if ($iOutput) {
+					foreach ($sReturned as $i => $sName) {
+						if ($i >= $iOutput) break;
+						$sReturn[] = $sName;
+					}
+					return implode(' / ', $sReturn) . (($bMore) ? '&hellip;' : '');
+				}
+				return implode(' / ', $sReturned);
+			}
+			return $sReturned;
+		}
+		return 'n/A';
+	}
+
+	/**
+	 * Returns the cast as links.
+	 */
+	public function getCastAsUrl($iOutput = null, $bMore = true) {
+		if ($this->_sSource) {
+			$sReturned1 = $this->getMatches(self::IMDB_CAST, 4);
+			$sReturned2 = $this->getMatches(self::IMDB_CAST, 3);
+			if (is_array($sReturned1)) {
+				if ($iOutput) {
+					foreach ($sReturned1 as $i => $sName) {
+						if ($i >= $iOutput) break;
+						$aReturn[] = '<a href="http://www.imdb.com/name/' . $sReturned2[$i] . '/">' . $sName . '</a>';;
+					}
+					return implode(' / ', $aReturn) . (($bMore) ? '&hellip;' : '');
+				}
+				return implode(' / ', $sReturned);
+			}
+			return '<a href="http://www.imdb.com/name/' . $sReturned2 . '/">' . $sReturned1 . '</a>';;
+		}
+		return 'n/A';
+	}
+
+	/**
+	 * Returns the countr(y|ies).
 	 */
 	public function getCountry() {
 		if ($this->_sSource) {
-			return $this->getMatch(self::IMDB_COUNTRY, $this->_sSource, 1);
+			$sReturned = $this->getMatches(self::IMDB_COUNTRY, 1);
+			if (is_array($sReturned)) {
+				return implode(' / ', $sReturned);
+			}
+			return $sReturned;
 		}
-		return false;
+		return 'n/A';
 	}
 
 	/**
-	 * Get the country url of the current movie.
+	 * Returns the countr(y|ies) as link(s).
 	 */
-	public function getCountryUrl() {
+	public function getCountryAsUrl() {
 		if ($this->_sSource) {
-			return 'http://www.imdb.com/Sections/Countries/' . $this->getMatch(self::IMDB_COUNTRY, $this->_sSource) . '/';
+			$sReturned = $this->getMatches(self::IMDB_COUNTRY, 1);
+			if (is_array($sReturned)) {
+				foreach ($sReturned as $sCountry) {
+					$aReturn[] = '<a href="http://www.imdb.com/Sections/Countries/' . $sCountry . '/">' . $sCountry . '</a>';
+				}
+				return implode(' / ', $aReturn);
+			}
+			return '<a href="http://www.imdb.com/Sections/Countries/' . $sReturned . '/">' . $sReturned . '</a>';
 		}
-		return false;
+		return 'n/A';
 	}
 
 	/**
-	 * Get the director of the current movie.
+	 * Returns the director(s).
 	 */
 	public function getDirector() {
 		if ($this->_sSource) {
-			return $this->getMatch(self::IMDB_DIRECTOR, $this->_sSource, 3);
+			$sReturned = $this->getMatches(self::IMDB_DIRECTOR, 4);
+			if (is_array($sReturned)) {
+				return implode(' / ', $sReturned);
+			}
+			return $sReturned;
 		}
-		return false;
+		return 'n/A';
 	}
 
 	/**
-	 * Get the director of the current movie.
+	 * Returns the director(s) as link(s).
 	 */
-	public function getDirectorUrl() {
+	public function getDirectorAsUrl() {
 		if ($this->_sSource) {
-			return 'http://www.imdb.com/name/' . $this->getMatch(self::IMDB_DIRECTOR, $this->_sSource) . '/';
+			$sReturned1 = $this->getMatches(self::IMDB_DIRECTOR, 4);
+			$sReturned2 = $this->getMatches(self::IMDB_DIRECTOR, 1);
+			if (is_array($sReturned1)) {
+				foreach ($sReturned1 as $i => $sDirector) {
+					$aReturn[] = '<a href="http://www.imdb.com/name/' . $sReturned2[$i] . '/">' . $sDirector . '</a>';
+				}
+				return implode(' / ', $aReturn);
+			}
+			return '<a href="http://www.imdb.com/name/' . $sReturned2 . '/">' . $sReturned1 . '</a>';
 		}
-		return false;
+		return 'n/A';
 	}
 
 	/**
-	 * Get the mpaa of the current movie.
+	 * Returns the genre(s).
+	 */
+	public function getGenre() {
+		if ($this->_sSource) {
+			$sReturned = $this->getMatches(self::IMDB_GENRE, 1);
+			if (is_array($sReturned)) {
+				return implode(' / ', $sReturned);
+			}
+			return $sReturned;
+		}
+		return 'n/A';
+	}
+
+	/**
+	 * Returns the genre(s) as link(s).
+	 */
+	public function getGenreAsUrl() {
+		if ($this->_sSource) {
+			$sReturned = $this->getMatches(self::IMDB_GENRE, 1);
+			if (is_array($sReturned)) {
+				foreach ($sReturned as $i => $sGenre) {
+					$aReturn[] = '<a href="http://www.imdb.com/Sections/Genres/' . $sGenre . '/">' . $sGenre . '</a>';
+				}
+				return implode(' / ', $aReturn);
+			}
+			return '<a href="http://www.imdb.com/Sections/Genres/' . $sReturned . '/">' . $sReturned . '</a>';
+		}
+		return 'n/A';
+	}
+
+	/**
+	 * Returns the mpaa.
 	 */
 	public function getMpaa() {
 		if ($this->_sSource) {
-			return $this->getMatch(self::IMDB_MPAA, $this->_sSource);
+			return implode('' , $this->getMatches(self::IMDB_MPAA, 1));
 		}
-		return false;
+		return 'n/A';
 	}
 
 	/**
-	 * Get the plot of the current movie.
+	 * Returns the plot.
 	 */
 	public function getPlot() {
 		if ($this->_sSource) {
-			return $this->getMatch(self::IMDB_PLOT, $this->_sSource);
+			return implode('' , $this->getMatches(self::IMDB_PLOT, 1));
 		}
-		return false;
+		return 'n/A';
 	}
 
 	/**
-	 * Get the rating of the current movie.
+	 * Download the poster, cache it and return the local path to the image.
+	 */
+	public function getPoster() {
+		if ($this->_sSource) {
+			if ($sPoster = $this->saveImage(implode("", $this->getMatches(self::IMDB_POSTER, 5)), 'poster.jpg')) {
+				return $sPoster;
+			}
+			return implode('', $this->getMatches(self::IMDB_POSTER, 5));
+		}
+		return 'n/A';
+	}
+
+	/**
+	 * Returns the rating.
 	 */
 	public function getRating() {
 		if ($this->_sSource) {
-			return $this->getMatch(self::IMDB_RATING, $this->_sSource);
+			return implode('', $this->getMatches(self::IMDB_RATING, 1));
 		}
-		return false;
+		return 'n/A';
 	}
 
-
 	/**
-	 * Get the release date of the current movie.
+	 * Returns the release date.
 	 */
 	public function getReleaseDate() {
 		if ($this->_sSource) {
-			return $this->getMatch(self::IMDB_RELEASE_DATE, $this->_sSource);
+			return implode('', $this->getMatches(self::IMDB_RELEASE_DATE, 1));
 		}
-		return false;
+		return 'n/A';
 	}
 
 	/**
-	 * Get the runtime of the current movie.
+	 * Returns the runtime of the current movie.
 	 */
 	public function getRuntime() {
 		if ($this->_sSource) {
-			return $this->getMatch(self::IMDB_RUNTIME, $this->_sSource);
+			return implode('', $this->getMatches(self::IMDB_RUNTIME, 1));
 		}
-		return false;
+		return 'n/A';
+	}
+
+	/**
+	 * Returns the tagline.
+	 */
+	public function getTagline() {
+		if ($this->_sSource) {
+			return implode('', $this->getMatches(self::IMDB_TAGLINE, 1));
+		}
+		return 'n/A';
 	}
 
 	/**
@@ -276,13 +407,13 @@ class IMDB {
 	 */
 	public function getTitle() {
 		if ($this->_sSource) {
-			return $this->getMatch(self::IMDB_TITLE, $this->_sSource);
+			return implode('', $this->getMatches(self::IMDB_TITLE, 1));
 		}
-		return false;
+		return 'n/A';
 	}
 
 	/**
-	 * Get the url of the current movie.
+	 * Returns the url.
 	 */
 	public function getUrl() {
 		return $this->_sUrl;
@@ -293,19 +424,9 @@ class IMDB {
 	 */
 	public function getVotes() {
 		if ($this->_sSource) {
-			return $this->getMatch(self::IMDB_VOTES, $this->_sSource);
+			return implode('', $this->getMatches(self::IMDB_VOTES, 1));
 		}
-		return false;
-	}
-
-	/**
-	 * Get the tagline of the current movie.
-	 */
-	public function getTagline() {
-		if ($this->_sSource) {
-			return $this->getMatch(self::IMDB_TAGLINE, $this->_sSource);
-		}
-		return false;
+		return 'n/A';
 	}
 
 	/**
@@ -313,34 +434,40 @@ class IMDB {
 	 */
 	public function getYear() {
 		if ($this->_sSource) {
-			return $this->getMatch(self::IMDB_TITLE, $this->_sSource, 2);
+			return implode('', $this->getMatches(self::IMDB_TITLE, 2));
 		}
-		return false;
+		return 'n/A';
 	}
 
 	/**
-	 * Download the poster, cache it and return the local path of the current movie.
+	 * Returns the writer(s).
 	 */
-	public function getPoster() {
+	public function getWriter() {
 		if ($this->_sSource) {
-			if ($sPoster = $this->saveImage($this->getMatch(self::IMDB_POSTER, $this->_sSource, 5), 'poster.jpg')) {
-				return $sPoster;
+			$sReturned = $this->getMatches(self::IMDB_WRITER, 4);
+			if (is_array($sReturned)) {
+				return implode(' / ', $sReturned);
 			}
-			return $this->getMatch(self::IMDB_POSTER, $this->_sSource, 5);
+			return $sReturned;
 		}
-		return false;
+		return 'n/A';
 	}
 
 	/**
-	 * Get the genres of the current movie.
+	 * Returns the writer(s).
 	 */
-	public function getGenre() {
+	public function getWriterAsUrl() {
 		if ($this->_sSource) {
-			preg_match_all(self::IMDB_GENRE, $this->_sSource, $arrGenre);
-			if (count($arrGenre)) {
-				return implode("/", $arrGenre[1]);
+			$sReturned1 = $this->getMatches(self::IMDB_WRITER, 4);
+			$sReturned2 = $this->getMatches(self::IMDB_WRITER, 1);
+			if (is_array($sReturned1)) {
+				foreach ($sReturned1 as $i => $sWriter) {
+					$aReturn[] = '<a href="http://www.imdb.com/name/' . $sReturned2[$i] . '/">' . $sWriter . '</a>';
+				}
+				return implode(' / ', $aReturn);
 			}
+			return '<a href="http://www.imdb.com/name/' . $sReturned2 . '/">' . $sReturned1 . '</a>';
 		}
-		return false;
+		return 'n/A';
 	}
 }
