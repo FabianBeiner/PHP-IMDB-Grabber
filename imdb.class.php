@@ -10,15 +10,17 @@
 * @author Fabian Beiner (mail [AT] fabian-beiner [DOT] de)
 * @license MIT License
 *
-* @version 4.0.1 (February 1st, 2010)
+* @version 4.1 (February 1st, 2010)
 *
 */
 
 class IMDB {
+	private $_sHeader = null;
 	private $_sSource = null;
 	private $_sUrl    = null;
 	private $_sId     = null;
 	public  $_bFound  = false;
+	private $_oCookie = '/tmp/imdb-grabber-fb.tmp';
 
 	const IMDB_CAST         = '#<a href="/name/(\w+)/" onclick="\(new Image\(\)\)\.src=\'/rg/castlist/position-(\d|\d\d)/images/b\.gif\?link=/name/(\w+)/\';">(.*)</a>#Ui';
 	const IMDB_COUNTRY      = '#<a href="/Sections/Countries/(\w+)/">#Ui';
@@ -35,7 +37,8 @@ class IMDB {
 	const IMDB_TITLE        = '#<title>(.*) \((.*)\)</title>#Ui';
 	const IMDB_URL          = '#http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)#i';
 	const IMDB_VOTES        = '#&nbsp;&nbsp;<a href="ratings" class="tn15more">(.*) votes</a>#Ui';
-	const IMDB_WRITER       = '#<a href="/name/(\w+)/" onclick="\(new Image\(\)\)\.src=\'/rg/writerlist/position-(\d|\d\d)/images/b\.gif\?link=name/(\w+)/\';">(.*)</a> \((.*)\)<br/>#Ui';
+	const IMDB_WRITER       = '#<a href="/name/(\w+)/" onclick="\(new Image\(\)\)\.src=\'/rg/writerlist/position-(\d|\d\d)/images/b\.gif\?link=name/(\w+)/\';">(.*)</a>#Ui';
+	const IMDB_REDIRECT     = '#Location: (.*)#';
 
 	/**
 	 * Public constructor.
@@ -43,6 +46,9 @@ class IMDB {
 	 * @param string $sSearch
 	 */
 	public function __construct($sSearch) {
+		if (function_exists(sys_get_temp_dir)) {
+			$this->_oCookie = tempnam(sys_get_temp_dir(), 'imdb');
+		}
 		$sUrl = $this->findUrl($sSearch);
 		if ($sUrl) {
 			$bFetch        = $this->fetchUrl($this->_sUrl);
@@ -67,10 +73,9 @@ class IMDB {
 	}
 
 	/**
-	 * Little REGEX helper.
+	 * Little REGEX helper, I should find one that works for both... ;/
 	 *
 	 * @param string $sRegex
-	 * @param string $sContent
 	 * @param int    $iIndex;
 	 */
 	private function getMatches($sRegex, $iIndex = null) {
@@ -92,7 +97,7 @@ class IMDB {
 				$bolDir = true;
 			}
 		}
-		$sFilename = getcwd() . '/posters/' . ereg_replace("[^0-9]", "", basename($this->_sUrl)) . '.jpg';
+		$sFilename = getcwd() . '/posters/' . preg_replace("#[^0-9]#", "", basename($sUrl)) . '.jpg';
 		if (file_exists($sFilename)) {
 			return 'posters/' . basename($sFilename);
 		}
@@ -138,13 +143,30 @@ class IMDB {
 		} else {
 			$sTemp    = 'http://www.imdb.com/find?s=all&q=' . str_replace(' ', '+', $sSearch) . '&x=0&y=0';
 			$bFetch   = $this->fetchUrl($sTemp);
-			if ($bFetch) {
+			if( $this->isRedirect() ) {
+				return true;
+			}
+			else if ($bFetch) {
 				if ($strMatch = $this->getMatch(self::IMDB_SEARCH, $this->_sSource)) {
 					$this->_sUrl = 'http://www.imdb.com/title/tt' . $strMatch . '/';
 					unset($this->_sSource);
 					return true;
 				}
 			}
+		}
+		return false;
+	}
+
+	/**
+	 * Find if result is redirected directly to exact movie.
+	 */
+	private function isRedirect()
+	{
+		if ($strMatch = $this->getMatch(self::IMDB_REDIRECT, $this->_sHeader)) {
+			$this->_sUrl = $strMatch;
+			unset($this->_sSource);
+			unset($this->_sHeader);
+			return true;
 		}
 		return false;
 	}
@@ -162,12 +184,17 @@ class IMDB {
 			$oCurl = curl_init($sUrl);
 			curl_setopt_array($oCurl, array (
 											CURLOPT_VERBOSE => 0,
-											CURLOPT_HEADER => 0,
+											CURLOPT_HEADER => 1,
 											CURLOPT_FRESH_CONNECT => true,
 											CURLOPT_RETURNTRANSFER => 1,
 											CURLOPT_TIMEOUT => (int)$iTimeout,
 											CURLOPT_CONNECTTIMEOUT => (int)$iTimeout,
-											CURLOPT_REFERER => $sUrl));
+											CURLOPT_REFERER => $sUrl,
+											CURLOPT_FOLLOWLOCATION => 0,
+											CURLOPT_COOKIEFILE => $this->_oCookie,
+											CURLOPT_COOKIEJAR => $this->_oCookie,
+											CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2) Gecko/20100115 Firefox/3.6'
+											));
 			$sOutput = curl_exec($oCurl);
 
 			if ($sOutput === false) {
@@ -175,11 +202,14 @@ class IMDB {
 			}
 
 			$aInfo = curl_getinfo($oCurl);
-			if ($aInfo['http_code'] != 200) {
+			if ($aInfo['http_code'] != 200 && $aInfo['http_code'] != 302) {
 				return false;
 			}
-			$this->_sSource = str_replace("\n", '', (string)$sOutput);
+			$sTmpHeader     = strpos($sOutput, "\r\n\r\n");
+			$this->_sHeader = substr($sOutput, 0, $sTmpHeader);
+			$this->_sSource = str_replace("\n", '', substr($sOutput, $sTmpHeader+1));
 			curl_close($oCurl);
+
 			return true;
 		} else {
 			$sOutput = @file_get_contents($sUrl, 0);
@@ -454,7 +484,7 @@ class IMDB {
 	}
 
 	/**
-	 * Returns the writer(s).
+	 * Returns the writer(s) as link(s).
 	 */
 	public function getWriterAsUrl() {
 		if ($this->_sSource) {
