@@ -10,7 +10,7 @@
 * @author Fabian Beiner (mail [AT] fabian-beiner [DOT] de)
 * @license MIT License
 *
-* @version 4.0 (January 30th, 2010)
+* @version 4.0.1 (February 1st, 2010)
 *
 */
 
@@ -23,7 +23,7 @@ class IMDB {
 	const IMDB_CAST         = '#<a href="/name/(\w+)/" onclick="\(new Image\(\)\)\.src=\'/rg/castlist/position-(\d|\d\d)/images/b\.gif\?link=/name/(\w+)/\';">(.*)</a>#Ui';
 	const IMDB_COUNTRY      = '#<a href="/Sections/Countries/(\w+)/">#Ui';
 	const IMDB_DIRECTOR     = '#<a href="/name/(\w+)/" onclick="\(new Image\(\)\)\.src=\'/rg/directorlist/position-(\d|\d\d)/images/b.gif\?link=name/(\w+)/\';">(.*)</a><br/>#Ui';
-	const IMDB_GENRE        = '#<a href="/Sections/Genres/(\w+)/">(\w+)</a>#Ui';
+	const IMDB_GENRE        = '#<a href="/Sections/Genres/(\w+|\w+\-\w+)/">(\w+|\w+\-\w+)</a>#Ui';
 	const IMDB_MPAA         = '#<h5><a href="/mpaa">MPAA</a>:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Ui';
 	const IMDB_PLOT         = '#<h5>Plot:</h5>\s*<div class="info-content">\s*(.*)\s*<a#Ui';
 	const IMDB_POSTER       = '#<a name="poster" href="(.*)" title="(.*)"><img border="0" alt="(.*)" title="(.*)" src="(.*)" /></a>#Ui';
@@ -35,7 +35,7 @@ class IMDB {
 	const IMDB_TITLE        = '#<title>(.*) \((.*)\)</title>#Ui';
 	const IMDB_URL          = '#http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)#i';
 	const IMDB_VOTES        = '#&nbsp;&nbsp;<a href="ratings" class="tn15more">(.*) votes</a>#Ui';
-	const IMDB_WRITER       = '#<a href="/name/(\w+)/" onclick="\(new Image\(\)\)\.src=\'/rg/writerlist/position-(\d|\d\d)/images/b\.gif\?link=name/(\w+)/\';">(.*)</a> \((\w+)\)<br/>#Ui';
+	const IMDB_WRITER       = '#<a href="/name/(\w+)/" onclick="\(new Image\(\)\)\.src=\'/rg/writerlist/position-(\d|\d\d)/images/b\.gif\?link=name/(\w+)/\';">(.*)</a> \((.*)\)<br/>#Ui';
 
 	/**
 	 * Public constructor.
