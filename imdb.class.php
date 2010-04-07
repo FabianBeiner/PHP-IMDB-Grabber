@@ -24,7 +24,7 @@ class IMDB {
 
 	const IMDB_CAST         = '#<a href="/name/(\w+)/" onclick="\(new Image\(\)\)\.src=\'/rg/castlist/position-(\d|\d\d)/images/b\.gif\?link=/name/(\w+)/\';">(.*)</a>#Ui';
 	const IMDB_COUNTRY      = '#<a href="/Sections/Countries/(\w+)/">#Ui';
-	const IMDB_DIRECTOR     = '#<a href="/name/(\w+)/" onclick="\(new Image\(\)\)\.src=\'/rg/directorlist/position-(\d|\d\d)/images/b.gif\?link=name/(\w+)/\';">(.*)</a><br/>#Ui';
+	const IMDB_DIRECTOR     = '#<a href="/name/(\w+)/" onclick="\(new Image\(\)\)\.src=\'/rg/directorlist/position-(\d|\d\d)/images/b.gif\?link=name/(\w+)/\';">(.*)</a>(.*)<br/>#Ui';
 	const IMDB_GENRE        = '#<a href="/Sections/Genres/(\w+|\w+\-\w+)/">(\w+|\w+\-\w+)</a>#Ui';
 	const IMDB_MPAA         = '#<h5><a href="/mpaa">MPAA</a>:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Ui';
 	const IMDB_PLOT         = '#<h5>Plot:</h5>\s*<div class="info-content">\s*(.*)\s*<a#Ui';
