@@ -427,7 +427,7 @@ class IMDB {
 	 */
 	public function getTagline() {
 		if ($this->_sSource) {
-			return implode('', $this->getMatches(self::IMDB_TAGLINE, 1));
+			return str_replace('See more&nbsp;&raquo;', '', strip_tags(implode('', $this->getMatches(self::IMDB_TAGLINE, 1))));
 		}
 		return 'n/A';
 	}
