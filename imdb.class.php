@@ -10,7 +10,7 @@
 * @author Fabian Beiner (mail [AT] fabian-beiner [DOT] de)
 * @license MIT License
 *
-* @version 4.1 (February 1st, 2010)
+* @version 4.2 (June 16th, 2010)
 *
 */
 
@@ -28,7 +28,7 @@ class IMDB {
 	const IMDB_GENRE        = '#<a href="/Sections/Genres/(\w+|\w+\-\w+)/">(\w+|\w+\-\w+)</a>#Ui';
 	const IMDB_MPAA         = '#<h5><a href="/mpaa">MPAA</a>:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Ui';
 	const IMDB_PLOT         = '#<h5>Plot:</h5>\s*<div class="info-content">\s*(.*)\s*<a#Ui';
-	const IMDB_POSTER       = '#<a name="poster" href="(.*)" title="(.*)"><img border="0" alt="(.*)" title="(.*)" src="(.*)" /></a>#Ui';
+	const IMDB_POSTER       = '#<link rel="image_src" href="(.*)">#Ui';
 	const IMDB_RATING       = '#<b>(\d\.\d/10)</b>#Ui';
 	const IMDB_RELEASE_DATE = '#<h5>Release Date:</h5>\s*\s*<div class="info-content">\s*(.*) \((.*)\)#Ui';
 	const IMDB_RUNTIME      = '#<h5>Runtime:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Ui';
@@ -384,10 +384,10 @@ class IMDB {
 	 */
 	public function getPoster() {
 		if ($this->_sSource) {
-			if ($sPoster = $this->saveImage(implode("", $this->getMatches(self::IMDB_POSTER, 5)), 'poster.jpg')) {
+			if ($sPoster = $this->saveImage(implode("", $this->getMatches(self::IMDB_POSTER, 1)), 'poster.jpg')) {
 				return $sPoster;
 			}
-			return implode('', $this->getMatches(self::IMDB_POSTER, 5));
+			return implode('', $this->getMatches(self::IMDB_POSTER, 1));
 		}
 		return 'n/A';
 	}
