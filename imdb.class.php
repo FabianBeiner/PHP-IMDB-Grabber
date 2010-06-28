@@ -46,7 +46,7 @@ class IMDB {
 	 * @param string $sSearch
 	 */
 	public function __construct($sSearch) {
-		if (function_exists(sys_get_temp_dir)) {
+		if (function_exists('sys_get_temp_dir')) {
 			$this->_oCookie = tempnam(sys_get_temp_dir(), 'imdb');
 		}
 		$sUrl = $this->findUrl($sSearch);
