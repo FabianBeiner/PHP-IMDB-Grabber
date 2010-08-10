@@ -96,7 +96,7 @@ class IMDB {
 			if (file_exists('posters/not-found.jpg')) {
 				return 'posters/not-found.jpg';
 			}
-			return false;
+			return 'n/A';
 		}
 
 		$bolDir = false;
