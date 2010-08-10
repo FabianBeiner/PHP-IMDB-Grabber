@@ -10,7 +10,7 @@
 * @author Fabian Beiner (mail [AT] fabian-beiner [DOT] de)
 * @license MIT License
 *
-* @version 4.2 (June 16th, 2010)
+* @version 4.3 (August 10th, 2010)
 *
 */
 
@@ -34,7 +34,7 @@ class IMDB {
 	const IMDB_RUNTIME      = '#<h5>Runtime:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Ui';
 	const IMDB_SEARCH       = '#<b>Media from&nbsp;<a href="/title/tt(\d+)/"#i';
 	const IMDB_TAGLINE      = '#<h5>Tagline:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Ui';
-	const IMDB_TITLE        = '#<title>(.*) \((.*)\)</title>#Ui';
+	const IMDB_TITLE        = '#<title>(.*) \((\d{4})\).*#Ui';
 	const IMDB_URL          = '#http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)#i';
 	const IMDB_VOTES        = '#&nbsp;&nbsp;<a href="ratings" class="tn15more">(.*) votes</a>#Ui';
 	const IMDB_WRITER       = '#<a href="/name/(\w+)/" onclick="\(new Image\(\)\)\.src=\'/rg/writerlist/position-(\d|\d\d)/images/b\.gif\?link=name/(\w+)/\';">(.*)</a>#Ui';
@@ -91,6 +91,14 @@ class IMDB {
 	 */
 	private function saveImage($sUrl) {
 		$sUrl   = trim($sUrl);
+
+		if (preg_match('/imdb-share-logo.gif/', $sUrl)) {
+			if (file_exists('posters/not-found.jpg')) {
+				return 'posters/not-found.jpg';
+			}
+			return false;
+		}
+
 		$bolDir = false;
 		if (!is_dir(getcwd() . '/posters')) {
 			if (mkdir(getcwd() . '/posters', 0777)) {
@@ -228,17 +236,15 @@ class IMDB {
 	public function getCast($iOutput = null, $bMore = true) {
 		if ($this->_sSource) {
 			$sReturned = $this->getMatches(self::IMDB_CAST, 4);
-			if (is_array($sReturned)) {
+			if (count($sReturned)) {
 				if ($iOutput) {
 					foreach ($sReturned as $i => $sName) {
 						if ($i >= $iOutput) break;
 						$sReturn[] = $sName;
 					}
-					return implode(' / ', $sReturn) . (($bMore) ? '&hellip;' : '');
+					return implode(' / ', $sReturn) . ($bMore && (count($sReturned) > $iOutput) ? '&hellip;' : '');
 				}
-				return implode(' / ', $sReturned);
 			}
-			return $sReturned;
 		}
 		return 'n/A';
 	}
@@ -250,17 +256,15 @@ class IMDB {
 		if ($this->_sSource) {
 			$sReturned1 = $this->getMatches(self::IMDB_CAST, 4);
 			$sReturned2 = $this->getMatches(self::IMDB_CAST, 3);
-			if (is_array($sReturned1)) {
+			if (count($sReturned1)) {
 				if ($iOutput) {
 					foreach ($sReturned1 as $i => $sName) {
 						if ($i >= $iOutput) break;
 						$aReturn[] = '<a href="http://www.imdb.com/name/' . $sReturned2[$i] . '/">' . $sName . '</a>';;
 					}
-					return implode(' / ', $aReturn) . (($bMore) ? '&hellip;' : '');
+					return implode(' / ', $aReturn) . ($bMore && (count($sReturned) > $iOutput) ? '&hellip;' : '');
 				}
-				return implode(' / ', $sReturned);
 			}
-			return '<a href="http://www.imdb.com/name/' . $sReturned2 . '/">' . $sReturned1 . '</a>';;
 		}
 		return 'n/A';
 	}
@@ -271,10 +275,9 @@ class IMDB {
 	public function getCountry() {
 		if ($this->_sSource) {
 			$sReturned = $this->getMatches(self::IMDB_COUNTRY, 1);
-			if (is_array($sReturned)) {
+			if (count($sReturned)) {
 				return implode(' / ', $sReturned);
 			}
-			return $sReturned;
 		}
 		return 'n/A';
 	}
@@ -285,13 +288,12 @@ class IMDB {
 	public function getCountryAsUrl() {
 		if ($this->_sSource) {
 			$sReturned = $this->getMatches(self::IMDB_COUNTRY, 1);
-			if (is_array($sReturned)) {
+			if (count($sReturned)) {
 				foreach ($sReturned as $sCountry) {
 					$aReturn[] = '<a href="http://www.imdb.com/Sections/Countries/' . $sCountry . '/">' . $sCountry . '</a>';
 				}
 				return implode(' / ', $aReturn);
 			}
-			return '<a href="http://www.imdb.com/Sections/Countries/' . $sReturned . '/">' . $sReturned . '</a>';
 		}
 		return 'n/A';
 	}
@@ -302,10 +304,9 @@ class IMDB {
 	public function getDirector() {
 		if ($this->_sSource) {
 			$sReturned = $this->getMatches(self::IMDB_DIRECTOR, 4);
-			if (is_array($sReturned)) {
+			if (count($sReturned)) {
 				return implode(' / ', $sReturned);
 			}
-			return $sReturned;
 		}
 		return 'n/A';
 	}
@@ -317,13 +318,12 @@ class IMDB {
 		if ($this->_sSource) {
 			$sReturned1 = $this->getMatches(self::IMDB_DIRECTOR, 4);
 			$sReturned2 = $this->getMatches(self::IMDB_DIRECTOR, 1);
-			if (is_array($sReturned1)) {
+			if (count($sReturned1)) {
 				foreach ($sReturned1 as $i => $sDirector) {
 					$aReturn[] = '<a href="http://www.imdb.com/name/' . $sReturned2[$i] . '/">' . $sDirector . '</a>';
 				}
 				return implode(' / ', $aReturn);
 			}
-			return '<a href="http://www.imdb.com/name/' . $sReturned2 . '/">' . $sReturned1 . '</a>';
 		}
 		return 'n/A';
 	}
@@ -334,10 +334,9 @@ class IMDB {
 	public function getGenre() {
 		if ($this->_sSource) {
 			$sReturned = $this->getMatches(self::IMDB_GENRE, 1);
-			if (is_array($sReturned)) {
+			if (count($sReturned)) {
 				return implode(' / ', $sReturned);
 			}
-			return $sReturned;
 		}
 		return 'n/A';
 	}
@@ -348,13 +347,12 @@ class IMDB {
 	public function getGenreAsUrl() {
 		if ($this->_sSource) {
 			$sReturned = $this->getMatches(self::IMDB_GENRE, 1);
-			if (is_array($sReturned)) {
+			if (count($sReturned)) {
 				foreach ($sReturned as $i => $sGenre) {
 					$aReturn[] = '<a href="http://www.imdb.com/Sections/Genres/' . $sGenre . '/">' . $sGenre . '</a>';
 				}
 				return implode(' / ', $aReturn);
 			}
-			return '<a href="http://www.imdb.com/Sections/Genres/' . $sReturned . '/">' . $sReturned . '</a>';
 		}
 		return 'n/A';
 	}
@@ -364,7 +362,10 @@ class IMDB {
 	 */
 	public function getMpaa() {
 		if ($this->_sSource) {
-			return implode('' , $this->getMatches(self::IMDB_MPAA, 1));
+			$strReturn = implode('' , $this->getMatches(self::IMDB_MPAA, 1));
+			if ($strReturn) {
+				return $strReturn;
+			}
 		}
 		return 'n/A';
 	}
@@ -374,7 +375,10 @@ class IMDB {
 	 */
 	public function getPlot() {
 		if ($this->_sSource) {
-			return implode('' , $this->getMatches(self::IMDB_PLOT, 1));
+			$strReturn = implode('' , $this->getMatches(self::IMDB_PLOT, 1));
+			if ($strReturn) {
+				return $strReturn;
+			}
 		}
 		return 'n/A';
 	}
@@ -387,7 +391,10 @@ class IMDB {
 			if ($sPoster = $this->saveImage(implode("", $this->getMatches(self::IMDB_POSTER, 1)), 'poster.jpg')) {
 				return $sPoster;
 			}
-			return implode('', $this->getMatches(self::IMDB_POSTER, 1));
+			$strReturn = implode('', $this->getMatches(self::IMDB_POSTER, 1));
+			if ($strReturn) {
+				return $strReturn;
+			}
 		}
 		return 'n/A';
 	}
@@ -397,7 +404,10 @@ class IMDB {
 	 */
 	public function getRating() {
 		if ($this->_sSource) {
-			return implode('', $this->getMatches(self::IMDB_RATING, 1));
+			$strReturn = implode('', $this->getMatches(self::IMDB_RATING, 1));
+			if ($strReturn) {
+				return $strReturn;
+			}
 		}
 		return 'n/A';
 	}
@@ -407,7 +417,10 @@ class IMDB {
 	 */
 	public function getReleaseDate() {
 		if ($this->_sSource) {
-			return implode('', $this->getMatches(self::IMDB_RELEASE_DATE, 1));
+			$strReturn = implode('', $this->getMatches(self::IMDB_RELEASE_DATE, 1));
+			if ($strReturn) {
+				return $strReturn;
+			}
 		}
 		return 'n/A';
 	}
@@ -417,7 +430,10 @@ class IMDB {
 	 */
 	public function getRuntime() {
 		if ($this->_sSource) {
-			return implode('', $this->getMatches(self::IMDB_RUNTIME, 1));
+			$strReturn = implode('', $this->getMatches(self::IMDB_RUNTIME, 1));
+			if ($strReturn) {
+				return $strReturn;
+			}
 		}
 		return 'n/A';
 	}
@@ -427,7 +443,10 @@ class IMDB {
 	 */
 	public function getTagline() {
 		if ($this->_sSource) {
-			return str_replace('See more&nbsp;&raquo;', '', strip_tags(implode('', $this->getMatches(self::IMDB_TAGLINE, 1))));
+			$strReturn = str_replace('See more&nbsp;&raquo;', '', strip_tags(implode('', $this->getMatches(self::IMDB_TAGLINE, 1))));
+			if ($strReturn) {
+				return $strReturn;
+			}
 		}
 		return 'n/A';
 	}
@@ -437,7 +456,10 @@ class IMDB {
 	 */
 	public function getTitle() {
 		if ($this->_sSource) {
-			return implode('', $this->getMatches(self::IMDB_TITLE, 1));
+			$strReturn = implode('', $this->getMatches(self::IMDB_TITLE, 1));
+			if ($strReturn) {
+				return $strReturn;
+			}
 		}
 		return 'n/A';
 	}
@@ -454,7 +476,10 @@ class IMDB {
 	 */
 	public function getVotes() {
 		if ($this->_sSource) {
-			return implode('', $this->getMatches(self::IMDB_VOTES, 1));
+			$strReturn = implode('', $this->getMatches(self::IMDB_VOTES, 1));
+			if ($strReturn) {
+				return $strReturn;
+			}
 		}
 		return 'n/A';
 	}
@@ -464,7 +489,10 @@ class IMDB {
 	 */
 	public function getYear() {
 		if ($this->_sSource) {
-			return implode('', $this->getMatches(self::IMDB_TITLE, 2));
+			$strReturn = implode('', $this->getMatches(self::IMDB_TITLE, 2));
+			if ($strReturn) {
+				return $strReturn;
+			}
 		}
 		return 'n/A';
 	}
@@ -475,10 +503,9 @@ class IMDB {
 	public function getWriter() {
 		if ($this->_sSource) {
 			$sReturned = $this->getMatches(self::IMDB_WRITER, 4);
-			if (is_array($sReturned)) {
+			if (count($sReturned)) {
 				return implode(' / ', $sReturned);
 			}
-			return $sReturned;
 		}
 		return 'n/A';
 	}
@@ -490,13 +517,12 @@ class IMDB {
 		if ($this->_sSource) {
 			$sReturned1 = $this->getMatches(self::IMDB_WRITER, 4);
 			$sReturned2 = $this->getMatches(self::IMDB_WRITER, 1);
-			if (is_array($sReturned1)) {
+			if (count($sReturned1)) {
 				foreach ($sReturned1 as $i => $sWriter) {
 					$aReturn[] = '<a href="http://www.imdb.com/name/' . $sReturned2[$i] . '/">' . $sWriter . '</a>';
 				}
 				return implode(' / ', $aReturn);
 			}
-			return '<a href="http://www.imdb.com/name/' . $sReturned2 . '/">' . $sReturned1 . '</a>';
 		}
 		return 'n/A';
 	}
