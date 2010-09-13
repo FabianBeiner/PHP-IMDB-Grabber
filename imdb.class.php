@@ -34,7 +34,7 @@ class IMDB {
 	const IMDB_RUNTIME      = '#<h5>Runtime:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Ui';
 	const IMDB_SEARCH       = '#<b>Media from&nbsp;<a href="/title/tt(\d+)/"#i';
 	const IMDB_TAGLINE      = '#<h5>Tagline:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Ui';
-	const IMDB_TITLE        = '#<title>(.*) \((\d{4})\).*#Ui';
+	const IMDB_TITLE        = '#<title>(.*) \((\d{4}).*\).*#Ui';
 	const IMDB_URL          = '#http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)#i';
 	const IMDB_VOTES        = '#&nbsp;&nbsp;<a href="ratings" class="tn15more">(.*) votes</a>#Ui';
 	const IMDB_WRITER       = '#<a href="/name/(\w+)/" onclick="\(new Image\(\)\)\.src=\'/rg/writerlist/position-(\d|\d\d)/images/b\.gif\?link=name/(\w+)/\';">(.*)</a>#Ui';
