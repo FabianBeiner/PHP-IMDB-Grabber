@@ -10,9 +10,13 @@
 * @author Fabian Beiner (mail [AT] fabian-beiner [DOT] de)
 * @license MIT License
 *
-* @version 4.3 (August 10th, 2010)
+* @version 4.4 (September 18th, 2010)
 *
 */
+
+// Enable this for error messages!
+//error_reporting(E_ALL);
+//ini_set('display_errors', '1');
 
 class IMDB {
 	private $_sHeader = null;
@@ -20,7 +24,6 @@ class IMDB {
 	private $_sUrl    = null;
 	private $_sId     = null;
 	public  $_bFound  = false;
-	private $_oCookie = '/tmp/imdb-grabber-fb.tmp';
 
 	const IMDB_CAST         = '#<a href="/name/(\w+)/" onclick="\(new Image\(\)\)\.src=\'/rg/castlist/position-(\d|\d\d)/images/b\.gif\?link=/name/(\w+)/\';">(.*)</a>#Ui';
 	const IMDB_COUNTRY      = '#<a href="/Sections/Countries/(\w+)/">#Ui';
@@ -145,7 +148,7 @@ class IMDB {
 	private function findUrl($sSearch) {
 		$sSearch = trim($sSearch);
 		if ($aUrl = $this->getMatch(self::IMDB_URL, $sSearch, 4)) {
-			$this->_sId  = 'tt' . ereg_replace('[^0-9]', '', $aUrl);
+			$this->_sId  = 'tt' . preg_replace('/[^0-9]/', '', $aUrl);
 			$this->_sUrl = 'http://www.imdb.com/title/' . $this->_sId .'/';
 			return true;
 		} else {
@@ -262,7 +265,7 @@ class IMDB {
 						if ($i >= $iOutput) break;
 						$aReturn[] = '<a href="http://www.imdb.com/name/' . $sReturned2[$i] . '/">' . $sName . '</a>';;
 					}
-					return implode(' / ', $aReturn) . ($bMore && (count($sReturned) > $iOutput) ? '&hellip;' : '');
+					return implode(' / ', $aReturn) . ($bMore && (count($sReturned1) > $iOutput) ? '&hellip;' : '');
 				}
 			}
 		}
