@@ -10,7 +10,7 @@
 * @author Fabian Beiner (mail [AT] fabian-beiner [DOT] de)
 * @license MIT License
 *
-* @version 4.4 (September 18th, 2010)
+* @version 4.4.1 (September 28th, 2010)
 *
 */
 
@@ -26,7 +26,7 @@ class IMDB {
 	public  $_bFound  = false;
 
 	const IMDB_CAST         = '#<a href="/name/(\w+)/" onclick="\(new Image\(\)\)\.src=\'/rg/castlist/position-(\d|\d\d)/images/b\.gif\?link=/name/(\w+)/\';">(.*)</a>#Ui';
-	const IMDB_COUNTRY      = '#<a href="/Sections/Countries/(\w+)/">#Ui';
+	const IMDB_COUNTRY      = '#<a href="/country/(\w+)">(\w+)</a>#Ui';
 	const IMDB_DIRECTOR     = '#<a href="/name/(\w+)/" onclick="\(new Image\(\)\)\.src=\'/rg/directorlist/position-(\d|\d\d)/images/b.gif\?link=name/(\w+)/\';">(.*)</a>(.*)<br/>#Ui';
 	const IMDB_GENRE        = '#<a href="/Sections/Genres/(\w+|\w+\-\w+)/">(\w+|\w+\-\w+)</a>#Ui';
 	const IMDB_MPAA         = '#<h5><a href="/mpaa">MPAA</a>:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Ui';
@@ -277,7 +277,7 @@ class IMDB {
 	 */
 	public function getCountry() {
 		if ($this->_sSource) {
-			$sReturned = $this->getMatches(self::IMDB_COUNTRY, 1);
+			$sReturned = $this->getMatches(self::IMDB_COUNTRY, 2);
 			if (count($sReturned)) {
 				return implode(' / ', $sReturned);
 			}
@@ -291,9 +291,10 @@ class IMDB {
 	public function getCountryAsUrl() {
 		if ($this->_sSource) {
 			$sReturned = $this->getMatches(self::IMDB_COUNTRY, 1);
+			$sReturnedClean = $this->getMatches(self::IMDB_COUNTRY, 2);
 			if (count($sReturned)) {
-				foreach ($sReturned as $sCountry) {
-					$aReturn[] = '<a href="http://www.imdb.com/Sections/Countries/' . $sCountry . '/">' . $sCountry . '</a>';
+				foreach ($sReturned as $i => $sCountry) {
+					$aReturn[] = '<a href="http://www.imdb.com/country/' . $sCountry . '/">' . $sReturnedClean[$i] . '</a>';
 				}
 				return implode(' / ', $aReturn);
 			}
