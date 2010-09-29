@@ -34,7 +34,7 @@ class IMDB {
 	const IMDB_POSTER       = '#<link rel="image_src" href="(.*)">#Ui';
 	const IMDB_RATING       = '#<b>(\d\.\d/10)</b>#Ui';
 	const IMDB_RELEASE_DATE = '#<h5>Release Date:</h5>\s*\s*<div class="info-content">\s*(.*) \((.*)\)#Ui';
-	const IMDB_RUNTIME      = '#<h5>Runtime:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Ui';
+	const IMDB_RUNTIME      = '#(\d+)\smin#Uis';
 	const IMDB_SEARCH       = '#<b>Media from&nbsp;<a href="/title/tt(\d+)/"#i';
 	const IMDB_TAGLINE      = '#<h5>Tagline:</h5>\s*<div class="info-content">\s*(.*)\s*</div>#Ui';
 	const IMDB_TITLE        = '#<title>(.*) \((\d{4}).*\).*#Ui';
@@ -171,8 +171,7 @@ class IMDB {
 	/**
 	 * Find if result is redirected directly to exact movie.
 	 */
-	private function isRedirect()
-	{
+	private function isRedirect() {
 		if ($strMatch = $this->getMatch(self::IMDB_REDIRECT, $this->_sHeader)) {
 			$this->_sUrl = $strMatch;
 			unset($this->_sSource);
@@ -434,7 +433,7 @@ class IMDB {
 	 */
 	public function getRuntime() {
 		if ($this->_sSource) {
-			$strReturn = implode('', $this->getMatches(self::IMDB_RUNTIME, 1));
+			$strReturn = $this->getMatch(self::IMDB_RUNTIME, $this->_sSource, 1);
 			if ($strReturn) {
 				return $strReturn;
 			}
