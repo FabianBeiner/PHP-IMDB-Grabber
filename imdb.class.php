@@ -10,7 +10,7 @@
 * @author Fabian Beiner (mail [AT] fabian-beiner [DOT] de)
 * @license MIT License
 *
-* @version 4.4.1 (September 28th, 2010)
+* @version 4.4.2 (September 30th, 2010)
 *
 */
 
