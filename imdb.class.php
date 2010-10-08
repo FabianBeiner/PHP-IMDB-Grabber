@@ -62,7 +62,7 @@ class IMDB {
     private $intId     = NULL;
 
     // Movie found?
-    public $isReady   = false;
+    public $isReady    = false;
 
     /**
      * IMDB constructor.
@@ -139,7 +139,7 @@ class IMDB {
         else {
             $this->strUrl = 'http://www.imdb.com/find?s=all&q=' . str_replace(' ', '+', $strSearch);
             // Check for cached redirects of this search.
-            $fRedirect = getcwd() . '/redirects/' . md5($this->strUrl);
+            $fRedirect = getcwd() . '/cache/' . md5($this->strUrl);
             if (file_exists($fRedirect) && is_readable($fRedirect)) {
                 $fRedirect = file_get_contents($fRedirect);
                 if (IMDB::IMDB_DEBUG) echo '<b>- Found an old redirect:</b> ' . $fRedirect . '<br>';
@@ -182,8 +182,8 @@ class IMDB {
             if ($strMatch = $this->matchRegex($strOutput, IMDB::IMDB_REDIRECT, 1)) {
                 if (IMDB::IMDB_DEBUG) echo '<b>- Found a redirect:</b> ' . $strMatch . '<br>';
                 // Try to save the redirect for later usage.
-                $fRedirect = getcwd() . '/redirects/' . md5($this->strUrl);
-                if (is_dir(getcwd() . '/redirects')) {
+                $fRedirect = getcwd() . '/cache/' . md5($this->strUrl);
+                if (is_dir(getcwd() . '/cache')) {
                     if (IMDB::IMDB_DEBUG) echo '<b>- Saved a new redirect:</b> ' . $strMatch . '<br>';
                     file_put_contents($fRedirect, $strMatch);
                 }
@@ -195,8 +195,8 @@ class IMDB {
                 $strMatch = 'http://www.imdb.com/title/tt' . $strMatch . '/';
                 if (IMDB::IMDB_DEBUG) echo '<b>- Using the first search result:</b> ' . $strMatch . '<br>';
                 // Try to save the redirect for later usage.
-                $fRedirect = getcwd() . '/redirects/' . md5($this->strUrl);
-                if (is_dir(getcwd() . '/redirects')) {
+                $fRedirect = getcwd() . '/cache/' . md5($this->strUrl);
+                if (is_dir(getcwd() . '/cache')) {
                     if (IMDB::IMDB_DEBUG) echo '<b>- Saved a new redirect:</b> ' . $strMatch . '<br>';
                     file_put_contents($fRedirect, $strMatch);
                 }
