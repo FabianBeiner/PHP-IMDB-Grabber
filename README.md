@@ -6,13 +6,22 @@ The script will fail as soon as IMDB changes their layout. Let me know if this h
 
 If you want to thank me for this script and the support, you can do this through PayPal (see email bellow) or just buy me something on Amazon (http://www.amazon.de/wishlist/3IAUEEEY6GD20) - **thank you**! :)
 
-## Changes (starting with v5.0.0 alpha):
+## Changes
 
+5.0.0
 - **Complete rewrite**
 - Added caching for redirects
 - Fixed ALL regular expressions according to new IMDB layout
 - Added getBudget function
 - Added debug option
+
+5.0.1
+- Renamed 'redirects' to 'cache'
+- Added a simple caching mechanism. Defaults to one day (1440 minutes). Feel free to change this: **new IMDB('Movie', 60)** (for one hour). This speeds up everything dramatically.
+- Removed /10 from rating return
+
+## Bugs?
+If you're sending me bugs, please enable debug by setting "const IMDB_DEBUG = true;" and provide me the output.
 
 ## Usage
 
