@@ -30,7 +30,7 @@ include_once 'imdb.class.php';
 $arrTests = array('Formosa Betrayed', 'New York, I Love You', 'http://us.imdb.com/Title?0144117', 'http://www.imdb.com/title/tt1022603/', 'Fabian Beiner never made a movie. Yet!');
 
 foreach ($arrTests as $strTest) {
-    $oIMDB = new IMDB($strTest);
+    $oIMDB = new IMDB($strTest, 1);
     if ($oIMDB->isReady) {
         echo '<p>Budget: <b>' . $oIMDB->getBudget() . '</b></p>';
         echo '<p>Cast (limited to 5): <b>' . $oIMDB->getCast(5) . '</b></p>';
