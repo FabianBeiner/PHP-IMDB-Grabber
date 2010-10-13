@@ -27,7 +27,7 @@
 <?php
 include_once 'imdb.class.php';
 
-$arrTests = array('Formosa Betrayed', 'New York, I Love You', 'http://us.imdb.com/Title?0144117', 'http://www.imdb.com/title/tt1022603/', 'Fabian Beiner never made a movie. Yet!');
+$arrTests = array('One Tree Hill', 'Formosa Betrayed', 'New York, I Love You', 'http://us.imdb.com/Title?0144117', 'http://www.imdb.com/title/tt1022603/', 'Fabian Beiner never made a movie. Yet!');
 
 foreach ($arrTests as $strTest) {
     $oIMDB = new IMDB($strTest, 1);
