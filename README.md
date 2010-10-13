@@ -8,6 +8,10 @@ If you want to thank me for this script and the support, you can do this through
 
 ## Changes
 
+5.0.3
+
+- Fixed regular expression for title
+
 5.0.2
 
 - Added regular expression for original title (which I prefer instead of the localized one)
