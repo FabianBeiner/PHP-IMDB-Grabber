@@ -16,7 +16,7 @@
  * @author Fabian Beiner (mail@fabian-beiner.de)
  * @license MIT License
  *
- * @version 5.0.2 (October 10th, 2010)
+ * @version 5.0.3 (October 13th, 2010)
 */
 
 class IMDB {
@@ -38,7 +38,7 @@ class IMDB {
     const IMDB_RUNTIME      = '~(\d+)\smin~Uis';
     const IMDB_SEARCH       = '~<b>Media from&nbsp;<a href="/title/tt(\d+)/"~i';
     const IMDB_TAGLINE      = '~<h4 class="inline">Taglines:</h4>(.*)(<[^>]+>)~Ui';
-    const IMDB_TITLE        = '~<title>(.*) \((\d{4}).*\).*~Ui';
+    const IMDB_TITLE        = '~<title>(.*) \((.*)\).*~Ui';
     const IMDB_TITLE_ORIG   = '~<span class="title-extra">(.*) <i>\(original title\)</i></span>~Ui';
     const IMDB_URL          = '~http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)~i';
     const IMDB_VOTES        = '~>(\d+|\d+,\d+) votes</a>\)~Ui';
@@ -724,7 +724,7 @@ class IMDB {
     public function getYear() {
         if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->strSource, IMDB::IMDB_TITLE, 2)) {
-                return $strReturn;
+                return substr(preg_replace('~[\D]~', '', $strReturn), 0, 4);
             }
             return 'n/A';
         }
