@@ -1,12 +1,22 @@
-# PHP IMDB Grabber
+# PHP IMDB.com SCRAPER
 
-This PHP class enables you to fetch / parse the most important data from IMDB.com.
+**This class can be used to retrieve data from IMDB.com with PHP.**
 
-The script will fail as soon as IMDB changes their layout. Let me know if this happens.
+The technique used is called “web scraping” (see [Wikipedia](http://en.wikipedia.org/wiki/Web_scraping "Web scraping") for details).
+Which means: If IMDB changes *anything* on their HTML, the script is going to fail (even a single space might be enough)
 
-If you want to thank me for this script and the support, you can do this through PayPal (see email bellow) or just buy me something on Amazon (http://www.amazon.de/wishlist/3IAUEEEY6GD20) - **thank you**! :)
+You might not know, but there is an IMDB API available. The problem? You will have to pay at least $15.000 to use it. Great, thank you.
+
+
+**If you want to thank me for my work and the support, feel free to do this through PayPal (use mail@fabian-beiner.de as payment destination) or just buy me a book at Amazon (http://www.amazon.de/wishlist/3IAUEEEY6GD20) – thank you! :-)**
 
 ## Changes
+
+5.0.4
+
+- Removed/cleaned some variable names
+- Fixed IMDB_POSTER regular expression
+- Changed IMDB_PLOT regular expression
 
 5.0.3
 
@@ -31,12 +41,14 @@ If you want to thank me for this script and the support, you can do this through
 - Added debug option
 
 ## Bugs?
-If you're sending me bugs, please enable debug by setting "const IMDB_DEBUG = true;" and provide me the output.
+If you run into a problem, feel free to contact me. I will help you if my time allows it. However, support is not guaranteed.
+
+I will only answer bug report if you provide me a detailed output of the failing script – please enable debug through setting "const IMDB_DEBUG = true;" in imdb.class.php.
 
 ## Usage
 
-See the imdb.example.php file.
+The usage of this script is simple. Just have a look at imdb.example.php – you will understand easily how it works.
 
 ## Example output (of imdb.example.php)
 
-![Screenshot](http://img148.imageshack.us/img148/5420/imdbd.png "Example output")
+![Screenshot](http://img801.imageshack.us/img801/3749/imdbc.png "Screenshot of imdb.example.php output")
