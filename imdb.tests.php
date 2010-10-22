@@ -27,7 +27,7 @@
 <?php
 include_once 'imdb.class.php';
 
-$arrTests = array('One Tree Hill', 'Formosa Betrayed', 'New York, I Love You', 'http://us.imdb.com/Title?0144117', 'http://www.imdb.com/title/tt1022603/', 'Fabian Beiner never made a movie. Yet!');
+$arrTests = array('North by Northwest', 'Iron Man 2', 'One Tree Hill', 'Formosa Betrayed', 'New York, I Love You', 'http://us.imdb.com/Title?0144117', 'http://www.imdb.com/title/tt1022603/', 'Fabian Beiner never made a movie. Yet!');
 
 foreach ($arrTests as $strTest) {
     $oIMDB = new IMDB($strTest, 1);
@@ -51,7 +51,7 @@ foreach ($arrTests as $strTest) {
         echo '<p>Runtime: <b>' . $oIMDB->getRuntime() . '</b></p>';
         echo '<p>Tagline: <b>' . $oIMDB->getTagline() . '</b></p>';
         echo '<p>Title: <b>' . $oIMDB->getTitle() . '</b></p>';
-        echo '<p>Url: <b>' . $oIMDB->getUrl() . '</b></p>';
+        echo '<p>Url: <b><a href="' . $oIMDB->getUrl() . '">' . $oIMDB->getUrl() . '</a></b></p>';
         echo '<p>Votes: <b>' . $oIMDB->getVotes() . '</b></p>';
         echo '<p>Year: <b>' . $oIMDB->getYear() . '</b></p>';
         echo '<p>Writers: <b>' . $oIMDB->getWriter() . '</b></p>';
