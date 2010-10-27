@@ -24,24 +24,31 @@
  * @author Fabian Beiner (mail@fabian-beiner.de)
  * @license MIT License
  *
- * @version 5.0.4 (October 22th, 2010)
+ * @version 5.1.0 (October 27th, 2010)
 */
 
+class IMDBException extends Exception {}
+
 class IMDB {
-    // Debug?
+    // Please set this to 'true' for debugging purposes only.
     const IMDB_DEBUG = false;
-    // cURL Timeout
+    // Define a timeout for the request of the IMDB page.
     const IMDB_TIMEOUT = 15;
 
-    // Regular expressions
+    // Regular expressions, I would not touch them. :)
+    const IMDB_BUDGET       = '~Budget:</h4> (.*)\(estimated\)~Ui';
     const IMDB_CAST         = '~<td class="name">\s+<a\s+href="/name/nm(\d+)/">(.*)</a>\s+</td~Ui';
     const IMDB_COUNTRY      = '~<a href="/country/(\w+)">(.*)</a>~Ui';
     const IMDB_DIRECTOR     = '~<h4 class="inline">\s+(Director|Directors):\s+</h4>(.*)</div><div~Ui';
     const IMDB_GENRE        = '~<a href="/genre/(.*)"~Ui';
+    const IMDB_LANGUAGES    = '~<a href="/language/(\w+)">(.*)</a>~Ui';
+    const IMDB_LOCATION     = '~<h4 class="inline">Filming Locations:</h4> <a href="/search/title\?locations=(.*)">(.*)</a>~Ui';
     const IMDB_MPAA         = '~<h4>Motion Picture Rating \(<a href="/mpaa">MPAA</a>\)</h4>(.*) <span~Ui';
+    const IMDB_NAME         = '~href="/name/nm(\d+)/">(.*)</a>~Ui';
     const IMDB_PLOT         = '~<h2>Storyline</h2><p>(.*)(<em class="nobr">|</p>)~Ui';
     const IMDB_POSTER       = '~href="/media/(.*)"\s+><img src="(.*)"~Ui';
     const IMDB_RATING       = '~<span class="rating-rating">(\d+\.\d+)<span>~Ui';
+    const IMDB_REDIRECT     = '~Location:\s(.*)~';
     const IMDB_RELEASE_DATE = '~Release Date:</h4>(.*)</div>~Ui';
     const IMDB_RUNTIME      = '~(\d+)\smin~Uis';
     const IMDB_SEARCH       = '~<b>Media from&nbsp;<a href="/title/tt(\d+)/"~i';
@@ -51,14 +58,9 @@ class IMDB {
     const IMDB_URL          = '~http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)~i';
     const IMDB_VOTES        = '~>(\d+|\d+,\d+) votes</a>\)~Ui';
     const IMDB_WRITER       = '~<h4 class="inline">\s+(Writer|Writers):(.*)</div><div~Ui';
-    const IMDB_REDIRECT     = '~Location:\s(.*)~';
-    const IMDB_LANGUAGES    = '~<a href="/language/(\w+)">(.*)</a>~Ui';
-    const IMDB_BUDGET       = '~Budget:</h4> (.*)\(estimated\)~Ui';
-    const IMDB_NAME         = '~href="/name/nm(\d+)/">(.*)</a>~Ui';
 
     // cURL cookie file
-    private $_fCookie  = false;
-
+    private $_fCookie   = false;
     // IMDB url
     private $_strUrl    = NULL;
     // IMDB source
@@ -69,9 +71,8 @@ class IMDB {
     private $_bolPoster = NULL;
     // IMDB cache directory
     private $_bolCache  = NULL;
-
     // Movie found?
-    public $isReady    = false;
+    public $isReady     = false;
 
     /**
      * IMDB constructor.
@@ -95,7 +96,7 @@ class IMDB {
             $this->_bolPoster = true;
         }
         else {
-            return;
+            throw new IMDBException(getcwd() . '/posters/ is not writable!');
         }
         if (!file_exists(getcwd() . '/cache/')) {
             if (mkdir(getcwd() . '/cache/', 0777)) {
@@ -106,7 +107,11 @@ class IMDB {
             $this->_bolCache = true;
         }
         else {
-            return;
+            throw new IMDBException(getcwd() . '/cache/ is not writable!');
+        }
+        // cURL.
+        if (!function_exists('curl_init')) {
+            throw new IMDBException('You need PHP with cURL enabled to use this script!');
         }
         // Debug only.
         if (IMDB::IMDB_DEBUG) {
@@ -203,7 +208,7 @@ class IMDB {
             return true;
         }
         // Check if cURL is installed.
-        elseif (function_exists('curl_init')) {
+        else {
             // Initialize and run the request.
             if (IMDB::IMDB_DEBUG) echo '<b>- Run cURL on:</b> ' . $this->_strUrl . '<br>';
             $oCurl = curl_init($this->_strUrl);
@@ -527,6 +532,39 @@ class IMDB {
         }
         return 'n/A';
     }
+
+    /**
+     * Returns the movie location.
+     *
+     * @return string The location of the movie.
+     */
+    public function getLocation() {
+        if ($this->isReady) {
+            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_LOCATION, 2)) {
+                return $strReturn;
+            }
+            return 'n/A';
+        }
+        return 'n/A';
+    }
+
+    /**
+     * Returns the movie location as URL.
+     *
+     * @return string The location of the movie as URL.
+     */
+    public function getLocationAsUrl() {
+        if ($this->isReady) {
+            $strReturn    = $this->matchRegex($this->_strSource, IMDB::IMDB_LOCATION, 2);
+            $strReturnUrl = $this->matchRegex($this->_strSource, IMDB::IMDB_LOCATION, 1);
+            if ($strReturn) {
+                return '<a href="http://www.imdb.com/search/title?locations=' . $strReturnUrl . '">' . $strReturn . '</a>';
+            }
+            return 'n/A';
+        }
+        return 'n/A';
+    }
+
 
     /**
      * Returns the MPAA.
