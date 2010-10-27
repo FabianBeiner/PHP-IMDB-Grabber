@@ -12,6 +12,12 @@ You might not know, but there is an IMDB API available. The problem? You will ha
 
 ## Changes
 
+5.1.0
+
+- Throws an exception if there is no posters/cache directory or cURL available
+- Some code cleanup
+- Added IMDB_LOCATION
+
 5.0.4
 
 - Removed/cleaned some variable names
