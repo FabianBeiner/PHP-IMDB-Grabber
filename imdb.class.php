@@ -24,7 +24,7 @@
  * @author Fabian Beiner (mail@fabian-beiner.de)
  * @license MIT License
  *
- * @version 5.1.0 (October 27th, 2010)
+ * @version 5.1.1 (November 1st, 2010)
 */
 
 class IMDBException extends Exception {}
