@@ -370,7 +370,7 @@ class IMDB {
             if (count($arrReturned[2])) {
                 foreach ($arrReturned[2] as $i => $strName) {
                     if ($i >= $intLimit) break;
-                    $arrReturn[] = '<a href="http://www.imdb.com/name/' . $arrReturned[1][$i] . '/">' . $strName . '</a>';
+                    $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . $arrReturned[1][$i] . '/">' . $strName . '</a>';
                 }
                 return implode(' / ', $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '&hellip;' : '');
             }
