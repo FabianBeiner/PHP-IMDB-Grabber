@@ -37,6 +37,8 @@ foreach ($arrTests as $strTest) {
         echo '<p>Cast as URL (default limited to 20): <b>' . $oIMDB->getCastAsUrl() . '</b></p>';
         echo '<p>Countries as URL: <b>' . $oIMDB->getCountryAsUrl() . '</b></p>';
         echo '<p>Countries: <b>' . $oIMDB->getCountry() . '</b></p>';
+        echo '<p>Creators as URL: <b>' . $oIMDB->getCreatorAsUrl() . '</b></p>';
+        echo '<p>Creators: <b>' . $oIMDB->getCreator() . '</b></p>';
         echo '<p>Directors as URL: <b>' . $oIMDB->getDirectorAsUrl() . '</b></p>';
         echo '<p>Directors: <b>' . $oIMDB->getDirector() . '</b></p>';
         echo '<p>Genres as URL: <b>' . $oIMDB->getGenreAsUrl() . '</b></p>';
@@ -51,6 +53,7 @@ foreach ($arrTests as $strTest) {
         echo '<p>Rating: <b>' . $oIMDB->getRating() . '</b></p>';
         echo '<p>Release Date: <b>' . $oIMDB->getReleaseDate() . '</b></p>';
         echo '<p>Runtime: <b>' . $oIMDB->getRuntime() . '</b></p>';
+        echo '<p>Seasons: <b>' . $oIMDB->getSeasons() . '</b></p>';
         echo '<p>Tagline: <b>' . $oIMDB->getTagline() . '</b></p>';
         echo '<p>Title: <b>' . $oIMDB->getTitle() . '</b></p>';
         echo '<p>Url: <b><a href="' . $oIMDB->getUrl() . '">' . $oIMDB->getUrl() . '</a></b></p>';
