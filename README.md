@@ -1,6 +1,7 @@
 # PHP IMDB.com SCRAPER
 
 **This class can be used to retrieve data from IMDB.com with PHP.**
+It's a proof of concept, don't use it, since IMDB rules don't allow it!
 
 The technique used is called “web scraping” (see [Wikipedia](http://en.wikipedia.org/wiki/Web_scraping "Web scraping") for details).
 Which means: If IMDB changes *anything* on their HTML, the script is going to fail (even a single space might be enough)
@@ -11,6 +12,10 @@ You might not know, but there is an IMDB API available. The problem? You will ha
 **If you want to thank me for my work and the support, feel free to do this through PayPal (use mail@fabian-beiner.de as payment destination) or just buy me a book at Amazon (http://www.amazon.de/wishlist/3IAUEEEY6GD20) – thank you! :-)**
 
 ## Changes
+
+5.2.0
+
+- Added series functions getSeasons() and getCreator()/getCreatorAsUrl() *(Coded by mali11011)*
 
 5.1.1
 
