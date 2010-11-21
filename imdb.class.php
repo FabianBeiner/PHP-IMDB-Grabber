@@ -40,6 +40,8 @@ class IMDB {
     const IMDB_CAST         = '~<td class="name">\s+<a\s+href="/name/nm(\d+)/">(.*)</a>\s+</td~Ui';
     const IMDB_COUNTRY      = '~<a href="/country/(\w+)">(.*)</a>~Ui';
     const IMDB_DIRECTOR     = '~<h4 class="inline">\s+(Director|Directors):\s+</h4>(.*)</div><div~Ui';
+    const IMDB_CREATOR      = '~<h4 class="inline">\s+(Creator|Creators):\s+</h4>(.*)</div><div~Ui';
+    const IMDB_SEASONS      = '~<h4 class="inline">Season: </h4><span class="see-more inline">(.*)</div><div~Ui';
     const IMDB_GENRE        = '~<a href="/genre/(.*)"~Ui';
     const IMDB_LANGUAGES    = '~<a href="/language/(\w+)">(.*)</a>~Ui';
     const IMDB_LOCATION     = '~<h4 class="inline">Filming Locations:</h4> <a href="/search/title\?locations=(.*)">(.*)</a>~Ui';
@@ -58,7 +60,7 @@ class IMDB {
     const IMDB_URL          = '~http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)~i';
     const IMDB_VOTES        = '~>(\d+|\d+,\d+) votes</a>\)~Ui';
     const IMDB_WRITER       = '~<h4 class="inline">\s+(Writer|Writers):(.*)</div><div~Ui';
-
+    
     // cURL cookie file
     private $_fCookie   = false;
     // IMDB url
@@ -456,6 +458,49 @@ class IMDB {
         }
         return 'n/A';
     }
+    
+    
+    /**
+     * Yapımcı(lar)ı bul.
+     *
+     * @return array yapımcı(lar).
+     */
+    public function getCreator() {
+        if ($this->isReady) {
+            $strContainer = $this->matchRegex($this->_strSource, IMDB::IMDB_CREATOR, 2);
+            $arrReturned  = $this->matchRegex($strContainer, IMDB::IMDB_NAME);
+            if (count($arrReturned[2])) {
+                foreach ($arrReturned[2] as $i => $strName) {
+                    $arrReturn[] = $strName;
+                }
+                return implode(' / ', $arrReturn);
+            }
+            return 'n/A';
+        }
+        return 'n/A';
+    }
+
+    /**
+     * Yapımcı(lar)ı bul link olarak.
+     *
+     * @return array yapımcı(lar) link olarak.
+     */
+    public function getCreatorAsUrl() {
+        if ($this->isReady) {
+            $strContainer = $this->matchRegex($this->_strSource, IMDB::IMDB_CREATOR, 2);
+            $arrReturned = $this->matchRegex($strContainer, IMDB::IMDB_NAME);
+            if (count($arrReturned[2])) {
+                foreach ($arrReturned[2] as $i => $strName) {
+                    $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . $arrReturned[1][$i] . '/">' . $strName . '</a>';
+                }
+                return implode(' / ', $arrReturn);
+            }
+            return 'n/A';
+        }
+        return 'n/A';
+    }
+    
+    
 
     /**
      * Returns the genre(s).
@@ -773,4 +818,28 @@ class IMDB {
         }
         return 'n/A';
     }
+    
+    
+     /**
+     * Returns the seasons.
+     *
+     * @return string The seasons.
+     */
+    public function getSeasons() {
+        if ($this->isReady) {
+            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_SEASONS)) {
+                $strReturn = strip_tags(implode($strReturn[1]));
+                $strFind = array('&raquo;','&nbsp;','Full episode list',' ');
+                $strReturn = str_replace($strFind,'',$strReturn);
+                $arrReturn = explode('|',$strReturn);
+                unset($arrReturn[(count($arrReturn)-1)]);
+                return implode(' / ', $arrReturn);             
+            }
+            return 'n/A';
+        }
+        return 'n/A';
+    }
+    
 }
+
+
