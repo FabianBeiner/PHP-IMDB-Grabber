@@ -24,7 +24,7 @@
  * @author Fabian Beiner (mail@fabian-beiner.de)
  * @license MIT License
  *
- * @version 5.1.1 (November 1st, 2010)
+ * @version 5.2.0 (November 21th, 2010)
 */
 
 class IMDBException extends Exception {}
@@ -39,9 +39,8 @@ class IMDB {
     const IMDB_BUDGET       = '~Budget:</h4> (.*)\(estimated\)~Ui';
     const IMDB_CAST         = '~<td class="name">\s+<a\s+href="/name/nm(\d+)/">(.*)</a>\s+</td~Ui';
     const IMDB_COUNTRY      = '~<a href="/country/(\w+)">(.*)</a>~Ui';
-    const IMDB_DIRECTOR     = '~<h4 class="inline">\s+(Director|Directors):\s+</h4>(.*)</div><div~Ui';
     const IMDB_CREATOR      = '~<h4 class="inline">\s+(Creator|Creators):\s+</h4>(.*)</div><div~Ui';
-    const IMDB_SEASONS      = '~<h4 class="inline">Season: </h4><span class="see-more inline">(.*)</div><div~Ui';
+    const IMDB_DIRECTOR     = '~<h4 class="inline">\s+(Director|Directors):\s+</h4>(.*)</div><div~Ui';
     const IMDB_GENRE        = '~<a href="/genre/(.*)"~Ui';
     const IMDB_LANGUAGES    = '~<a href="/language/(\w+)">(.*)</a>~Ui';
     const IMDB_LOCATION     = '~<h4 class="inline">Filming Locations:</h4> <a href="/search/title\?locations=(.*)">(.*)</a>~Ui';
@@ -53,6 +52,7 @@ class IMDB {
     const IMDB_REDIRECT     = '~Location:\s(.*)~';
     const IMDB_RELEASE_DATE = '~Release Date:</h4>(.*)</div>~Ui';
     const IMDB_RUNTIME      = '~(\d+)\smin~Uis';
+    const IMDB_SEASONS      = '~<h4 class="inline">Season: </h4><span class="see-more inline">(.*)</div><div~Ui';
     const IMDB_SEARCH       = '~<b>Media from&nbsp;<a href="/title/tt(\d+)/"~i';
     const IMDB_TAGLINE      = '~<h4 class="inline">Taglines:</h4>(.*)(<[^>]+>)~Ui';
     const IMDB_TITLE        = '~<title>(.*) \((.*)\).*~Ui';
@@ -60,7 +60,7 @@ class IMDB {
     const IMDB_URL          = '~http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)~i';
     const IMDB_VOTES        = '~>(\d+|\d+,\d+) votes</a>\)~Ui';
     const IMDB_WRITER       = '~<h4 class="inline">\s+(Writer|Writers):(.*)</div><div~Ui';
-    
+
     // cURL cookie file
     private $_fCookie   = false;
     // IMDB url
@@ -458,12 +458,12 @@ class IMDB {
         }
         return 'n/A';
     }
-    
-    
+
+
     /**
-     * Yapımcı(lar)ı bul.
+     * Returns the creator(s).
      *
-     * @return array yapımcı(lar).
+     * @return array The movie creator(s).
      */
     public function getCreator() {
         if ($this->isReady) {
@@ -481,9 +481,9 @@ class IMDB {
     }
 
     /**
-     * Yapımcı(lar)ı bul link olarak.
+     * Returns the creator(s) as URL.
      *
-     * @return array yapımcı(lar) link olarak.
+     * @return array The movie creator(s) as URL.
      */
     public function getCreatorAsUrl() {
         if ($this->isReady) {
@@ -499,8 +499,6 @@ class IMDB {
         }
         return 'n/A';
     }
-    
-    
 
     /**
      * Returns the genre(s).
@@ -818,28 +816,24 @@ class IMDB {
         }
         return 'n/A';
     }
-    
-    
+
      /**
      * Returns the seasons.
      *
-     * @return string The seasons.
+     * @return string The movie seasons.
      */
     public function getSeasons() {
         if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_SEASONS)) {
                 $strReturn = strip_tags(implode($strReturn[1]));
-                $strFind = array('&raquo;','&nbsp;','Full episode list',' ');
-                $strReturn = str_replace($strFind,'',$strReturn);
-                $arrReturn = explode('|',$strReturn);
+                $strFind   = array('&raquo;', '&nbsp;', 'Full episode list', ' ');
+                $strReturn = str_replace($strFind, '', $strReturn);
+                $arrReturn = explode('|', $strReturn);
                 unset($arrReturn[(count($arrReturn)-1)]);
-                return implode(' / ', $arrReturn);             
+                return implode(' / ', $arrReturn);
             }
             return 'n/A';
         }
         return 'n/A';
     }
-    
 }
-
-
