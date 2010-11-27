@@ -32,6 +32,8 @@ if ($oIMDB->isReady) {
     echo '<p>Budget: <b>' . $oIMDB->getBudget() . '</b></p>';
     echo '<p>Cast (limited to 5): <b>' . $oIMDB->getCast(5) . '</b></p>';
     echo '<p>Cast as URL (default limited to 20): <b>' . $oIMDB->getCastAsUrl() . '</b></p>';
+    echo '<p>Cast and Character (limited to 10): <b>' . $oIMDB->getCastAndCharacter(10) . '</b></p>';
+    echo '<p>Cast and Character as URL (limited to 10): <b>' . $oIMDB->getCastAndCharacterAsUrl(10) . '</b></p>';
     echo '<p>Countries as URL: <b>' . $oIMDB->getCountryAsUrl() . '</b></p>';
     echo '<p>Countries: <b>' . $oIMDB->getCountry() . '</b></p>';
     echo '<p>Creators as URL: <b>' . $oIMDB->getCreatorAsUrl() . '</b></p>';
