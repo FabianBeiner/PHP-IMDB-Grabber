@@ -24,7 +24,7 @@
  * @author Fabian Beiner (mail@fabian-beiner.de)
  * @license MIT License
  *
- * @version 5.2.0 (November 21th, 2010)
+ * @version 5.2.1 (November 27th, 2010)
 */
 
 class IMDBException extends Exception {}
@@ -38,6 +38,7 @@ class IMDB {
     // Regular expressions, I would not touch them. :)
     const IMDB_BUDGET       = '~Budget:</h4> (.*)\(estimated\)~Ui';
     const IMDB_CAST         = '~<td class="name">\s+<a\s+href="/name/nm(\d+)/">(.*)</a>\s+</td~Ui';
+    const IMDB_CHAR         = '~<td class="character">\s+<div>\s+(.*)\s+</div>\s+</td~Ui';
     const IMDB_COUNTRY      = '~<a href="/country/(\w+)">(.*)</a>~Ui';
     const IMDB_CREATOR      = '~<h4 class="inline">\s+(Creator|Creators):\s+</h4>(.*)</div><div~Ui';
     const IMDB_DIRECTOR     = '~<h4 class="inline">\s+(Director|Directors):\s+</h4>(.*)</div><div~Ui';
@@ -380,6 +381,57 @@ class IMDB {
         }
         return 'n/A';
     }
+
+    /**
+     * Returns the cast and character.
+     *
+     * @return array The movie cast and character (default limited to 20).
+     */
+    public function getCastAndCharacter($intLimit = 20, $bolMore = true) {
+        if ($this->isReady) {
+            $arrReturned = $this->matchRegex($this->_strSource, IMDB::IMDB_CAST);
+            $arrChar     = $this->matchRegex($this->_strSource, IMDB::IMDB_CHAR);
+            if (count($arrReturned[2])) {
+                foreach ($arrReturned[2] as $i => $strName) {
+                    if ($i >= $intLimit) break;
+                    $arrChar[1][$i] = preg_replace('~\((.*)\)~Ui', '', $arrChar[1][$i]);
+                    $arrReturn[] = $strName . ' as ' . strip_tags($arrChar[1][$i]);
+                }
+                return implode(' / ', $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '&hellip;' : '');
+            }
+            return 'n/A';
+        }
+        return 'n/A';
+    }
+
+    /**
+     * Returns the cast and character as URL .
+     *
+     * @return array The movie cast and character as URL (default limited to 20).
+     */
+    public function getCastAndCharacterAsUrl($intLimit = 20, $bolMore = true) {
+        if ($this->isReady) {
+            $arrReturned = $this->matchRegex($this->_strSource, IMDB::IMDB_CAST);
+            $arrChar     = $this->matchRegex($this->_strSource, IMDB::IMDB_CHAR);
+            if (count($arrReturned[2])) {
+                foreach ($arrReturned[2] as $i => $strName) {
+                    if ($i >= $intLimit) break;
+                    $arrChar[1][$i] = trim(preg_replace('~\((.*)\)~Ui', '', $arrChar[1][$i]));
+                    preg_match_all('~<a href="/character/ch(\d+)/">(.*)</a>~Ui', $arrChar[1][$i], $arrMatches);
+                    if ($arrMatches[1][0] && $arrMatches[2][0]) {
+                        $arrReturn[] = $strName . ' as <a href="http://www.imdb.com/character/ch' . $arrMatches[1][0] . '/">' . $arrMatches[2][0] . '</a>';
+                    }
+                    else {
+                        $arrReturn[] = $strName . ' as ' . strip_tags($arrChar[1][$i]);
+                    }
+                }
+                return implode(' / ', $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '&hellip;' : '');
+            }
+            return 'n/A';
+        }
+        return 'n/A';
+    }
+
 
     /**
      * Returns the countr(y|ies).
