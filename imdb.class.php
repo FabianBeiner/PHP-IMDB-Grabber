@@ -24,7 +24,7 @@
  * @author Fabian Beiner (mail@fabian-beiner.de)
  * @license MIT License
  *
- * @version 5.2.2 (November 27th, 2010)
+ * @version 5.2.3 (November 27th, 2010)
 */
 
 class IMDBException extends Exception {}
@@ -38,7 +38,8 @@ class IMDB {
     // Regular expressions, I would not touch them. :)
     const IMDB_BUDGET       = '~Budget:</h4> (.*)\(estimated\)~Ui';
     const IMDB_CAST         = '~<td class="name">\s+<a\s+href="/name/nm(\d+)/">(.*)</a>\s+</td~Ui';
-    const IMDB_CHAR         = '~<td class="character">\s+<div>\s+(.*)\s+</div>\s+</td~Ui';
+    //const IMDB_CHAR         = '~<td class="character">\s+<div>\s+(.*)\s+</div>\s+</td~Ui';
+    const IMDB_CHAR         = '~<td class="character">(.*)</td~Ui';
     const IMDB_COUNTRY      = '~<a href="/country/(\w+)">(.*)</a>~Ui';
     const IMDB_CREATOR      = '~<h4 class="inline">\s+(Creator|Creators):\s+</h4>(.*)</div><div~Ui';
     const IMDB_DIRECTOR     = '~<h4 class="inline">\s+(Director|Directors):\s+</h4>(.*)</div><div~Ui';
@@ -394,8 +395,13 @@ class IMDB {
             if (count($arrReturned[2])) {
                 foreach ($arrReturned[2] as $i => $strName) {
                     if ($i >= $intLimit) break;
-                    $arrChar[1][$i] = preg_replace('~\((.*)\)~Ui', '', $arrChar[1][$i]);
-                    $arrReturn[] = $strName . ' as ' . strip_tags($arrChar[1][$i]);
+                    $arrChar[1][$i] = trim(preg_replace('~\((.*)\)~Ui', '', strip_tags($arrChar[1][$i])));
+                    if ($arrChar[1][$i]) {
+                        $arrReturn[] = $strName . ' as ' . $arrChar[1][$i];
+                    }
+                    else {
+                        $arrReturn[] = $strName;
+                    }
                 }
                 return implode(' / ', $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '&hellip;' : '');
             }
@@ -417,12 +423,18 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     if ($i >= $intLimit) break;
                     $arrChar[1][$i] = trim(preg_replace('~\((.*)\)~Ui', '', $arrChar[1][$i]));
+                    //print_r($arrChar[1][$i]);
                     preg_match_all('~<a href="/character/ch(\d+)/">(.*)</a>~Ui', $arrChar[1][$i], $arrMatches);
                     if ($arrMatches[1][0] && $arrMatches[2][0]) {
                         $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . $arrReturned[1][$i] . '/">' . $strName . '</a> as <a href="http://www.imdb.com/character/ch' . $arrMatches[1][0] . '/">' . $arrMatches[2][0] . '</a>';
                     }
                     else {
-                        $arrReturn[] = $strName . ' as ' . strip_tags($arrChar[1][$i]);
+                        if ($arrChar[1][$i]) {
+                            $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . $arrReturned[1][$i] . '/">' . $strName . '</a> as ' . strip_tags($arrChar[1][$i]);
+                        }
+                        else {
+                            $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . $arrReturned[1][$i] . '/">' . $strName . '</a>';
+                        }
                     }
                 }
                 return implode(' / ', $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '&hellip;' : '');
