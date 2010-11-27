@@ -16,6 +16,10 @@ Did you know about the available IMDB.com API? The price to use it is around $15
 
 ## Changes
 
+5.2.3
+
+- And another fix for getCastAndCharacter(AsUrl())
+
 5.2.2
 
 - Forgot a link in getCastAndCharacterAsUrl() function
