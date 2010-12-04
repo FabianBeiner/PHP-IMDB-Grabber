@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="de">
+<html>
 <head>
   <meta charset="utf-8" />
-  <title>PHP-IMDB-Grabber by Fabian Beiner | Examples</title>
+  <title>PHP-IMDB-Grabber by Fabian Beiner | Tests</title>
   <style>
     body {
       background-color:#aaa;
@@ -27,7 +27,7 @@
 <?php
 include_once 'imdb.class.php';
 
-$arrTests = array('North by Northwest', 'Iron Man 2', 'One Tree Hill', 'Formosa Betrayed', 'New York, I Love You', 'http://us.imdb.com/Title?0144117', 'http://www.imdb.com/title/tt1022603/', 'Fabian Beiner never made a movie. Yet!');
+$arrTests = array('Wer ist Clark Rockefeller?', 'North by Northwest', 'Iron Man 2', 'One Tree Hill', 'Formosa Betrayed', 'New York, I Love You', 'http://us.imdb.com/Title?0144117', 'http://www.imdb.com/title/tt1022603/', 'Fabian Beiner never made a movie. Yet!');
 
 foreach ($arrTests as $strTest) {
     $oIMDB = new IMDB($strTest, 10);
@@ -60,6 +60,9 @@ foreach ($arrTests as $strTest) {
         echo '<p>Title: <b>' . $oIMDB->getTitle() . '</b></p>';
         echo '<p>Url: <b><a href="' . $oIMDB->getUrl() . '">' . $oIMDB->getUrl() . '</a></b></p>';
         echo '<p>Votes: <b>' . $oIMDB->getVotes() . '</b></p>';
+        echo '<p>Writers as URL: <b>' . $oIMDB->getWriterAsUrl() . '</b></p>';
+        echo '<p>Writers: <b>' . $oIMDB->getWriter() . '</b></p>';
+        echo '<p>Year: <b>' . $oIMDB->getYear() . '</b></p>';
         echo '<hr>';
     }
     else {
