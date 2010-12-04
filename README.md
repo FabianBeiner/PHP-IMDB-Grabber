@@ -16,6 +16,12 @@ Did you know about the available IMDB.com API? The price to use it is around $15
 
 ## Changes
 
+5.2.4
+
+- Fixed a few functions in imdb.class.php
+- Added gallery script *(Thanks to xsabianus)*
+- Cleaned the search script
+
 5.2.3
 
 - And another fix for getCastAndCharacter(AsUrl())
