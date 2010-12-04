@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html>
 <head>
   <meta charset="utf-8" />
   <title>PHP-IMDB-Grabber by Fabian Beiner | Examples</title>
@@ -57,6 +57,9 @@ if ($oIMDB->isReady) {
     echo '<p>Title: <b>' . $oIMDB->getTitle() . '</b></p>';
     echo '<p>Url: <b><a href="' . $oIMDB->getUrl() . '">' . $oIMDB->getUrl() . '</a></b></p>';
     echo '<p>Votes: <b>' . $oIMDB->getVotes() . '</b></p>';
+    echo '<p>Writers as URL: <b>' . $oIMDB->getWriterAsUrl() . '</b></p>';
+    echo '<p>Writers: <b>' . $oIMDB->getWriter() . '</b></p>';
+    echo '<p>Year: <b>' . $oIMDB->getYear() . '</b></p>';
 }
 else {
     echo '<p>Movie not found!</p>';
