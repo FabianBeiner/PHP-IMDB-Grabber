@@ -24,7 +24,7 @@
  * @author Fabian Beiner (mail@fabian-beiner.de)
  * @license MIT License
  *
- * @version 5.2.3 (November 27th, 2010)
+ * @version 5.2.4 (December 4th, 2010)
 */
 
 class IMDBException extends Exception {}
@@ -52,7 +52,7 @@ class IMDB {
     const IMDB_POSTER       = '~href="/media/(.*)"\s+><img src="(.*)"~Ui';
     const IMDB_RATING       = '~<span class="rating-rating">(\d+\.\d+)<span>~Ui';
     const IMDB_REDIRECT     = '~Location:\s(.*)~';
-    const IMDB_RELEASE_DATE = '~Release Date:</h4>(.*)</div>~Ui';
+    const IMDB_RELEASE_DATE = '~Release Date:</h4>(.*)(<span|</div>)~Ui';
     const IMDB_RUNTIME      = '~(\d+)\smin~Uis';
     const IMDB_SEASONS      = '~<h4 class="inline">Season: </h4><span class="see-more inline">(.*)</div><div~Ui';
     const IMDB_SEARCH       = '~<b>Media from&nbsp;<a href="/title/tt(\d+)/"~i';
@@ -663,9 +663,8 @@ class IMDB {
     public function getLocationAsUrl() {
         if ($this->isReady) {
             $strReturn    = $this->matchRegex($this->_strSource, IMDB::IMDB_LOCATION, 2);
-            $strReturnUrl = $this->matchRegex($this->_strSource, IMDB::IMDB_LOCATION, 1);
             if ($strReturn) {
-                return '<a href="http://www.imdb.com/search/title?locations=' . $strReturnUrl . '">' . $strReturn . '</a>';
+                return '<a href="http://www.imdb.com/search/title?locations=' . urlencode($strReturn) . '">' . $strReturn . '</a>';
             }
             return 'n/A';
         }
@@ -894,7 +893,9 @@ class IMDB {
                 $strReturn = str_replace($strFind, '', $strReturn);
                 $arrReturn = explode('|', $strReturn);
                 unset($arrReturn[(count($arrReturn)-1)]);
-                return implode(' / ', $arrReturn);
+                if ($arrReturn) {
+                    return implode(' / ', $arrReturn);
+                }
             }
             return 'n/A';
         }
