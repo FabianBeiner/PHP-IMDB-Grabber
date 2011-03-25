@@ -12,9 +12,9 @@ margin:4px 8px 5px 0;
 -moz-border-radius:5px 5px 5px 5px;
 -khtml-border-radius:5px 5px 5px 5px;
 -webkit-border-radius:5px 5px 5px 5px;
-border-radius:5px 5px 5px 5px;  
+border-radius:5px 5px 5px 5px;
   }
-  
+
 a  img {
 display:inline;
 margin-bottom:10px;
@@ -68,8 +68,8 @@ if($endpage > $total) $endpage = $total;
 for($i=$startpage; $i < $endpage; $i++){
 echo "
 
-<a href='".$root."/".$picture[$i]."' target='_blank'>
-<img  onContextMenu='return false' src='".$root."/".$picture[$i]."' width='100'  height='100' border='0'></a>";
+<a href='http://www.imdb.com/title/tt".substr($picture[$i], 0,strrpos($picture[$i],'.'))."/' target='_blank'>
+<img  onContextMenu='return false' src='".$root."/".$picture[$i]."' width='107'  height='158' border='0'></a>";
 }
 echo"<br>";
 
