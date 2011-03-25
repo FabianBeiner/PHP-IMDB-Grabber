@@ -1,20 +1,28 @@
-# PHP IMDB.com Grabber
+# PHP IMDb.com Grabber
 
-**This class enables you to retrieve data from IMDB.com with PHP.**
+**This class enables you to retrieve data from IMDb.com with PHP.**
 
-*The script is a proof of concept. It's working, but you shouldn't use it, since IMDB does not allow this method of data grabbing!*
+*The script is a proof of concept. It's working, but you shouldn't use it, since IMDb does not allow this method of data grabbing!*
 
-The technique used is called “web scraping” (see [Wikipedia](http://en.wikipedia.org/wiki/Web_scraping "Web scraping") for details). That means: If IMDB changes anything on their HTML, the script is going to fail.
+The technique used is called “web scraping” (see [Wikipedia](http://en.wikipedia.org/wiki/Web_scraping "Web scraping") for details). That means: If IMDb changes anything on their HTML, the script is going to fail.
 
 ---
 
-Did you know about the available IMDB.com API? The price to use it is around $15.000. This might be fine for commercial projects, but it's impossible to afford for private/non-commercial ones.
+Did you know about the available IMDb.com API? The price to use it is around $15.000. This might be fine for commercial projects, but it's impossible to afford for private/non-commercial ones.
 
 ---
 
 **If you want to thank me for my work and the support, feel free to do this through PayPal (use mail@fabian-beiner.de as payment destination) or just buy me a book at Amazon (http://www.amazon.de/wishlist/3IAUEEEY6GD20) – thank you! :-)**
 
 ## Changes
+
+5.3.0
+
+- Added ".redir"-suffix to the redirect caches
+- Naming local posters is using the movie id now (instead of a cryptic md5 hash)
+- Added variable to specific a string to return if movie is not found ($strNotFound)
+- Removing cookie after it's not used anymore
+- Some code tweaks
 
 5.2.4
 
@@ -73,7 +81,7 @@ Did you know about the available IMDB.com API? The price to use it is around $15
 
 - **Complete rewrite**
 - Added caching for redirects
-- Fixed ALL regular expressions according to new IMDB layout
+- Fixed ALL regular expressions according to new IMDb layout
 - Added getBudget function
 - Added debug option
 
