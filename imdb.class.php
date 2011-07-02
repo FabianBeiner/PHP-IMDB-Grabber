@@ -51,7 +51,7 @@ class IMDB {
     const IMDB_NAME         = '~href="/name/nm(\d+)/">(.*)</a>~Ui';
     const IMDB_PLOT         = '~<h2>Storyline</h2><p>(.*)(<em class="nobr">|</p>)~Ui';
     const IMDB_POSTER       = '~href="/media/(.*)"\s+><img src="(.*)"~Ui';
-    const IMDB_RATING       = '~<span class="rating-rating">(\d+\.\d+)<span>~Ui';
+    const IMDB_RATING       = '~<span class="rating-rating"><span class="value".*?>(\d+\.\d+)<span>~Ui';
     const IMDB_REDIRECT     = '~Location:\s(.*)~';
     const IMDB_RELEASE_DATE = '~Release Date:</h4>(.*)(<span|</div>)~Ui';
     const IMDB_RUNTIME      = '~(\d+)\smin~Uis';
