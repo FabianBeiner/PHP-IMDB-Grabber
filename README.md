@@ -16,6 +16,11 @@ Did you know about the available IMDb.com API? The price to use it is around $15
 
 ## Changes
 
+5.3.1
+
+- Fixed IMDB_VOTES regular expression *(Thanks to hareevs)*
+- Tiny cleanup.
+
 5.3.0
 
 - Added ".redir"-suffix to the redirect caches
