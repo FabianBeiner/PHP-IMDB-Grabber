@@ -24,7 +24,7 @@
  * @author Fabian Beiner (mail@fabian-beiner.de)
  * @license MIT License
  *
- * @version 5.3.0 (March 26th, 2011)
+ * @version 5.3.1 (July 3rd, 2011)
 */
 
 class IMDBException extends Exception {}
@@ -411,7 +411,6 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     if ($i >= $intLimit) break;
                     $arrChar[1][$i] = trim(preg_replace('~\((.*)\)~Ui', '', $arrChar[1][$i]));
-                    //print_r($arrChar[1][$i]);
                     preg_match_all('~<a href="/character/ch(\d+)/">(.*)</a>~Ui', $arrChar[1][$i], $arrMatches);
                     if (isset($arrMatches[1][0]) && isset($arrMatches[2][0])) {
                         $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . $arrReturned[1][$i] . '/">' . $strName . '</a> as <a href="http://www.imdb.com/character/ch' . $arrMatches[1][0] . '/">' . $arrMatches[2][0] . '</a>';
