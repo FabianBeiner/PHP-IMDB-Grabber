@@ -24,7 +24,7 @@
  * @author Fabian Beiner (mail@fabian-beiner.de)
  * @license MIT License
  *
- * @version 5.3.1 (July 3rd, 2011)
+ * @version 5.3.2 (August 4th, 2011)
 */
 
 class IMDBException extends Exception {}
@@ -41,14 +41,14 @@ class IMDB {
     const IMDB_BUDGET       = '~Budget:</h4> (.*)\(estimated\)~Ui';
     const IMDB_CAST         = '~<td class="name">\s+<a\s+href="/name/nm(\d+)/">(.*)</a>\s+</td~Ui';
     const IMDB_CHAR         = '~<td class="character">(.*)</td~Ui';
-    const IMDB_COUNTRY      = '~<a href="/country/(\w+)">(.*)</a>~Ui';
+    const IMDB_COUNTRY      = '~<a href="/country/(\w+)"(?:>| >)(.*)</a>~Ui';
     const IMDB_CREATOR      = '~<h4 class="inline">\s+(Creator|Creators):\s+</h4>(.*)</div><div~Ui';
-    const IMDB_DIRECTOR     = '~<h4 class="inline">\s+(Director|Directors):\s+</h4>(.*)</div><div~Ui';
+    const IMDB_DIRECTOR     = '~<h4 class="inline">\s+(Director|Directors):\s+</h4>(.*)</div>~Ui';
     const IMDB_GENRE        = '~<a href="/genre/(.*)"~Ui';
-    const IMDB_LANGUAGES    = '~<a href="/language/(\w+)">(.*)</a>~Ui';
+    const IMDB_LANGUAGES    = '~<a href="/language/(\w+)" itemprop="inLanguage">(.*)</a>~Ui';
     const IMDB_LOCATION     = '~<h4 class="inline">Filming Locations:</h4> <a href="/search/title\?locations=(.*)">(.*)</a>~Ui';
-    const IMDB_MPAA         = '~<h4>Motion Picture Rating \(<a href="/mpaa">MPAA</a>\)</h4>(.*) <span~Ui';
-    const IMDB_NAME         = '~href="/name/nm(\d+)/">(.*)</a>~Ui';
+    const IMDB_MPAA         = '~<span itemprop="contentRating">(.*)</span>~Ui';
+    const IMDB_NAME         = '~href="/name/nm(\d+)/"(?:\s|\s+itemprop="\w+")>(.*)</a>~Ui';
     const IMDB_PLOT         = '~<h2>Storyline</h2><p>(.*)(<em class="nobr">|</p>)~Ui';
     const IMDB_POSTER       = '~href="/media/(.*)"\s+><img src="(.*)"~Ui';
     const IMDB_RATING       = '~<span class="rating-rating"><span class="value".*?>(\d+\.\d+)</span>~Ui';

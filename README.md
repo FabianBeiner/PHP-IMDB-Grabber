@@ -2,9 +2,9 @@
 
 **This class enables you to retrieve data from IMDb.com with PHP.**
 
-*The script is a proof of concept. It's working, but you shouldn't use it, since IMDb does not allow this method of data grabbing!*
+*The script is a proof of concept. It's working pretty well, but you shouldn't use it, since IMDb does not allow this method of data grabbing! Personally, I do not use or promote this script. You’re responsible IF you’re using it.*
 
-The technique used is called “web scraping” (see [Wikipedia](http://en.wikipedia.org/wiki/Web_scraping "Web scraping") for details). That means: If IMDb changes anything on their HTML, the script is going to fail.
+The technique used is called “[web scraping](http://en.wikipedia.org/wiki/Web_scraping "Web scraping")”. That means: If IMDb changes anything on their HTML, the script is going to fail.
 
 ---
 
@@ -12,9 +12,13 @@ Did you know about the available IMDb.com API? The price to use it is around $15
 
 ---
 
-**If you want to thank me for my work and the support, feel free to do this through PayPal (use mail@fabian-beiner.de as payment destination) or just buy me a book at Amazon (http://www.amazon.de/wishlist/3IAUEEEY6GD20) – thank you! :-)**
+**If you want to thank me for my work and the support, feel free to do this through PayPal (use mail@fabian-beiner.de as payment destination) or just buy me a book at [Amazon](http://www.amazon.de/wishlist/3IAUEEEY6GD20) – thank you! :-)**
 
 ## Changes
+
+5.3.2
+
+- Fixed Director, MPAA, Country & Language
 
 5.3.1
 
@@ -97,7 +101,7 @@ I will only answer bug report if you provide me a detailed output of the failing
 
 ## Wishes?
 
-Add your wish to the project wiki or send me an email.
+Well, normally I do not update or fix parts of this script anymore. I do update it, if one of the few givers asks me for an update. But it's very unlikely that I'll add new features for just "anyone". But feel free to add your wish to the project wiki.
 
 ## Usage
 
