@@ -24,7 +24,7 @@
  * @author Fabian Beiner (mail@fabian-beiner.de)
  * @license MIT License
  *
- * @version 5.3.2 (August 4th, 2011)
+ * @version 5.4.0 (August 20th, 2011)
 */
 
 class IMDBException extends Exception {}
@@ -41,6 +41,9 @@ class IMDB {
     const IMDB_BUDGET       = '~Budget:</h4> (.*)\(estimated\)~Ui';
     const IMDB_CAST         = '~<td class="name">\s+<a\s+href="/name/nm(\d+)/">(.*)</a>\s+</td~Ui';
     const IMDB_CHAR         = '~<td class="character">(.*)</td~Ui';
+    const IMDB_COLOR        = '~<a href="/search/title\?colors=(.*)">(.*)</a>~Ui';
+    const IMDB_COMPANY      = '~<h4 class="inline">Production Co:</h4>(.*)<span~Ui';
+    const IMDB_COMPANY_NAME = '~href="/company/co(\d+)/">(.*)</a>~Ui';
     const IMDB_COUNTRY      = '~<a href="/country/(\w+)"(?:>| >)(.*)</a>~Ui';
     const IMDB_CREATOR      = '~<h4 class="inline">\s+(Creator|Creators):\s+</h4>(.*)</div><div~Ui';
     const IMDB_DIRECTOR     = '~<h4 class="inline">\s+(Director|Directors):\s+</h4>(.*)</div>~Ui';
@@ -48,7 +51,7 @@ class IMDB {
     const IMDB_LANGUAGES    = '~<a href="/language/(\w+)" itemprop="inLanguage">(.*)</a>~Ui';
     const IMDB_LOCATION     = '~<h4 class="inline">Filming Locations:</h4> <a href="/search/title\?locations=(.*)">(.*)</a>~Ui';
     const IMDB_MPAA         = '~<span itemprop="contentRating">(.*)</span>~Ui';
-    const IMDB_NAME         = '~href="/name/nm(\d+)/"(?:\s|\s+itemprop="\w+")>(.*)</a>~Ui';
+    const IMDB_NAME         = '~href="/name/nm(\d+)/"(?:\s>|\s+itemprop="\w+">|>)(.*)</a>~Ui';
     const IMDB_PLOT         = '~<h2>Storyline</h2><p>(.*)(<em class="nobr">|</p>)~Ui';
     const IMDB_POSTER       = '~href="/media/(.*)"\s+><img src="(.*)"~Ui';
     const IMDB_RATING       = '~<span class="rating-rating"><span class="value".*?>(\d+\.\d+)</span>~Ui';
@@ -61,8 +64,8 @@ class IMDB {
     const IMDB_TITLE        = '~<title>(.*) \((.*)\).*~Ui';
     const IMDB_TITLE_ORIG   = '~<span class="title-extra">(.*) <i>\(original title\)</i></span>~Ui';
     const IMDB_URL          = '~http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)~i';
-    const IMDB_VOTES        = '~>(\d+|\d+,\d+) votes</a>\)~Ui';
-    const IMDB_WRITER       = '~<h4 class="inline">\s+(Writer|Writers):(.*)</div><div~Ui';
+    const IMDB_VOTES        = '~<span itemprop="ratingCount">(.*)</span>~Ui';
+    const IMDB_WRITER       = '~<h4 class="inline">\s+(Writer|Writers):\s+</h4>(.*)</div>~Ui';
 
     // cURL cookie file.
     private $_fCookie   = false;
@@ -431,6 +434,74 @@ class IMDB {
         return $this->strNotFound;
     }
 
+    /**
+     * Returns the color.
+     *
+     * @return string The movie color.
+     */
+    public function getColor() {
+        if ($this->isReady) {
+            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_COLOR, 2)) {
+                return $strReturn;
+            }
+            return $this->strNotFound;
+        }
+        return $this->strNotFound;
+    }
+
+    /**
+     * Returns the companies.
+     *
+     * @return array The movie companies.
+     */
+    public function getCompany() {
+        if ($this->isReady) {
+            $strContainer = $this->matchRegex($this->_strSource, IMDB::IMDB_COMPANY, 1);
+            $arrReturned  = $this->matchRegex($strContainer, IMDB::IMDB_COMPANY_NAME);
+            if (count($arrReturned[2])) {
+                foreach ($arrReturned[2] as $i => $strName) {
+                    $arrReturn[] = $strName;
+                }
+                return implode(' / ', $arrReturn);
+            }
+            return $this->strNotFound;
+        }
+        return $this->strNotFound;
+    }
+
+    /**
+     * Returns the companies as URL.
+     *
+     * @return array The movie companies as URL.
+     */
+    public function getCompanyAsUrl() {
+        if ($this->isReady) {
+            $strContainer = $this->matchRegex($this->_strSource, IMDB::IMDB_COMPANY, 1);
+            $arrReturned  = $this->matchRegex($strContainer, IMDB::IMDB_COMPANY_NAME);
+            if (count($arrReturned[2])) {
+                foreach ($arrReturned[2] as $i => $strName) {
+                    $arrReturn[] = '<a href="http://www.imdb.com/company/co' . $arrReturned[1][$i] . '/">' . $strName . '</a>';
+                }
+                return implode(' / ', $arrReturn);
+            }
+            return $this->strNotFound;
+        }
+        return $this->strNotFound;
+
+
+        if ($this->isReady) {
+            $arrReturned = $this->matchRegex($this->_strSource, IMDB::IMDB_CAST);
+            if (count($arrReturned[2])) {
+                foreach ($arrReturned[2] as $i => $strName) {
+                    if ($i >= $intLimit) break;
+                    $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . $arrReturned[1][$i] . '/">' . $strName . '</a>';
+                }
+                return implode(' / ', $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '&hellip;' : '');
+            }
+            return $this->strNotFound;
+        }
+        return $this->strNotFound;
+    }
 
     /**
      * Returns the countr(y|ies).

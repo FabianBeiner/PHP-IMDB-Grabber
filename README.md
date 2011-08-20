@@ -16,6 +16,11 @@ Did you know about the available IMDb.com API? The price to use it is around $15
 
 ## Changes
 
+5.4.1
+
+- Fixed title
+- Added getTrailer() and getAka() *(Thanks to Seifer Almasy)*
+
 5.4.0
 
 - Fixed Writer, Writer as URL and Votes
