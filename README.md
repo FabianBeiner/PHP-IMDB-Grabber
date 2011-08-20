@@ -16,6 +16,11 @@ Did you know about the available IMDb.com API? The price to use it is around $15
 
 ## Changes
 
+5.4.0
+
+- Fixed Writer, Writer as URL and Votes
+- Added getColor(), getCompany() and getCompanyAsUrl()
+
 5.3.2
 
 - Fixed Director, MPAA, Country & Language
