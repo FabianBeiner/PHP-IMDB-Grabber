@@ -24,7 +24,7 @@
  * @author Fabian Beiner (mail@fabian-beiner.de)
  * @license MIT License
  *
- * @version 5.4.0 (August 20th, 2011)
+ * @version 5.4.1 (August 25th, 2011)
 */
 
 class IMDBException extends Exception {}
@@ -38,6 +38,7 @@ class IMDB {
     const IMDB_TIMEOUT  = 15;
 
     // Regular expressions, I would not touch them. :)
+    const IMDB_AKA          = '~<h4 class="inline">Also Known As:(.*)<span~Ui';
     const IMDB_BUDGET       = '~Budget:</h4> (.*)\(estimated\)~Ui';
     const IMDB_CAST         = '~<td class="name">\s+<a\s+href="/name/nm(\d+)/">(.*)</a>\s+</td~Ui';
     const IMDB_CHAR         = '~<td class="character">(.*)</td~Ui';
@@ -61,8 +62,9 @@ class IMDB {
     const IMDB_SEARCH       = '~<b>Media from&nbsp;<a href="/title/tt(\d+)/"~i';
     const IMDB_SEASONS      = '~<h4 class="inline">Season: </h4><span class="see-more inline">(.*)</div><div~Ui';
     const IMDB_TAGLINE      = '~<h4 class="inline">Taglines:</h4>(.*)(<[^>]+>)~Ui';
-    const IMDB_TITLE        = '~<title>(.*) \((.*)\).*~Ui';
+    const IMDB_TITLE        = '~og:title\' content=\'(.*) \((.*)\).*~Ui';
     const IMDB_TITLE_ORIG   = '~<span class="title-extra">(.*) <i>\(original title\)</i></span>~Ui';
+    const IMDB_TRAILER      = '~<a href="/video/(.*)/"~Ui';
     const IMDB_URL          = '~http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)~i';
     const IMDB_VOTES        = '~<span itemprop="ratingCount">(.*)</span>~Ui';
     const IMDB_WRITER       = '~<h4 class="inline">\s+(Writer|Writers):\s+</h4>(.*)</div>~Ui';
@@ -318,6 +320,21 @@ class IMDB {
         fclose($oFile);
         return 'posters/' . $this->_strId . '.jpg';
     }
+
+    /**
+     * Returns the "also known as" name.
+     *
+     * @return string The aka name.
+     */
+    public function getAka() {
+       if ($this->isReady) {
+           if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_AKA, 1)) {
+           return $strReturn;
+           }
+           return $this->strNotFound;
+       }
+       return $this->strNotFound;
+   }
 
     /**
      * Returns the budget.
@@ -853,6 +870,20 @@ class IMDB {
             }
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_TITLE, 1)) {
                 return $strReturn;
+            }
+            return $this->strNotFound;
+        }
+        return $this->strNotFound;
+    }
+
+    /** Return the first video found (should be the trailer). Thanks to Seifer Almasy.
+     *
+     * @return string The url to the trailer.
+     */
+    public function getTrailerAsUrl() {
+       if ($this->isReady) {
+            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_TRAILER, 1)) {
+               return 'http://www.imdb.com/video/' . $strReturn . '/player';
             }
             return $this->strNotFound;
         }
