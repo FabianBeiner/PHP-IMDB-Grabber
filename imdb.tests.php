@@ -32,6 +32,7 @@ $arrTests = array('Wer ist Clark Rockefeller?', 'North by Northwest', 'Iron Man 
 foreach ($arrTests as $strTest) {
     $oIMDB = new IMDB($strTest, 10);
     if ($oIMDB->isReady) {
+        echo '<p>Also Known As: <b>' . $oIMDB->getAka() . '</b></p>';
         echo '<p>Budget: <b>' . $oIMDB->getBudget() . '</b></p>';
         echo '<p>Cast (limited to 5): <b>' . $oIMDB->getCast(5) . '</b></p>';
         echo '<p>Cast as URL (default limited to 20): <b>' . $oIMDB->getCastAsUrl() . '</b></p>';
@@ -61,6 +62,7 @@ foreach ($arrTests as $strTest) {
         echo '<p>Seasons: <b>' . $oIMDB->getSeasons() . '</b></p>';
         echo '<p>Tagline: <b>' . $oIMDB->getTagline() . '</b></p>';
         echo '<p>Title: <b>' . $oIMDB->getTitle() . '</b></p>';
+        echo '<p>Trailer: <b><a href="' . $oIMDB->getTrailerAsUrl() . '">' . $oIMDB->getTrailerAsUrl() . '</a></b></p>';
         echo '<p>Url: <b><a href="' . $oIMDB->getUrl() . '">' . $oIMDB->getUrl() . '</a></b></p>';
         echo '<p>Votes: <b>' . $oIMDB->getVotes() . '</b></p>';
         echo '<p>Writers as URL: <b>' . $oIMDB->getWriterAsUrl() . '</b></p>';
