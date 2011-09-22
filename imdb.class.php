@@ -24,7 +24,7 @@
  * @author Fabian Beiner (mail@fabian-beiner.de)
  * @license MIT License
  *
- * @version 5.4.1 (August 25th, 2011)
+ * @version 5.4.2 (September 22th, 2011)
 */
 
 class IMDBException extends Exception {}
@@ -62,9 +62,10 @@ class IMDB {
     const IMDB_SEARCH       = '~<b>Media from&nbsp;<a href="/title/tt(\d+)/"~i';
     const IMDB_SEASONS      = '~<h4 class="inline">Season: </h4><span class="see-more inline">(.*)</div><div~Ui';
     const IMDB_TAGLINE      = '~<h4 class="inline">Taglines:</h4>(.*)(<[^>]+>)~Ui';
-    const IMDB_TITLE        = '~og:title\' content=\'(.*) \((.*)\).*~Ui';
+    const IMDB_TITLE        = '~og:title" content="(.*) \((.*)\)"~Ui';
     const IMDB_TITLE_ORIG   = '~<span class="title-extra">(.*) <i>\(original title\)</i></span>~Ui';
-    const IMDB_TRAILER      = '~<a href="/video/(.*)/"~Ui';
+    const IMDB_TRAILER2     = '~<a href="/video/(.*)/"~Ui';
+    const IMDB_TRAILER      = '~href="/video/imdb/(.*)/"~Ui';
     const IMDB_URL          = '~http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)~i';
     const IMDB_VOTES        = '~<span itemprop="ratingCount">(.*)</span>~Ui';
     const IMDB_WRITER       = '~<h4 class="inline">\s+(Writer|Writers):\s+</h4>(.*)</div>~Ui';
@@ -883,7 +884,7 @@ class IMDB {
     public function getTrailerAsUrl() {
        if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_TRAILER, 1)) {
-               return 'http://www.imdb.com/video/' . $strReturn . '/player';
+               return 'http://www.imdb.com/video/imdb/' . $strReturn . '/player';
             }
             return $this->strNotFound;
         }
