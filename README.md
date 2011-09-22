@@ -16,6 +16,10 @@ Did you know about the available IMDb.com API? The price to use it is around $15
 
 ## Changes
 
+5.4.2
+
+- Fixed title and trailer
+
 5.4.1
 
 - Fixed title
