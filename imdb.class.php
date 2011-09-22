@@ -64,7 +64,6 @@ class IMDB {
     const IMDB_TAGLINE      = '~<h4 class="inline">Taglines:</h4>(.*)(<[^>]+>)~Ui';
     const IMDB_TITLE        = '~og:title" content="(.*) \((.*)\)"~Ui';
     const IMDB_TITLE_ORIG   = '~<span class="title-extra">(.*) <i>\(original title\)</i></span>~Ui';
-    const IMDB_TRAILER2     = '~<a href="/video/(.*)/"~Ui';
     const IMDB_TRAILER      = '~href="/video/imdb/(.*)/"~Ui';
     const IMDB_URL          = '~http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)~i';
     const IMDB_VOTES        = '~<span itemprop="ratingCount">(.*)</span>~Ui';
