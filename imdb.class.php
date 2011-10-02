@@ -24,7 +24,7 @@
  * @author Fabian Beiner (mail@fabian-beiner.de)
  * @license MIT License
  *
- * @version 5.4.2 (September 22th, 2011)
+ * @version 5.4.3 (October 2nd, 2011)
 */
 
 class IMDBException extends Exception {}
@@ -500,20 +500,6 @@ class IMDB {
                     $arrReturn[] = '<a href="http://www.imdb.com/company/co' . $arrReturned[1][$i] . '/">' . $strName . '</a>';
                 }
                 return implode(' / ', $arrReturn);
-            }
-            return $this->strNotFound;
-        }
-        return $this->strNotFound;
-
-
-        if ($this->isReady) {
-            $arrReturned = $this->matchRegex($this->_strSource, IMDB::IMDB_CAST);
-            if (count($arrReturned[2])) {
-                foreach ($arrReturned[2] as $i => $strName) {
-                    if ($i >= $intLimit) break;
-                    $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . $arrReturned[1][$i] . '/">' . $strName . '</a>';
-                }
-                return implode(' / ', $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '&hellip;' : '');
             }
             return $this->strNotFound;
         }
