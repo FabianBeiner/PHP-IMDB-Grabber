@@ -1,6 +1,6 @@
 <?php
 /**
- * PHP-IMDB-Grabber -- a PHP IMDb.com scraper
+ * PHP-IMDb-Grabber -- a PHP IMDb.com scraper
  *
  * This class can be used to retrieve data from IMDb.com with PHP.
  *
@@ -19,40 +19,42 @@
  * – thank you! :-)
  *
  *
- * @link http://fabian-beiner.de
- * @copyright 2011 Fabian Beiner
- * @author Fabian Beiner (mail@fabian-beiner.de)
- * @license MIT License
+ * @author  Fabian Beiner (mail@fabian-beiner.de)
+ * @link    http://fabian-beiner.de
+ * @license Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  *
- * @version 5.4.3 (October 2nd, 2011)
+ * @version 5.5.0 (January 14th, 2012)
 */
 
 class IMDBException extends Exception {}
 
 class IMDB {
     // Define what to return if something is not found.
-    public $strNotFound = 'n/A';
+    public $strNotFound  = 'n/A';
+    // Define the seperator (eg. for cast).
+    public $strSeperator = ' / ';
     // Please set this to 'true' for debugging purposes only.
-    const IMDB_DEBUG    = false;
+    const IMDB_DEBUG     = false;
     // Define a timeout for the request of the IMDb page.
-    const IMDB_TIMEOUT  = 15;
+    const IMDB_TIMEOUT   = 15;
 
     // Regular expressions, I would not touch them. :)
     const IMDB_AKA          = '~<h4 class="inline">Also Known As:(.*)<span~Ui';
-    const IMDB_BUDGET       = '~Budget:</h4> (.*)\(estimated\)~Ui';
-    const IMDB_CAST         = '~<td class="name">\s+<a\s+href="/name/nm(\d+)/">(.*)</a>\s+</td~Ui';
+    const IMDB_BUDGET       = '~Budget:</h4>(.*)\(estimated\)~Ui';
+    const IMDB_CAST         = '~<td class="name">\s+<a\s+onclick="(?:.*)"\s+href="/name/nm(\d+)/"\s+>(.*)</a>\s+</td~Ui';
     const IMDB_CHAR         = '~<td class="character">(.*)</td~Ui';
-    const IMDB_COLOR        = '~<a href="/search/title\?colors=(.*)">(.*)</a>~Ui';
+    const IMDB_COLOR        = '~href="/search/title\?colors=(?:.*)"\s+>(.*)</a>~Ui';
     const IMDB_COMPANY      = '~<h4 class="inline">Production Co:</h4>(.*)<span~Ui';
-    const IMDB_COMPANY_NAME = '~href="/company/co(\d+)/">(.*)</a>~Ui';
-    const IMDB_COUNTRY      = '~<a href="/country/(\w+)"(?:>| >)(.*)</a>~Ui';
+    const IMDB_COMPANY_NAME = '~href="/company/co(\d+)/"\s+>(.*)</a>~Ui';
+    const IMDB_COUNTRY      = '~href="/country/(\w+)"(?:>|    >)(.*)</a>~Ui';
     const IMDB_CREATOR      = '~<h4 class="inline">\s+(Creator|Creators):\s+</h4>(.*)</div><div~Ui';
-    const IMDB_DIRECTOR     = '~<h4 class="inline">\s+(Director|Directors):\s+</h4>(.*)</div>~Ui';
-    const IMDB_GENRE        = '~<a href="/genre/(.*)"~Ui';
-    const IMDB_LANGUAGES    = '~<a href="/language/(\w+)" itemprop="inLanguage">(.*)</a>~Ui';
-    const IMDB_LOCATION     = '~<h4 class="inline">Filming Locations:</h4> <a href="/search/title\?locations=(.*)">(.*)</a>~Ui';
+    const IMDB_DESCRIPTION  = '~<p itemprop="description">(.*)(?:<a |</p>)~Ui';
+    const IMDB_DIRECTOR     = '~<h4 class="inline">\s+(?:Director|Directors):\s+</h4>(.*)</div>~Ui';
+    const IMDB_GENRE        = '~href="/genre/(.*)"~Ui';
+    const IMDB_LANGUAGES    = '~href="/language/(\w+)"\s+itemprop="inLanguage"\s+>(.*)</a>~Ui';
+    const IMDB_LOCATION     = '~href="/search/title\?locations=(.+)"\s+>(.*)</a>~Ui';
     const IMDB_MPAA         = '~<span itemprop="contentRating">(.*)</span>~Ui';
-    const IMDB_NAME         = '~href="/name/nm(\d+)/"(?:\s>|\s+itemprop="\w+">|>)(.*)</a>~Ui';
+    const IMDB_NAME         = '~href="/name/nm(\d+)/"\s+(?:itemprop="(?:\w+)"\s+>|>)(.*)</a>~Ui';
     const IMDB_PLOT         = '~<h2>Storyline</h2><p>(.*)(<em class="nobr">|</p>)~Ui';
     const IMDB_POSTER       = '~href="/media/(.*)"\s+><img src="(.*)"~Ui';
     const IMDB_RATING       = '~<span class="rating-rating"><span class="value".*?>(\d+\.\d+)</span>~Ui';
@@ -67,7 +69,7 @@ class IMDB {
     const IMDB_TRAILER      = '~href="/video/imdb/(.*)/"~Ui';
     const IMDB_URL          = '~http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)~i';
     const IMDB_VOTES        = '~<span itemprop="ratingCount">(.*)</span>~Ui';
-    const IMDB_WRITER       = '~<h4 class="inline">\s+(Writer|Writers):\s+</h4>(.*)</div>~Ui';
+    const IMDB_WRITER       = '~<h4 class="inline">\s+(?:Writer|Writers):\s+</h4>(.*)</div>~Ui';
 
     // cURL cookie file.
     private $_fCookie   = false;
@@ -85,6 +87,10 @@ class IMDB {
     private $_strId     = false;
     // Movie found?
     public $isReady     = false;
+    // Define root of this script.
+    private $_strRoot   = '';
+    // Current version.
+    const IMDB_VERSION  = '5.5.0';
 
     /**
      * IMDB constructor.
@@ -93,18 +99,19 @@ class IMDB {
      * @param integer $intCache  The maximum age (in minutes) of the cache (default 1 day)
      */
     public function __construct($strSearch, $intCache = 1440) {
+        $this->_strRoot = dirname(__FILE__);
         // Posters and cache directory existant?
-        if (is_writable(getcwd() . '/posters/') || mkdir(getcwd() . '/posters/')) {
+        if (is_writable($this->_strRoot . '/posters/') || mkdir($this->_strRoot . '/posters/')) {
             $this->_bolPoster = true;
         }
         else {
-            throw new IMDBException(getcwd() . '/posters/ is not writable!');
+            throw new IMDBException($this->_strRoot . '/posters/ is not writable!');
         }
-        if (is_writable(getcwd() . '/cache/') || mkdir(getcwd() . '/cache/')) {
+        if (is_writable($this->_strRoot . '/cache/') || mkdir($this->_strRoot . '/cache/')) {
             $this->_bolCache = true;
         }
         else {
-            throw new IMDBException(getcwd() . '/cache/ is not writable!');
+            throw new IMDBException($this->_strRoot . '/cache/ is not writable!');
         }
         // cURL.
         if (!function_exists('curl_init')) {
@@ -112,9 +119,9 @@ class IMDB {
         }
         // Debug only.
         if (IMDB::IMDB_DEBUG) {
-          error_reporting(-1);
-          ini_set('display_errors', 1);
-          echo '<b>- Running:</b> IMDB::fetchUrl<br>';
+            error_reporting(-1);
+            ini_set('display_errors', 1);
+            echo '<b>- Running:</b> IMDB::fetchUrl<br>';
         }
         // Set global cache and fetch the data.
         $this->_intCache = (int)$intCache;
@@ -131,12 +138,11 @@ class IMDB {
      * @return array  The matches found
      */
     private function matchRegex($strContent, $strRegex, $intIndex = null) {
-        $arrMatches = null;
         preg_match_all($strRegex, $strContent, $arrMatches);
         if ($arrMatches === FALSE) return false;
         if ($intIndex != null && is_int($intIndex)) {
             if ($arrMatches[$intIndex]) {
-              return $arrMatches[$intIndex][0];
+                return $arrMatches[$intIndex][0];
             }
             return false;
         }
@@ -153,7 +159,7 @@ class IMDB {
         $strText = trim($strText) . ' ';
         $strText = substr($strText, 0, $intLength);
         $strText = substr($strText, 0, strrpos($strText, ' '));
-        return $strText . '&hellip;';
+        return $strText . '…';
     }
 
     /**
@@ -167,17 +173,27 @@ class IMDB {
         // Remove whitespaces.
         $strSearch = trim($strSearch);
 
+        // "Remote Debug" - so I can see which version you're running.
+        // To due people complaing about broken functions while they're
+        // using old versions. Feel free to remove this.
+        if ($strSearch == '##REMOTEDEBUG##') {
+            $strSearch = 'http://www.imdb.com/title/tt1022603/';
+            echo '<pre>Running PHP-IMDB-Grabber v' . IMDB::IMDB_VERSION . '.</pre>';
+        }
+
         // Check for a valid IMDb URL and use it, if available.
         if ($strId = IMDB::matchRegex($strSearch, IMDB::IMDB_URL, 4)) {
-            $this->_strUrl = 'http://www.imdb.com/title/tt' . preg_replace('~[\D]~', '', $strId) . '/';
             $this->_strId  = preg_replace('~[\D]~', '', $strId);
+            $this->_strUrl = 'http://www.imdb.com/title/tt' . $this->_strId . '/';
+            $bolFind       = false;
             $this->isReady = true;
         }
         // Otherwise try to find one.
         else {
             $this->_strUrl = 'http://www.imdb.com/find?s=all&q=' . str_replace(' ', '+', $strSearch);
+            $bolFind       = true;
             // Check for cached redirects of this search.
-            if ($fRedirect = @file_get_contents(getcwd() . '/cache/' . md5($this->_strUrl) . '.redir')) {
+            if ($fRedirect = @file_get_contents($this->_strRoot . '/cache/' . md5($this->_strUrl) . '.redir')) {
                 if (IMDB::IMDB_DEBUG) echo '<b>- Found an old redirect:</b> ' . $fRedirect . '<br>';
                 $this->_strUrl = trim($fRedirect);
                 $this->_strId  = preg_replace('~[\D]~', '', IMDB::matchRegex($fRedirect, IMDB::IMDB_URL, 4));
@@ -186,19 +202,19 @@ class IMDB {
         }
 
         // Check if there is a cache we can use.
-        $fCache = getcwd() . '/cache/' . md5($this->_strUrl) . '.cache';
-        $bolNewRequest = false;
+        $fCache      = $this->_strRoot . '/cache/' . md5($this->_strUrl) . '.cache';
+        $bolUseCache = false;
         if (file_exists($fCache)) {
             $intChanged = filemtime($fCache);
             $intNow     = time();
             $intDiff    = $intNow - $intChanged;
             $intCache   = $this->_intCache * 60;
             if ($intCache >= $intDiff) {
-                $bolNewRequest = true;
+                $bolUseCache = true;
             }
         }
 
-        if ($bolNewRequest) {
+        if ($bolUseCache) {
             if (IMDB::IMDB_DEBUG) echo '<b>- Using cache for ' . $strSearch . ' from ' . $fCache . '</b><br>';
             $this->_strSource = file_get_contents($fCache);
             return true;
@@ -246,8 +262,10 @@ class IMDB {
             curl_close($oCurl);
 
             // Check if there is a redirect given (IMDb sometimes does not return 301 for this...).
-            $fRedirect = getcwd() . '/cache/' . md5($this->_strUrl) . '.redir';
+            $fRedirect = $this->_strRoot . '/cache/' . md5($this->_strUrl) . '.redir';
             if ($strMatch = $this->matchRegex($strOutput, IMDB::IMDB_REDIRECT, 1)) {
+                $arrExplode = explode('?fr=', $strMatch);
+                $strMatch   = ($arrExplode[0] ? $arrExplode[0] : $strMatch);
                 if (IMDB::IMDB_DEBUG) echo '<b>- Found a redirect:</b> ' . $strMatch . '<br>';
                 // Try to save the redirect for later usage.
                 if (IMDB::IMDB_DEBUG) echo '<b>- Saved a new redirect:</b> ' . $fRedirect . '<br>';
@@ -276,7 +294,9 @@ class IMDB {
 
             // Save cache.
             if (IMDB::IMDB_DEBUG) echo '<b>- Saved a new cache:</b> ' . $fCache . '<br>';
-            file_put_contents($fCache, $this->_strSource);
+            if (!$bolFind) {
+                file_put_contents($fCache, $this->_strSource);
+            }
 
             return true;
         }
@@ -296,7 +316,7 @@ class IMDB {
             return 'posters/not-found.jpg';
         }
 
-        $strFilename = getcwd() . '/posters/' . $this->_strId . '.jpg';
+        $strFilename = $this->_strRoot . '/posters/' . $this->_strId . '.jpg';
         if (file_exists($strFilename)) {
             return 'posters/' . $this->_strId . '.jpg';
         }
@@ -327,14 +347,13 @@ class IMDB {
      * @return string The aka name.
      */
     public function getAka() {
-       if ($this->isReady) {
-           if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_AKA, 1)) {
-           return $strReturn;
-           }
-           return $this->strNotFound;
-       }
-       return $this->strNotFound;
-   }
+        if ($this->isReady) {
+            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_AKA, 1)) {
+                return trim($strReturn);
+            }
+        }
+        return $this->strNotFound;
+    }
 
     /**
      * Returns the budget.
@@ -344,9 +363,8 @@ class IMDB {
     public function getBudget() {
         if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_BUDGET, 1)) {
-                return $strReturn;
+                return trim($strReturn);
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -361,12 +379,13 @@ class IMDB {
             $arrReturned = $this->matchRegex($this->_strSource, IMDB::IMDB_CAST);
             if (count($arrReturned[2])) {
                 foreach ($arrReturned[2] as $i => $strName) {
-                    if ($i >= $intLimit) break;
-                    $arrReturn[] = $strName;
+                    if ($i >= $intLimit) {
+                        break;
+                    }
+                    $arrReturn[] = trim($strName);
                 }
-                return implode(' / ', $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '&hellip;' : '');
+                return implode($this->strSeperator, $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '…' : '');
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -381,12 +400,13 @@ class IMDB {
             $arrReturned = $this->matchRegex($this->_strSource, IMDB::IMDB_CAST);
             if (count($arrReturned[2])) {
                 foreach ($arrReturned[2] as $i => $strName) {
-                    if ($i >= $intLimit) break;
-                    $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . $arrReturned[1][$i] . '/">' . $strName . '</a>';
+                    if ($i >= $intLimit) {
+                        break;
+                    }
+                    $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . trim($arrReturned[1][$i]) . '/">' . trim($strName) . '</a>';
                 }
-                return implode(' / ', $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '&hellip;' : '');
+                return implode($this->strSeperator, $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '…' : '');
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -402,18 +422,19 @@ class IMDB {
             $arrChar     = $this->matchRegex($this->_strSource, IMDB::IMDB_CHAR);
             if (count($arrReturned[2])) {
                 foreach ($arrReturned[2] as $i => $strName) {
-                    if ($i >= $intLimit) break;
+                    if ($i >= $intLimit) {
+                        break;
+                    }
                     $arrChar[1][$i] = trim(preg_replace('~\((.*)\)~Ui', '', strip_tags($arrChar[1][$i])));
                     if ($arrChar[1][$i]) {
-                        $arrReturn[] = $strName . ' as ' . $arrChar[1][$i];
+                        $arrReturn[] = trim($strName) . ' as ' . trim($arrChar[1][$i]);
                     }
                     else {
-                        $arrReturn[] = $strName;
+                        $arrReturn[] = trim($strName);
                     }
                 }
-                return implode(' / ', $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '&hellip;' : '');
+                return implode($this->strSeperator, $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '…' : '');
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -429,24 +450,25 @@ class IMDB {
             $arrChar     = $this->matchRegex($this->_strSource, IMDB::IMDB_CHAR);
             if (count($arrReturned[2])) {
                 foreach ($arrReturned[2] as $i => $strName) {
-                    if ($i >= $intLimit) break;
+                    if ($i >= $intLimit) {
+                        break;
+                    }
                     $arrChar[1][$i] = trim(preg_replace('~\((.*)\)~Ui', '', $arrChar[1][$i]));
                     preg_match_all('~<a href="/character/ch(\d+)/">(.*)</a>~Ui', $arrChar[1][$i], $arrMatches);
                     if (isset($arrMatches[1][0]) && isset($arrMatches[2][0])) {
-                        $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . $arrReturned[1][$i] . '/">' . $strName . '</a> as <a href="http://www.imdb.com/character/ch' . $arrMatches[1][0] . '/">' . $arrMatches[2][0] . '</a>';
+                        $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . trim($arrReturned[1][$i]) . '/">' . trim($strName) . '</a> as <a href="http://www.imdb.com/character/ch' . trim($arrMatches[1][0]) . '/">' . trim($arrMatches[2][0]) . '</a>';
                     }
                     else {
                         if ($arrChar[1][$i]) {
-                            $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . $arrReturned[1][$i] . '/">' . $strName . '</a> as ' . strip_tags($arrChar[1][$i]);
+                            $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . trim($arrReturned[1][$i]) . '/">' . trim($strName) . '</a> as ' . strip_tags(trim($arrChar[1][$i]));
                         }
                         else {
-                            $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . $arrReturned[1][$i] . '/">' . $strName . '</a>';
+                            $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . trim($arrReturned[1][$i]) . '/">' . trim($strName) . '</a>';
                         }
                     }
                 }
-                return implode(' / ', $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '&hellip;' : '');
+                return implode($this->strSeperator, $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '…' : '');
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -458,10 +480,9 @@ class IMDB {
      */
     public function getColor() {
         if ($this->isReady) {
-            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_COLOR, 2)) {
+            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_COLOR, 1)) {
                 return $strReturn;
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -477,11 +498,10 @@ class IMDB {
             $arrReturned  = $this->matchRegex($strContainer, IMDB::IMDB_COMPANY_NAME);
             if (count($arrReturned[2])) {
                 foreach ($arrReturned[2] as $i => $strName) {
-                    $arrReturn[] = $strName;
+                    $arrReturn[] = trim($strName);
                 }
-                return implode(' / ', $arrReturn);
+                return implode($this->strSeperator, $arrReturn);
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -497,11 +517,10 @@ class IMDB {
             $arrReturned  = $this->matchRegex($strContainer, IMDB::IMDB_COMPANY_NAME);
             if (count($arrReturned[2])) {
                 foreach ($arrReturned[2] as $i => $strName) {
-                    $arrReturn[] = '<a href="http://www.imdb.com/company/co' . $arrReturned[1][$i] . '/">' . $strName . '</a>';
+                    $arrReturn[] = '<a href="http://www.imdb.com/company/co' . trim($arrReturned[1][$i]) . '/">' . trim($strName) . '</a>';
                 }
-                return implode(' / ', $arrReturn);
+                return implode($this->strSeperator, $arrReturn);
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -516,11 +535,10 @@ class IMDB {
             $arrReturned = $this->matchRegex($this->_strSource, IMDB::IMDB_COUNTRY);
             if (count($arrReturned[2])) {
                 foreach ($arrReturned[2] as $strName) {
-                    $arrReturn[] = $strName;
+                    $arrReturn[] = trim($strName);
                 }
-                return implode(' / ', $arrReturn);
+                return implode($this->strSeperator, $arrReturn);
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -535,55 +553,13 @@ class IMDB {
             $arrReturned = $this->matchRegex($this->_strSource, IMDB::IMDB_COUNTRY);
             if (count($arrReturned[2])) {
                 foreach ($arrReturned[2] as $i => $strName) {
-                    $arrReturn[] = '<a href="http://www.imdb.com/country/' . $arrReturned[1][$i] . '/">' . $strName . '</a>';
+                    $arrReturn[] = '<a href="http://www.imdb.com/country/' . trim($arrReturned[1][$i]) . '/">' . trim($strName) . '</a>';
                 }
-                return implode(' / ', $arrReturn);
+                return implode($this->strSeperator, $arrReturn);
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
-
-    /**
-     * Returns the director(s).
-     *
-     * @return array The movie director(s).
-     */
-    public function getDirector() {
-        if ($this->isReady) {
-            $strContainer = $this->matchRegex($this->_strSource, IMDB::IMDB_DIRECTOR, 2);
-            $arrReturned  = $this->matchRegex($strContainer, IMDB::IMDB_NAME);
-            if (count($arrReturned[2])) {
-                foreach ($arrReturned[2] as $i => $strName) {
-                    $arrReturn[] = $strName;
-                }
-                return implode(' / ', $arrReturn);
-            }
-            return $this->strNotFound;
-        }
-        return $this->strNotFound;
-    }
-
-    /**
-     * Returns the director(s) as URL.
-     *
-     * @return array The movie director(s) as URL.
-     */
-    public function getDirectorAsUrl() {
-        if ($this->isReady) {
-            $strContainer = $this->matchRegex($this->_strSource, IMDB::IMDB_DIRECTOR, 2);
-            $arrReturned = $this->matchRegex($strContainer, IMDB::IMDB_NAME);
-            if (count($arrReturned[2])) {
-                foreach ($arrReturned[2] as $i => $strName) {
-                    $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . $arrReturned[1][$i] . '/">' . $strName . '</a>';
-                }
-                return implode(' / ', $arrReturn);
-            }
-            return $this->strNotFound;
-        }
-        return $this->strNotFound;
-    }
-
 
     /**
      * Returns the creator(s).
@@ -596,11 +572,10 @@ class IMDB {
             $arrReturned  = $this->matchRegex($strContainer, IMDB::IMDB_NAME);
             if (count($arrReturned[2])) {
                 foreach ($arrReturned[2] as $i => $strName) {
-                    $arrReturn[] = $strName;
+                    $arrReturn[] = trim($strName);
                 }
-                return implode(' / ', $arrReturn);
+                return implode($this->strSeperator, $arrReturn);
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -616,11 +591,62 @@ class IMDB {
             $arrReturned = $this->matchRegex($strContainer, IMDB::IMDB_NAME);
             if (count($arrReturned[2])) {
                 foreach ($arrReturned[2] as $i => $strName) {
-                    $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . $arrReturned[1][$i] . '/">' . $strName . '</a>';
+                    $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . trim($arrReturned[1][$i]) . '/">' . trim($strName) . '</a>';
                 }
-                return implode(' / ', $arrReturn);
+                return implode($this->strSeperator, $arrReturn);
             }
-            return $this->strNotFound;
+        }
+        return $this->strNotFound;
+    }
+
+    /**
+     * Returns the description.
+     *
+     * @return string The movie description.
+     */
+    public function getDescription() {
+        if ($this->isReady) {
+            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_DESCRIPTION, 1)) {
+                return trim($strReturn);
+            }
+        }
+        return $this->strNotFound;
+    }
+
+    /**
+     * Returns the director(s).
+     *
+     * @return array The movie director(s).
+     */
+    public function getDirector() {
+        if ($this->isReady) {
+            $strContainer = $this->matchRegex($this->_strSource, IMDB::IMDB_DIRECTOR, 1);
+            $arrReturned  = $this->matchRegex($strContainer, IMDB::IMDB_NAME);
+            if (count($arrReturned[2])) {
+                foreach ($arrReturned[2] as $i => $strName) {
+                    $arrReturn[] = trim($strName);
+                }
+                return implode($this->strSeperator, $arrReturn);
+            }
+        }
+        return $this->strNotFound;
+    }
+
+    /**
+     * Returns the director(s) as URL.
+     *
+     * @return array The movie director(s) as URL.
+     */
+    public function getDirectorAsUrl() {
+        if ($this->isReady) {
+            $strContainer = $this->matchRegex($this->_strSource, IMDB::IMDB_DIRECTOR, 1);
+            $arrReturned  = $this->matchRegex($strContainer, IMDB::IMDB_NAME);
+            if (count($arrReturned[2])) {
+                foreach ($arrReturned[2] as $i => $strName) {
+                    $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . trim($arrReturned[1][$i]) . '/">' . trim($strName) . '</a>';
+                }
+                return implode($this->strSeperator, $arrReturn);
+            }
         }
         return $this->strNotFound;
     }
@@ -634,12 +660,11 @@ class IMDB {
         if ($this->isReady) {
             $arrReturned = $this->matchRegex($this->_strSource, IMDB::IMDB_GENRE);
             if (count($arrReturned[1])) {
-               foreach ($arrReturned[1] as $strName) {
-                    $arrReturn[] = $strName;
+                foreach ($arrReturned[1] as $strName) {
+                    $arrReturn[] = trim($strName);
                 }
-                return implode(' / ', $arrReturn);
+                return implode($this->strSeperator, array_unique($arrReturn));
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -654,11 +679,10 @@ class IMDB {
             $arrReturned = $this->matchRegex($this->_strSource, IMDB::IMDB_GENRE);
             if (count($arrReturned[1])) {
                foreach ($arrReturned[1] as $i => $strName) {
-                    $arrReturn[] = '<a href="http://www.imdb.com/genre/' . $strName . '/">' . $strName . '</a>';
+                    $arrReturn[] = '<a href="http://www.imdb.com/genre/' . trim($strName) . '/">' . trim($strName) . '</a>';
                 }
-                return implode(' / ', $arrReturn);
+                return implode($this->strSeperator, array_unique($arrReturn));
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -673,11 +697,10 @@ class IMDB {
             $arrReturned = $this->matchRegex($this->_strSource, IMDB::IMDB_LANGUAGES);
             if (count($arrReturned[2])) {
                 foreach ($arrReturned[2] as $strName) {
-                    $arrReturn[] = $strName;
+                    $arrReturn[] = trim($strName);
                 }
-                return implode(' / ', $arrReturn);
+                return implode($this->strSeperator, $arrReturn);
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -692,11 +715,10 @@ class IMDB {
             $arrReturned = $this->matchRegex($this->_strSource, IMDB::IMDB_LANGUAGES);
             if (count($arrReturned[2])) {
                 foreach ($arrReturned[2] as $i => $strName) {
-                    $arrReturn[] = '<a href="http://www.imdb.com/language/' . $arrReturned[1][$i] . '">' . $strName . '</a>';
+                    $arrReturn[] = '<a href="http://www.imdb.com/language/' . trim($arrReturned[1][$i]) . '">' . trim($strName) . '</a>';
                 }
-                return implode(' / ', $arrReturn);
+                return implode($this->strSeperator, $arrReturn);
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -709,9 +731,8 @@ class IMDB {
     public function getLocation() {
         if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_LOCATION, 2)) {
-                return $strReturn;
+                return trim($strReturn);
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -723,11 +744,9 @@ class IMDB {
      */
     public function getLocationAsUrl() {
         if ($this->isReady) {
-            $strReturn    = $this->matchRegex($this->_strSource, IMDB::IMDB_LOCATION, 2);
-            if ($strReturn) {
-                return '<a href="http://www.imdb.com/search/title?locations=' . urlencode($strReturn) . '">' . $strReturn . '</a>';
+            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_LOCATION, 2)) {
+                return '<a href="http://www.imdb.com/search/title?locations=' . urlencode(trim($strReturn)) . '">' . trim($strReturn) . '</a>';
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -741,9 +760,8 @@ class IMDB {
     public function getMpaa() {
         if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_MPAA, 1)) {
-                return $strReturn;
+                return trim($strReturn);
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -759,9 +777,8 @@ class IMDB {
                 if ($intLimit) {
                     return $this->getShortText($strReturn, $intLimit);
                 }
-                return $strReturn;
+                return trim($strReturn);
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -779,7 +796,6 @@ class IMDB {
                 }
                 return $strReturn;
             }
-           return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -792,9 +808,8 @@ class IMDB {
     public function getRating() {
         if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_RATING, 1)) {
-                return $strReturn;
+                return trim($strReturn);
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -807,9 +822,8 @@ class IMDB {
     public function getReleaseDate() {
         if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_RELEASE_DATE, 1)) {
-                return str_replace('(', ' (', $strReturn);
+                return str_replace('(', ' (', trim($strReturn));
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -822,9 +836,29 @@ class IMDB {
     public function getRuntime() {
         if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_RUNTIME, 1)) {
-                return $strReturn;
+                return trim($strReturn);
             }
-            return $this->strNotFound;
+        }
+        return $this->strNotFound;
+    }
+
+    /**
+     * Returns the seasons.
+     *
+     * @return string The movie seasons.
+     */
+    public function getSeasons() {
+        if ($this->isReady) {
+            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_SEASONS)) {
+                $strReturn = strip_tags(implode($strReturn[1]));
+                $strFind   = array('&raquo;', '&nbsp;', 'Full episode list', ' ');
+                $strReturn = str_replace($strFind, '', $strReturn);
+                $arrReturn = explode('|', $strReturn);
+                unset($arrReturn[(count($arrReturn)-1)]);
+                if ($arrReturn) {
+                    return implode($this->strSeperator, $arrReturn);
+                }
+            }
         }
         return $this->strNotFound;
     }
@@ -837,9 +871,8 @@ class IMDB {
     public function getTagline() {
         if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_TAGLINE, 1)) {
-                return $strReturn;
+                return trim($strReturn);
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -852,12 +885,11 @@ class IMDB {
     public function getTitle() {
         if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_TITLE_ORIG, 1)) {
-                return $strReturn;
+                return trim($strReturn);
             }
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_TITLE, 1)) {
-                return $strReturn;
+                return trim($strReturn);
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -871,7 +903,6 @@ class IMDB {
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_TRAILER, 1)) {
                return 'http://www.imdb.com/video/imdb/' . $strReturn . '/player';
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -893,9 +924,8 @@ class IMDB {
     public function getVotes() {
         if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_VOTES, 1)) {
-                return $strReturn;
+                return trim($strReturn);
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -907,15 +937,14 @@ class IMDB {
      */
     public function getWriter() {
         if ($this->isReady) {
-            $strContainer = $this->matchRegex($this->_strSource, IMDB::IMDB_WRITER, 2);
+            $strContainer = $this->matchRegex($this->_strSource, IMDB::IMDB_WRITER, 1);
             $arrReturned  = $this->matchRegex($strContainer, IMDB::IMDB_NAME);
             if (count($arrReturned[2])) {
                 foreach ($arrReturned[2] as $i => $strName) {
-                    $arrReturn[] = $strName;
+                    $arrReturn[] = trim($strName);
                 }
-                return implode(' / ', $arrReturn);
+                return implode($this->strSeperator, $arrReturn);
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -927,15 +956,14 @@ class IMDB {
      */
     public function getWriterAsUrl() {
         if ($this->isReady) {
-            $strContainer = $this->matchRegex($this->_strSource, IMDB::IMDB_WRITER, 2);
+            $strContainer = $this->matchRegex($this->_strSource, IMDB::IMDB_WRITER, 1);
             $arrReturned  = $this->matchRegex($strContainer, IMDB::IMDB_NAME);
             if (count($arrReturned[2])) {
                 foreach ($arrReturned[2] as $i => $strName) {
-                    $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . $arrReturned[1][$i] . '/">' . $strName . '</a>';
+                    $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . trim($arrReturned[1][$i]) . '/">' . trim($strName) . '</a>';
                 }
-                return implode(' / ', $arrReturn);
+                return implode($this->strSeperator, $arrReturn);
             }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
@@ -950,29 +978,6 @@ class IMDB {
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_TITLE, 2)) {
                 return substr(preg_replace('~[\D]~', '', $strReturn), 0, 4);
             }
-            return $this->strNotFound;
-        }
-        return $this->strNotFound;
-    }
-
-     /**
-     * Returns the seasons.
-     *
-     * @return string The movie seasons.
-     */
-    public function getSeasons() {
-        if ($this->isReady) {
-            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_SEASONS)) {
-                $strReturn = strip_tags(implode($strReturn[1]));
-                $strFind   = array('&raquo;', '&nbsp;', 'Full episode list', ' ');
-                $strReturn = str_replace($strFind, '', $strReturn);
-                $arrReturn = explode('|', $strReturn);
-                unset($arrReturn[(count($arrReturn)-1)]);
-                if ($arrReturn) {
-                    return implode(' / ', $arrReturn);
-                }
-            }
-            return $this->strNotFound;
         }
         return $this->strNotFound;
     }
