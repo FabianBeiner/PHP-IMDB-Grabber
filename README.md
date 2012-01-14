@@ -14,7 +14,23 @@ Did you know about the available IMDb.com API? The price to use it is around $15
 
 **If you want to thank me for my work and the support, feel free to do this through PayPal (use mail@fabian-beiner.de as payment destination) or just buy me a book at [Amazon](http://www.amazon.de/wishlist/3IAUEEEY6GD20) – thank you! :-)**
 
+## License
+
+Since verison 5.5.0 the script is licensed under [CC BY-NC-SA 3.0](http://creativecommons.org/licenses/by-nc-sa/3.0/).
+
 ## Changes
+
+5.0.0
+
+- Fixed almost every function, like Cast, Color, Company, Country, Language, Director, Writer.
+- Added $strSeperator which lets you define the seperator for lists (default is /).
+- Did some code cleaning.
+- Optimized local caching system.
+- Added a small remote debugging feature.
+- Added a trim to every possible return.
+- Added getDescription() which returns a small description given bei IMDb.
+- Changed License. Basicly: You're not allowed to use this for your commercial work.
+-
 
 5.4.3
 
