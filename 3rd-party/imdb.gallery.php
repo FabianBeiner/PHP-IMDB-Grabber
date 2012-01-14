@@ -45,7 +45,7 @@ filter: alpha(opacity=75);
 <td>
   <center>
 <?php
-$root = "posters";
+$root = "../posters";
 $take = opendir($root);
 while($picturefile = readdir($take)){
 if(is_file($root."/".$picturefile) && $picturefile != 'not-found.jpg')

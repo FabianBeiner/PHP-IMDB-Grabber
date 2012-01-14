@@ -87,7 +87,7 @@
     </form>
   </div>
 <?php
-include_once 'imdb.class.php';
+include_once '../imdb.class.php';
 
 $strSearch = @$_POST['movie_link'];
 
