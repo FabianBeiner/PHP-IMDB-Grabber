@@ -20,7 +20,7 @@ Since verison 5.5.0 the script is licensed under [CC BY-NC-SA 3.0](http://creati
 
 ## Changes
 
-5.0.0
+5.5.0
 
 - Fixed almost every function, like Cast, Color, Company, Country, Language, Director, Writer.
 - Added $strSeperator which lets you define the seperator for lists (default is /).
