@@ -39,7 +39,7 @@ class IMDB {
     const IMDB_TIMEOUT   = 15;
 
     // Regular expressions, I would not touch them. :)
-    const IMDB_AKA          = '~<h4 class="inline">Also Known As:(.*)<span~Ui';
+    const IMDB_AKA          = '~<h4 class="inline">Also Known As:</h4>(.*)<span~Ui';
     const IMDB_ASPECT_RATIO = '~<h4 class="inline">Aspect Ratio:</h4>(.*)</div>~Ui';
     const IMDB_BUDGET       = '~Budget:</h4>(.*)\(estimated\)~Ui';
     const IMDB_CAST         = '~<td class="name">\s+<a\s+onclick="(?:.*)"\s+href="/name/nm(\d+)/"\s+>(.*)</a>\s+</td~Ui';
