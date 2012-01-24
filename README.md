@@ -16,7 +16,7 @@ Did you know about the available IMDb.com API? The price to use it is around $15
 
 ## License
 
-Since verison 5.5.0 the script is licensed under [CC BY-NC-SA 3.0](http://creativecommons.org/licenses/by-nc-sa/3.0/).
+Since version 5.5.0 the script is licensed under [CC BY-NC-SA 3.0](http://creativecommons.org/licenses/by-nc-sa/3.0/).
 
 ## Changes
 
@@ -28,14 +28,14 @@ Since verison 5.5.0 the script is licensed under [CC BY-NC-SA 3.0](http://creati
 
 5.5.0
 
-- Fixed almost every function, like Cast, Color, Company, Country, Language, Director, Writer.
+- Fixed almost every function, like Cast, Color, Company, Country, Language, Director and Writer.
 - Added $strSeperator which lets you define the seperator for lists (default is /).
 - Did some code cleaning.
 - Optimized local caching system.
 - Added a small remote debugging feature.
 - Added a trim to every possible return.
-- Added getDescription() which returns a small description given bei IMDb.
-- Changed License. Basicly: You're not allowed to use this for your commercial work.
+- Added getDescription() which returns a small description given by IMDb.
+- Changed License. Which means basically: You're not allowed to use this for your commercial work.
 -
 
 5.4.3
@@ -123,7 +123,7 @@ Since verison 5.5.0 the script is licensed under [CC BY-NC-SA 3.0](http://creati
 5.0.1
 
 - Renamed 'redirects' to 'cache'
-- Added a simple caching mechanism. Defaults to one day (1440 minutes). Feel free to change this: **new IMDB('Movie', 60)** (for one hour). This speeds up everything dramatically.
+- Added a simple caching mechanism. Default is set to one day (1440 minutes). Feel free to change this: **new IMDB('Movie', 60)** (for one hour). This speeds up everything dramatically.
 - Removed /10 from rating return
 
 5.0.0
