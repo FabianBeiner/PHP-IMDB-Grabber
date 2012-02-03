@@ -20,6 +20,10 @@ Since version 5.5.0 the script is licensed under [CC BY-NC-SA 3.0](http://creati
 
 ## Changes
 
+5.5.2
+
+- Fixed getSeasons() & $_strRoot.
+
 5.5.1
 
 - Fixed a bug in the caching system.

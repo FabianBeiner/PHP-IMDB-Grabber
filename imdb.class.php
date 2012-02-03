@@ -23,7 +23,7 @@
  * @link    http://fabian-beiner.de
  * @license Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  *
- * @version 5.5.1 (January 14th, 2012)
+ * @version 5.5.2 (February 3rd, 2012)
 */
 
 class IMDBException extends Exception {}
@@ -64,7 +64,7 @@ class IMDB {
     const IMDB_RELEASE_DATE = '~Release Date:</h4>(.*)(<span|</div>)~Ui';
     const IMDB_RUNTIME      = '~(\d+)\smin~Uis';
     const IMDB_SEARCH       = '~<b>Media from&nbsp;<a href="/title/tt(\d+)/"~i';
-    const IMDB_SEASONS      = '~<h4 class="inline">Season: </h4><span class="see-more inline">(.*)</div><div~Ui';
+    const IMDB_SEASONS      = '~<h4 class="inline">Season:</h4><span class="see-more inline">(.*)</span></div>~Ui';
     const IMDB_SITES        = '~<h4 class="inline">Official Sites:</h4>(.*)</div>~Ui';
     const IMDB_SITES_A      = '~href="(.*)"\s+rel="nofollow"\s+>(.*)</a>~Ui';
     const IMDB_SOUND_MIX    = '~<h4 class="inline">Sound Mix:</h4>(.*)</div><div~Ui';
@@ -96,7 +96,7 @@ class IMDB {
     // Define root of this script.
     private $_strRoot   = '';
     // Current version.
-    const IMDB_VERSION  = '5.5.1';
+    const IMDB_VERSION  = '5.5.2';
 
     /**
      * IMDB constructor.
@@ -105,7 +105,9 @@ class IMDB {
      * @param integer $intCache  The maximum age (in minutes) of the cache (default 1 day)
      */
     public function __construct($strSearch, $intCache = 1440) {
-        $this->_strRoot = dirname(__FILE__);
+        if (!$this->_strRoot) {
+            $this->_strRoot = dirname(__FILE__);
+        }
         // Posters and cache directory existant?
         if (is_writable($this->_strRoot . '/posters/') || mkdir($this->_strRoot . '/posters/')) {
             $this->_bolPoster = true;
@@ -891,7 +893,6 @@ class IMDB {
                 $strFind   = array('&raquo;', '&nbsp;', 'Full episode list', ' ');
                 $strReturn = str_replace($strFind, '', $strReturn);
                 $arrReturn = explode('|', $strReturn);
-                unset($arrReturn[(count($arrReturn)-1)]);
                 if ($arrReturn) {
                     return implode($this->strSeperator, $arrReturn);
                 }
