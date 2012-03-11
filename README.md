@@ -20,6 +20,11 @@ Since version 5.5.0 the script is licensed under [CC BY-NC-SA 3.0](http://creati
 
 ## Changes
 
+5.5.3
+
+- Fixed getTrailerAsUrl() *(Thanks to luizrafael)*
+- Fixed imdb.tests.php
+
 5.5.2
 
 - Fixed getSeasons() & $_strRoot.

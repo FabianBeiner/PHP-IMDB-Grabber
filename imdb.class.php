@@ -23,7 +23,7 @@
  * @link    http://fabian-beiner.de
  * @license Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  *
- * @version 5.5.2 (February 3rd, 2012)
+ * @version 5.5.3 (March 11th, 2012)
 */
 
 class IMDBException extends Exception {}
@@ -72,7 +72,7 @@ class IMDB {
     const IMDB_TAGLINE      = '~<h4 class="inline">Taglines:</h4>(.*)(<[^>]+>)~Ui';
     const IMDB_TITLE        = '~og:title" content="(.*) \((.*)\)"~Ui';
     const IMDB_TITLE_ORIG   = '~<span class="title-extra">(.*) <i>\(original title\)</i></span>~Ui';
-    const IMDB_TRAILER      = '~href="/video/imdb/(.*)/"~Ui';
+    const IMDB_TRAILER      = '~href="/video/(.*)/"~Ui';
     const IMDB_URL          = '~http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)~i';
     const IMDB_VOTES        = '~<span itemprop="ratingCount">(.*)</span>~Ui';
     const IMDB_WRITER       = '~<h4 class="inline">\s+(?:Writer|Writers):\s+</h4>(.*)</div>~Ui';
@@ -96,7 +96,7 @@ class IMDB {
     // Define root of this script.
     private $_strRoot   = '';
     // Current version.
-    const IMDB_VERSION  = '5.5.2';
+    const IMDB_VERSION  = '5.5.3';
 
     /**
      * IMDB constructor.
@@ -977,7 +977,7 @@ class IMDB {
     public function getTrailerAsUrl() {
        if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_TRAILER, 1)) {
-               return 'http://www.imdb.com/video/imdb/' . $strReturn . '/player';
+                return 'http://www.imdb.com/video/' . $strReturn . '/player';
             }
         }
         return $this->strNotFound;
