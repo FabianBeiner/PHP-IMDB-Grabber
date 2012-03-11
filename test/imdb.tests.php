@@ -27,7 +27,7 @@
 <?php
 include_once '../imdb.class.php';
 
-$arrTests = array('http://www.imdb.com/title/tt2005268/', 'Wer ist Clark Rockefeller?', 'North by Northwest', 'Iron Man 2', 'One Tree Hill', 'Formosa Betrayed', 'New York, I Love You', 'http://us.imdb.com/Title?0144117', 'http://www.imdb.com/title/tt1022603/'/*, 'Fabian Beiner never made a movie. Yet!'*/);
+$arrTests = array('Wyse Guys', 'http://www.imdb.com/title/tt2005268/', 'Wer ist Clark Rockefeller?', 'North by Northwest', 'Iron Man 2', 'One Tree Hill', 'Formosa Betrayed', 'New York, I Love You', 'http://us.imdb.com/Title?0144117', 'http://www.imdb.com/title/tt1022603/'/*, 'Fabian Beiner never made a movie. Yet!'*/);
 
 foreach ($arrTests as $strTest) {
     $oIMDB = new IMDB($strTest, 10);
@@ -36,7 +36,7 @@ foreach ($arrTests as $strTest) {
         echo '<p>Aspect Ratio: <b>' . $oIMDB->getAspectRatio() . '</b></p>';
         echo '<p>Budget: <b>' . $oIMDB->getBudget() . '</b></p>';
         echo '<p>Cast (limited to 5): <b>' . $oIMDB->getCast(5) . '</b></p>';
-        echo '<p>Cast as URL (default limited to 20): <b>' . $oIMDB->getCastAsUrl('_blank') . '</b></p>';
+        echo '<p>Cast as URL (default limited to 20): <b>' . $oIMDB->getCastAsUrl(20, true, '_blank') . '</b></p>';
         echo '<p>Cast and Character (limited to 10): <b>' . $oIMDB->getCastAndCharacter(10) . '</b></p>';
         echo '<p>Cast and Character as URL (limited to 10): <b>' . $oIMDB->getCastAndCharacterAsUrl(10) . '</b></p>';
         echo '<p>Color: <b>' . $oIMDB->getColor() . '</b></p>';
