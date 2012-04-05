@@ -23,7 +23,7 @@
  * @link    http://fabian-beiner.de
  * @license Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  *
- * @version 5.5.3 (March 11th, 2012)
+ * @version 5.5.4 (April 5th, 2012)
 */
 
 class IMDBException extends Exception {}
@@ -96,7 +96,7 @@ class IMDB {
     // Define root of this script.
     private $_strRoot   = '';
     // Current version.
-    const IMDB_VERSION  = '5.5.3';
+    const IMDB_VERSION  = '5.5.4';
 
     /**
      * IMDB constructor.
@@ -893,7 +893,7 @@ class IMDB {
                 $strFind   = array('&raquo;', '&nbsp;', 'Full episode list', ' ');
                 $strReturn = str_replace($strFind, '', $strReturn);
                 $arrReturn = explode('|', $strReturn);
-                if ($arrReturn) {
+                if ($arrReturn[0]) {
                     return implode($this->strSeperator, $arrReturn);
                 }
             }
@@ -1056,5 +1056,56 @@ class IMDB {
             }
         }
         return $this->strNotFound;
+    }
+
+    /**
+     * Returns all the information found.
+     *
+     * @return Object An object with all the information found.
+     */
+    public function getAll(){
+        $oData = new stdClass;
+        $oData->aka = $this->getAka();
+        $oData->aspectRatio = $this->getAspectRatio();
+        $oData->budget = $this->getBudget();
+        $oData->cast = $this->getCast();
+        $oData->castAsUrl = $this->getCastAsUrl();
+        $oData->castAndCharacter = $this->getCastAndCharacter();
+        $oData->castAndCharacterAsUrl = $this->getCastAndCharacterAsUrl();
+        $oData->color = $this->getColor();
+        $oData->company = $this->getCompany();
+        $oData->companyAsUrl = $this->getCompanyAsUrl();
+        $oData->country = $this->getCountry();
+        $oData->countryAsUrl = $this->getCountryAsUrl();
+        $oData->creator = $this->getCreator();
+        $oData->creatorAsUrl = $this->getCreatorAsUrl();
+        $oData->description = $this->getDescription();
+        $oData->director = $this->getDirector();
+        $oData->directorAsUrl = $this->getDirectorAsUrl();
+        $oData->genre = $this->getGenre();
+        $oData->genreAsUrl = $this->getGenreAsUrl();
+        $oData->languages = $this->getLanguages();
+        $oData->languagesAsUrl = $this->getLanguagesAsUrl();
+        $oData->location = $this->getLocation();
+        $oData->locationAsUrl = $this->getLocationAsUrl();
+        $oData->mpaa = $this->getMpaa();
+        $oData->opening = $this->getOpening();
+        $oData->plot = $this->getPlot();
+        $oData->poster = $this->getPoster();
+        $oData->rating = $this->getRating();
+        $oData->releaseDate = $this->getReleaseDate();
+        $oData->runtime = $this->getRuntime();
+        $oData->seasons = $this->getSeasons();
+        $oData->soundMix = $this->getSoundMix();
+        $oData->sitesAsUrl = $this->getSitesAsUrl();
+        $oData->tagline = $this->getTagline();
+        $oData->title = $this->getTitle();
+        $oData->trailerAsUrl = $this->getTrailerAsUrl();
+        $oData->url = $this->getUrl();
+        $oData->votes = $this->getVotes();
+        $oData->writers = $this->getWriter();
+        $oData->writersAsUrl = $this->getWriterAsUrl();
+        $oData->year = $this->getYear();
+        return $oData;
     }
 }
