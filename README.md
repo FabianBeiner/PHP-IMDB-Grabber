@@ -20,6 +20,11 @@ Since version 5.5.0 the script is licensed under [CC BY-NC-SA 3.0](http://creati
 
 ## Changes
 
+5.5.4
+
+- Fixed getSeasons()
+- Added getAll (which returns ALL information as an object) *(Thanks to Brett Brewer)*
+
 5.5.3
 
 - Fixed getTrailerAsUrl() *(Thanks to luizrafael)*
