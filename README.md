@@ -20,6 +20,10 @@ Since version 5.5.0 the script is licensed under [CC BY-NC-SA 3.0](http://creati
 
 ## Changes
 
+5.5.5
+
+- Now looking for an exact match first, instead of popular one.
+
 5.5.4
 
 - Fixed getSeasons()
