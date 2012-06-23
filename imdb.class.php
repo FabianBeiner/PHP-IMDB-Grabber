@@ -23,7 +23,7 @@
  * @link    http://fabian-beiner.de
  * @license Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  *
- * @version 5.5.4 (April 5th, 2012)
+ * @version 5.5.5 (June 23rd, 2012)
 */
 
 class IMDBException extends Exception {}
@@ -63,7 +63,8 @@ class IMDB {
     const IMDB_REDIRECT     = '~Location:\s(.*)~';
     const IMDB_RELEASE_DATE = '~Release Date:</h4>(.*)(<span|</div>)~Ui';
     const IMDB_RUNTIME      = '~(\d+)\smin~Uis';
-    const IMDB_SEARCH       = '~<b>Media from&nbsp;<a href="/title/tt(\d+)/"~i';
+    const IMDB_SEARCH1      = '~<b>Titles \(Exact Matches\)</b> \(Displaying (?:\d+) Result(?:s|)\)<table><tr> <td valign="top"><a href="/title/tt(\d+)/~i';
+    const IMDB_SEARCH2      = '~<b>Media from&nbsp;<a href="/title/tt(\d+)/"~i';
     const IMDB_SEASONS      = '~<h4 class="inline">Season:</h4><span class="see-more inline">(.*)</span></div>~Ui';
     const IMDB_SITES        = '~<h4 class="inline">Official Sites:</h4>(.*)</div>~Ui';
     const IMDB_SITES_A      = '~href="(.*)"\s+rel="nofollow"\s+>(.*)</a>~Ui';
@@ -96,7 +97,7 @@ class IMDB {
     // Define root of this script.
     private $_strRoot   = '';
     // Current version.
-    const IMDB_VERSION  = '5.5.4';
+    const IMDB_VERSION  = '5.5.5';
 
     /**
      * IMDB constructor.
@@ -284,8 +285,8 @@ class IMDB {
                 // Run the cURL request again with the new url.
                 IMDB::fetchUrl($strMatch);
             }
-            // Lets assume the first search result is what we want. :)
-            elseif ($strMatch = $this->matchRegex($strOutput, IMDB::IMDB_SEARCH, 1)) {
+            // Check if any of the search regexes is matching.
+            elseif (($strMatch = $this->matchRegex($strOutput, IMDB::IMDB_SEARCH1, 1)) || ($strMatch = $this->matchRegex($strOutput, IMDB::IMDB_SEARCH2, 1))) {
                 $strMatch = 'http://www.imdb.com/title/tt' . $strMatch . '/';
                 if (IMDB::IMDB_DEBUG) echo '<b>- Using the first search result:</b> ' . $strMatch . '<br>';
                 // Try to save the redirect for later usage.
