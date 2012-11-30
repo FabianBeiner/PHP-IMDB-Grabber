@@ -80,11 +80,11 @@ foreach ($arrTests as $strTest) {
         echo '<p>Writers: <b>' . $oIMDB->getWriter() . '</b></p>';
         echo '<p>Writers as URL: <b>' . $oIMDB->getWriterAsUrl() . '</b></p>';
         echo '<p>Year: <b>' . $oIMDB->getYear() . '</b></p>';
-        echo '<hr>';
     }
     else {
         echo '<p>Movie not found: ' . $strTest . '</p>';
     }
+    echo '<hr>';
 }
 ?>
 </body>
