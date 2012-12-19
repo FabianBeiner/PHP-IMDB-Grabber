@@ -23,7 +23,7 @@
  * @link    http://fabian-beiner.de
  * @license Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  *
- * @version 5.5.6 (November 30th, 2012)
+ * @version 5.5.7 (December 19th, 2012)
 */
 
 class IMDBException extends Exception {}
@@ -59,11 +59,11 @@ class IMDB {
     const IMDB_OPENING      = '~<h4 class="inline">Opening Weekend:</h4>(.*)\(~Ui';
     const IMDB_PLOT         = '~<h2>Storyline</h2><p>(.*)(<em class="nobr">|</p>)~Ui';
     const IMDB_POSTER       = '~href="/media/(.*)"\s+><img src="(.*)"~Ui';
-    const IMDB_RATING       = '~<span class="rating-rating"><span class="value".*?>(\d+\.\d+)</span>~Ui';
+    const IMDB_RATING       = '~<span itemprop="ratingValue">(\d+\.\d+)</span>~Ui';
     const IMDB_REDIRECT     = '~Location:\s(.*)~';
     const IMDB_RELEASE_DATE = '~Release Date:</h4>(.*)(<span|</div>)~Ui';
     const IMDB_RUNTIME      = '~(\d+)\smin~Uis';
-    const IMDB_SEARCH       = '~<td class="result_text"> <a href="\/title\/tt(\d+)\/(?:.*)" >(?:.*)<\/a>~Uis';
+    const IMDB_SEARCH       = '~<td class="result_text"> <a href="\/title\/tt(\d+)\/(?:.*)">(?:.*)<\/a>~Uis';
     const IMDB_SEASONS      = '~<h4 class="inline">Season:</h4><span class="see-more inline">(.*)</span></div>~Ui';
     const IMDB_SITES        = '~<h4 class="inline">Official Sites:</h4>(.*)</div>~Ui';
     const IMDB_SITES_A      = '~href="(.*)"\s+rel="nofollow"\s+>(.*)</a>~Ui';
@@ -96,7 +96,7 @@ class IMDB {
     // Define root of this script.
     private $_strRoot   = '';
     // Current version.
-    const IMDB_VERSION  = '5.5.6';
+    const IMDB_VERSION  = '5.5.7';
 
     /**
      * IMDB constructor.
