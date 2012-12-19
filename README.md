@@ -20,6 +20,10 @@ Since version 5.5.0 the script is licensed under [CC BY-NC-SA 3.0](http://creati
 
 ## Changes
 
+5.5.7
+
+- Fixed rating & search (again). *(Thanks to Chiel)*
+
 5.5.6
 
 - Fixed search.
