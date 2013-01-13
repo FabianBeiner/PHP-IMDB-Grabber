@@ -31,7 +31,9 @@ $arrTests = array('Donner Pass', 'If only', 'http://www.imdb.com/title/tt1604113
 
 set_time_limit(count($arrTests) * 15);
 
+$i = 0;
 foreach ($arrTests as $strTest) {
+    $i++;
     $oIMDB = new IMDB($strTest, 10);
     if ($oIMDB->isReady) {
         echo '<p>Also Known As: <b>' . $oIMDB->getAka() . '</b></p>';
@@ -60,7 +62,7 @@ foreach ($arrTests as $strTest) {
         echo '<p>MPAA: <b>' . $oIMDB->getMpaa() . '</b></p>';
         echo '<p>Opening Weekend: <b>' . $oIMDB->getOpening() . '</b></p>';
         echo '<p>Plot (shortened to 150 chars): <b>' . $oIMDB->getPlot(150) . '</b></p>';
-        echo '<p>Poster: <b>' . $oIMDB->getPoster() . '</b></p>';
+        echo '<p>Poster: <b>' . $oIMDB->getPoster((($i % 2) == 0) ? 'big' : 'small') . '</b></p>';
         echo '<p>Rating: <b>' . $oIMDB->getRating() . '</b></p>';
         echo '<p>Release Date: <b>' . $oIMDB->getReleaseDate() . '</b></p>';
         echo '<p>Runtime: <b>' . $oIMDB->getRuntime() . '</b></p>';
