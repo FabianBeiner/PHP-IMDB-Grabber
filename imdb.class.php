@@ -23,7 +23,7 @@
  * @link    http://fabian-beiner.de
  * @license Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  *
- * @version 5.5.8 (January 13th, 2013)
+ * @version 5.5.9 (January 31st, 2013)
 */
 
 class IMDBException extends Exception {}
@@ -39,43 +39,44 @@ class IMDB {
     const IMDB_TIMEOUT   = 15;
 
     // Regular expressions, I would not touch them. :)
-    const IMDB_AKA          = '~<h4 class="inline">Also Known As:</h4>(.*)<span~Ui';
-    const IMDB_ASPECT_RATIO = '~<h4 class="inline">Aspect Ratio:</h4>(.*)</div>~Ui';
-    const IMDB_BUDGET       = '~Budget:</h4>(.*)\(estimated\)~Ui';
-    const IMDB_CAST         = '~<td class="name">\s+<a\s+onclick="(?:.*)"\s+href="/name/nm(\d+)/"\s+>(.*)</a>\s+</td~Ui';
-    const IMDB_CHAR         = '~<td class="character">(.*)</td~Ui';
-    const IMDB_COLOR        = '~href="/search/title\?colors=(?:.*)"\s+>(.*)</a>~Ui';
-    const IMDB_COMPANY      = '~<h4 class="inline">Production Co:</h4>(.*)<span~Ui';
-    const IMDB_COMPANY_NAME = '~href="/company/co(\d+)/"\s+>(.*)</a>~Ui';
-    const IMDB_COUNTRY      = '~href="/country/(\w+)"(?:>|    >)(.*)</a>~Ui';
-    const IMDB_CREATOR      = '~<h4 class="inline">\s+(Creator|Creators):\s+</h4>(.*)</div><div~Ui';
-    const IMDB_DESCRIPTION  = '~<p itemprop="description">(.*)(?:<a |</p>)~Ui';
-    const IMDB_DIRECTOR     = '~<h4 class="inline">\s+(?:Director|Directors):\s+</h4>(.*)</div>~Ui';
-    const IMDB_GENRE        = '~href="/genre/(.*)"~Ui';
-    const IMDB_LANGUAGES    = '~href="/language/(\w+)"\s+itemprop="inLanguage"\s+>(.*)</a>~Ui';
-    const IMDB_LOCATION     = '~href="/search/title\?locations=(.+)"\s+>(.*)</a>~Ui';
-    const IMDB_MPAA         = '~<span itemprop="contentRating">(.*)</span>~Ui';
-    const IMDB_NAME         = '~href="/name/nm(\d+)/"\s+(?:itemprop="(?:\w+)"\s+>|>)(.*)</a>~Ui';
-    const IMDB_OPENING      = '~<h4 class="inline">Opening Weekend:</h4>(.*)\(~Ui';
-    const IMDB_PLOT         = '~<h2>Storyline</h2><p>(.*)(<em class="nobr">|</p>)~Ui';
-    const IMDB_POSTER       = '~href="/media/(.*)"\s+><img src="(.*)"~Ui';
-    const IMDB_RATING       = '~<span itemprop="ratingValue">(\d+\.\d+)</span>~Ui';
+    const IMDB_AKA          = '~Also Known As:</h4>(.*)<span~Ui';
+    const IMDB_ASPECT_RATIO = '~Aspect Ratio:</h4>(.*)</div>~Ui';
+    const IMDB_BUDGET       = '~Budget:</h4>(.*)<span~Ui';
+    const IMDB_CAST         = '~itemprop="actor"(?:.*)><a href="/name/nm(\d+)/(?:.*)" itemprop=\'name\'>(.*)</a>~Ui';
+    const IMDB_CHAR         = '~<td class="character">\s+<div>(.*)</div>\s+</td~Ui';
+    const IMDB_COLOR        = '~href="/search/title\?colors=(?:.*)" itemprop=\'url\'>(.*)</a>~Ui';
+    const IMDB_COMPANY      = '~Production Co:</h4>(.*)</div>~Ui';
+    const IMDB_COMPANY_NAME = '~href="/company/co(\d+)(?:\?.*)" itemprop=\'url\'>(.*)</a>~Ui';
+    const IMDB_COUNTRY      = '~href="/country/(\w+)\?(?:.*)" itemprop=\'url\'>(.*)</a>~Ui';
+    const IMDB_CREATOR      = '~Creators:</h4>(.*)</div>~Ui';
+    const IMDB_DESCRIPTION  = '~<p itemprop="description">(.*)(?:<a|<\/p>)~Ui';
+    const IMDB_DIRECTOR     = '~Director:</h4>(.*)</div>~Ui';
+    const IMDB_GENRE        = '~href="/genre/(.*)(?:\?.*)"(?:\s+|)>(.*)</a>~Ui';
+    const IMDB_LANGUAGES    = '~href="/language/(.*)(?:\?.*)" itemprop=\'url\'>(.*)</a>~Ui';
+    const IMDB_LOCATION     = '~href="/search/title\?locations=(.*)(?:&.*)" itemprop=\'url\'>(.*)</a>~Ui';
+    const IMDB_MPAA         = '~MPAA</a>\)\s+</h4>\s+<span itemprop="contentRating">Rated (.*) (?:.*)</span>~Ui';
+    const IMDB_NAME         = '~href="/name/nm(\d+)/(?:.*)" itemprop=\'(?:\w+)\'>(.*)</a>~Ui';
+    const IMDB_OPENING      = '~Opening Weekend:</h4>(.*)\(~Ui';
+    const IMDB_PLOT         = '~Storyline</h2>\s+<div class="inline canwrap" itemprop="description">\s+<p>(.*)(?:<em|<\/p>|<\/div>)~Ui';
+    const IMDB_POSTER       = '~"src="(.*)"itemprop="image" \/>~Ui';
+    const IMDB_RATING       = '~<span itemprop="ratingValue">(.*)</span>~Ui';
     const IMDB_REDIRECT     = '~Location:\s(.*)~';
-    const IMDB_RELEASE_DATE = '~Release Date:</h4>(.*)(<span|</div>)~Ui';
-    const IMDB_RUNTIME      = '~(\d+)\smin~Uis';
-    const IMDB_SEARCH       = '~<td class="result_text"> <a href="\/title\/tt(\d+)\/(?:.*)">(?:.*)<\/a>~Uis';
-    const IMDB_SEASONS      = '~<h4 class="inline">Season:</h4><span class="see-more inline">(.*)</span></div>~Ui';
-    const IMDB_SITES        = '~<h4 class="inline">Official Sites:</h4>(.*)</div>~Ui';
-    const IMDB_SITES_A      = '~href="(.*)"\s+rel="nofollow"\s+>(.*)</a>~Ui';
-    const IMDB_SOUND_MIX    = '~<h4 class="inline">Sound Mix:</h4>(.*)</div><div~Ui';
-    const IMDB_SOUND_MIX_A  = '~href="/search/title\?sound_mixes=(.*)"\s+>(.*)</a>~Ui';
-    const IMDB_TAGLINE      = '~<h4 class="inline">Taglines:</h4>(.*)(<[^>]+>)~Ui';
-    const IMDB_TITLE        = '~og:title" content="(.*) \((.*)\)"~Ui';
-    const IMDB_TITLE_ORIG   = '~<span class="title-extra">(.*) <i>\(original title\)</i></span>~Ui';
-    const IMDB_TRAILER      = '~href="/video/(.*)/"~Ui';
-    const IMDB_URL          = '~http://(.*\.|.*)imdb.com/(t|T)itle(\?|/)(..\d+)~i';
+    const IMDB_RELEASE_DATE = '~Release Date:</h4>(.*)(?:<span|<\/div>)~Ui';
+    const IMDB_RUNTIME      = '~Runtime:</h4>\s+<time itemprop="duration" datetime="(?:.*)">(.*)</time>\s+</div>~Uis';
+    const IMDB_SEARCH       = '~<td class="result_text"> <a href="\/title\/tt(\d+)\/(?:.*)"(?:\s+|)>(.*)<\/a>~Uis';
+    const IMDB_SEASONS      = '~Season:</h4>\s+<span class="see-more inline">(.*)</span>\s+</div>~Ui';
+    const IMDB_SITES        = '~Official Sites:</h4>(.*)(?:<a href="officialsites|</div>)~Ui';
+    const IMDB_SITES_A      = '~href="(.*)" itemprop=\'url\'>(.*)</a>~Ui';
+    const IMDB_SOUND_MIX    = '~Sound Mix:</h4>(.*)</div>~Ui';
+    const IMDB_SOUND_MIX_A  = '~href="/search/title\?sound_mixes=(?:.*)" itemprop=\'url\'>(.*)</a>~Ui';
+    const IMDB_TAGLINE      = '~Taglines:</h4>(.*)(?:<span|<\/span>|</div>)~Ui';
+    const IMDB_TITLE        = '~<h1 class="header" itemprop="name">(.*)<span class="nobr">\((.*)\)</span>~Ui';
+    const IMDB_TITLE_ORIG   = '~<span class="title-extra">(.*)<i>\(original title\)<\/i>\s+</span>~Ui';
+    const IMDB_TRAILER      = '~href="/video/(.*)/(?:\?.*)"(?:.*)itemprop="trailer">~Ui';
+    const IMDB_URL          = '~http://(?:.*\.|.*)imdb.com/(?:t|T)itle(?:\?|/)(..\d+)~i';
     const IMDB_VOTES        = '~<span itemprop="ratingCount">(.*)</span>~Ui';
-    const IMDB_WRITER       = '~<h4 class="inline">\s+(?:Writer|Writers):\s+</h4>(.*)</div>~Ui';
+    const IMDB_YEAR         = '~<a href="/year/(?:.*)/(?:\?.*)"(?:\s+|)>(.*)</a>~Ui';
+    const IMDB_WRITER       = '~(?:Writer|Writers):</h4>(.*)</div>~Ui';
 
     // cURL cookie file.
     private $_fCookie   = false;
@@ -96,7 +97,7 @@ class IMDB {
     // Define root of this script.
     private $_strRoot   = '';
     // Current version.
-    const IMDB_VERSION  = '5.5.8';
+    const IMDB_VERSION  = '5.5.9';
 
     /**
      * IMDB constructor.
@@ -190,7 +191,7 @@ class IMDB {
         }
 
         // Check for a valid IMDb URL and use it, if available.
-        if ($strId = IMDB::matchRegex($strSearch, IMDB::IMDB_URL, 4)) {
+        if ($strId = IMDB::matchRegex($strSearch, IMDB::IMDB_URL, 1)) {
             $this->_strId  = preg_replace('~[\D]~', '', $strId);
             $this->_strUrl = 'http://www.imdb.com/title/tt' . $this->_strId . '/';
             $bolFind       = false;
@@ -204,7 +205,7 @@ class IMDB {
             if ($fRedirect = @file_get_contents($this->_strRoot . '/cache/' . md5($this->_strUrl) . '.redir')) {
                 if (IMDB::IMDB_DEBUG) echo '<b>- Found an old redirect:</b> ' . $fRedirect . '<br>';
                 $this->_strUrl = trim($fRedirect);
-                $this->_strId  = preg_replace('~[\D]~', '', IMDB::matchRegex($fRedirect, IMDB::IMDB_URL, 4));
+                $this->_strId  = preg_replace('~[\D]~', '', IMDB::matchRegex($fRedirect, IMDB::IMDB_URL, 1));
                 $this->isReady = true;
                 $bolFind       = false;
             }
@@ -593,7 +594,7 @@ class IMDB {
      */
     public function getCreator() {
         if ($this->isReady) {
-            $strContainer = $this->matchRegex($this->_strSource, IMDB::IMDB_CREATOR, 2);
+            $strContainer = $this->matchRegex($this->_strSource, IMDB::IMDB_CREATOR, 1);
             $arrReturned  = $this->matchRegex($strContainer, IMDB::IMDB_NAME);
             if (count($arrReturned[2])) {
                 foreach ($arrReturned[2] as $i => $strName) {
@@ -612,7 +613,7 @@ class IMDB {
      */
     public function getCreatorAsUrl($strTarget = '') {
         if ($this->isReady) {
-            $strContainer = $this->matchRegex($this->_strSource, IMDB::IMDB_CREATOR, 2);
+            $strContainer = $this->matchRegex($this->_strSource, IMDB::IMDB_CREATOR, 1);
             $arrReturned = $this->matchRegex($strContainer, IMDB::IMDB_NAME);
             if (count($arrReturned[2])) {
                 foreach ($arrReturned[2] as $i => $strName) {
@@ -827,13 +828,9 @@ class IMDB {
      *
      * @return string The path to the poster (either local or online).
      */
-    public function getPoster($sSize = 'small') {
+    public function getPoster() {
        if ($this->isReady) {
-            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_POSTER, 2)) {
-                if (strtolower($sSize) == 'big') {
-                    $strReturn = substr($strReturn, 0, strpos($strReturn, '@')) . '@@._V1._SX640_SY951_.jpg';
-                }
-
+            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_POSTER, 1)) {
                 if ($strLocal = $this->saveImage($strReturn)) {
                     return $strLocal;
                 }
@@ -933,8 +930,8 @@ class IMDB {
         if ($this->isReady) {
             $strContainer = $this->matchRegex($this->_strSource, IMDB::IMDB_SOUND_MIX, 1);
             $arrReturned  = $this->matchRegex($strContainer, IMDB::IMDB_SOUND_MIX_A);
-            if (count($arrReturned[2])) {
-                foreach ($arrReturned[2] as $i => $strName) {
+            if (count($arrReturned[1])) {
+                foreach ($arrReturned[1] as $i => $strName) {
                     $arrReturn[] = trim($strName);
                 }
                 return implode($this->strSeperator, $arrReturn);
@@ -960,14 +957,15 @@ class IMDB {
     /**
      * Return the title.
      *
+     * @param  bool   Try to get the local naming of the movie first.
      * @return string The movie title.
      */
-    public function getTitle() {
+    public function getTitle($bForceLocal = false) {
         if ($this->isReady) {
-            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_TITLE_ORIG, 1)) {
+            if ($strReturn = $this->matchRegex($this->_strSource, ($bForceLocal ? IMDB::IMDB_TITLE : IMDB::IMDB_TITLE_ORIG), 1)) {
                 return trim($strReturn);
             }
-            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_TITLE, 1)) {
+            if ($strReturn = $this->matchRegex($this->_strSource, ($bForceLocal ? IMDB::IMDB_TITLE_ORIG : IMDB::IMDB_TITLE), 1)) {
                 return trim($strReturn);
             }
         }

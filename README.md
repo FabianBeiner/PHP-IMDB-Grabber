@@ -20,6 +20,16 @@ Since version 5.5.0 the script is licensed under [CC BY-NC-SA 3.0](http://creati
 
 ## Changes
 
+5.5.9
+
+- Updated almost every used regex. Gosh, this took me hours …
+- `getTitle()` now returns the local movie name if called via `getTitle(true)`. Falls back to global one.
+- Tried to fix MPAA rating. Should work, but who knows? ;)
+- Removed the `getPoster('big')` parameter as this fails on most of the pictures. So call getPoster() without any parameter.
+
+*(As this is a really heavy update, there will probably be a bunch of mistakes. But give it a try.)*
+
+
 5.5.8
 
 - Added option to download bigger images: `$oIMDb->getPoster('big')`; *(Thanks to Robert)*
