@@ -23,7 +23,7 @@
  * @link    http://fabian-beiner.de
  * @license Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  *
- * @version 5.5.9 (January 31st, 2013)
+ * @version 5.5.9b (January 31st, 2013)
 */
 
 class IMDBException extends Exception {}
@@ -50,7 +50,7 @@ class IMDB {
     const IMDB_COUNTRY      = '~href="/country/(\w+)\?(?:.*)" itemprop=\'url\'>(.*)</a>~Ui';
     const IMDB_CREATOR      = '~Creators:</h4>(.*)</div>~Ui';
     const IMDB_DESCRIPTION  = '~<p itemprop="description">(.*)(?:<a|<\/p>)~Ui';
-    const IMDB_DIRECTOR     = '~Director:</h4>(.*)</div>~Ui';
+    const IMDB_DIRECTOR     = '~(?:Director|Directors):</h4>(.*)</div>~Ui';
     const IMDB_GENRE        = '~href="/genre/(.*)(?:\?.*)"(?:\s+|)>(.*)</a>~Ui';
     const IMDB_LANGUAGES    = '~href="/language/(.*)(?:\?.*)" itemprop=\'url\'>(.*)</a>~Ui';
     const IMDB_LOCATION     = '~href="/search/title\?locations=(.*)(?:&.*)" itemprop=\'url\'>(.*)</a>~Ui';
@@ -97,7 +97,7 @@ class IMDB {
     // Define root of this script.
     private $_strRoot   = '';
     // Current version.
-    const IMDB_VERSION  = '5.5.9';
+    const IMDB_VERSION  = '5.5.9b';
 
     /**
      * IMDB constructor.
