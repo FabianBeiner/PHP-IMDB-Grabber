@@ -34,7 +34,7 @@ set_time_limit(count($arrTests) * 15);
 $i = 0;
 foreach ($arrTests as $strTest) {
     $i++;
-    $oIMDB = new IMDB($strTest, 10);
+    $oIMDB = new IMDB($strTest, 120);
     if ($oIMDB->isReady) {
         echo '<p>Also Known As: <b>' . $oIMDB->getAka() . '</b></p>';
         echo '<p>Aspect Ratio: <b>' . $oIMDB->getAspectRatio() . '</b></p>';
@@ -67,6 +67,7 @@ foreach ($arrTests as $strTest) {
         echo '<p>Release Date: <b>' . $oIMDB->getReleaseDate() . '</b></p>';
         echo '<p>Runtime: <b>' . $oIMDB->getRuntime() . '</b></p>';
         echo '<p>Seasons: <b>' . $oIMDB->getSeasons() . '</b></p>';
+        echo '<p>Seasons as URL: <b>' . $oIMDB->getSeasonsAsUrl() . '</b></p>';
         echo '<p>Sound Mix: <b>' . $oIMDB->getSoundMix() . '</b></p>';
         echo '<p>Sites as URL: <b>' . $oIMDB->getSitesAsUrl('_blank') . '</b></p>';
         echo '<p>Tagline: <b>' . $oIMDB->getTagline() . '</b></p>';
