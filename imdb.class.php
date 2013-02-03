@@ -23,7 +23,7 @@
  * @link    http://fabian-beiner.de
  * @license Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  *
- * @version 5.5.9b (January 31st, 2013)
+ * @version 5.5.10 (January 31st, 2013)
 */
 
 class IMDBException extends Exception {}
@@ -62,7 +62,7 @@ class IMDB {
     const IMDB_RATING       = '~<span itemprop="ratingValue">(.*)</span>~Ui';
     const IMDB_REDIRECT     = '~Location:\s(.*)~';
     const IMDB_RELEASE_DATE = '~Release Date:</h4>(.*)(?:<span|<\/div>)~Ui';
-    const IMDB_RUNTIME      = '~Runtime:</h4>\s+<time itemprop="duration" datetime="(?:.*)">(.*)</time>\s+</div>~Uis';
+    const IMDB_RUNTIME      = '~Runtime:</h4>\s+<time itemprop="duration" datetime="(?:.*)">(.*)</time>~Uis';
     const IMDB_SEARCH       = '~<td class="result_text"> <a href="\/title\/tt(\d+)\/(?:.*)"(?:\s+|)>(.*)<\/a>~Uis';
     const IMDB_SEASONS      = '~Season:</h4>\s+<span class="see-more inline">(.*)</span>\s+</div>~Ui';
     const IMDB_SITES        = '~Official Sites:</h4>(.*)(?:<a href="officialsites|</div>)~Ui';
@@ -97,7 +97,7 @@ class IMDB {
     // Define root of this script.
     private $_strRoot   = '';
     // Current version.
-    const IMDB_VERSION  = '5.5.9b';
+    const IMDB_VERSION  = '5.5.10';
 
     /**
      * IMDB constructor.
@@ -895,6 +895,29 @@ class IMDB {
                 $strReturn = str_replace($strFind, '', $strReturn);
                 $arrReturn = explode('|', $strReturn);
                 if ($arrReturn[0]) {
+                    return implode($this->strSeperator, array_reverse($arrReturn));
+                }
+            }
+        }
+        return $this->strNotFound;
+    }
+
+    /**
+     * Returns the seasons as URL.
+     *
+     * @return string The movie seasons.
+     */
+    public function getSeasonsAsUrl() {
+        if ($this->isReady) {
+            if ($strReturn  = $this->matchRegex($this->_strSource, IMDB::IMDB_SEASONS)) {
+                $strReturn  = strip_tags(implode($strReturn[1]));
+                $strFind    = array('&raquo;', '&nbsp;', 'Full episode list', ' ');
+                $strReturn  = str_replace($strFind, '', $strReturn);
+                $arrSeasons = explode('|', $strReturn);
+                if ($arrSeasons[0]) {
+                    foreach (array_reverse($arrSeasons) as $sSeasons) {
+                        $arrReturn[] = '<a href="http://www.imdb.com/title/tt' . $this->_strId . '/episodes?season=' . $sSeasons . '">' . $sSeasons . '</a>';
+                    }
                     return implode($this->strSeperator, $arrReturn);
                 }
             }
@@ -1098,6 +1121,7 @@ class IMDB {
         $oData->releaseDate = $this->getReleaseDate();
         $oData->runtime = $this->getRuntime();
         $oData->seasons = $this->getSeasons();
+        $oData->seasonsAsUrl = $this->getSeasonsAsUrl();
         $oData->soundMix = $this->getSoundMix();
         $oData->sitesAsUrl = $this->getSitesAsUrl();
         $oData->tagline = $this->getTagline();

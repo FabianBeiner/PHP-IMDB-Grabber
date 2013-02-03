@@ -20,6 +20,11 @@ Since version 5.5.0 the script is licensed under [CC BY-NC-SA 3.0](http://creati
 
 ## Changes
 
+5.5.10
+
+- Fixed IMDB_RUNTIME.
+- Added getSeasonsAsUrl() and reversed the return of getSeasons (starting with Season 1).
+
 5.5.9
 
 - Updated almost every used regex. Gosh, this took me hours …
