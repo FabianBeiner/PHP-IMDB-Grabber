@@ -23,7 +23,7 @@
  * @link    http://fabian-beiner.de
  * @license Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  *
- * @version 5.5.10 (January 31st, 2013)
+ * @version 5.5.11 (February 5th, 2013)
 */
 
 class IMDBException extends Exception {}
@@ -97,7 +97,7 @@ class IMDB {
     // Define root of this script.
     private $_strRoot   = '';
     // Current version.
-    const IMDB_VERSION  = '5.5.10';
+    const IMDB_VERSION  = '5.5.11';
 
     /**
      * IMDB constructor.
@@ -828,9 +828,12 @@ class IMDB {
      *
      * @return string The path to the poster (either local or online).
      */
-    public function getPoster() {
+    public function getPoster($sSize = 'small') {
        if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_POSTER, 1)) {
+                if (strtolower($sSize) == 'big') {
+                    $strReturn = substr($strReturn, 0, strpos($strReturn, '_'));
+                }
                 if ($strLocal = $this->saveImage($strReturn)) {
                     return $strLocal;
                 }
