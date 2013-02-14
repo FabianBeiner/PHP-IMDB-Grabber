@@ -23,7 +23,7 @@
  * @link    http://fabian-beiner.de
  * @license Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  *
- * @version 5.5.11 (February 5th, 2013)
+ * @version 5.5.12 (February 14th, 2013)
 */
 
 class IMDBException extends Exception {}
@@ -52,6 +52,7 @@ class IMDB {
     const IMDB_DESCRIPTION  = '~<p itemprop="description">(.*)(?:<a|<\/p>)~Ui';
     const IMDB_DIRECTOR     = '~(?:Director|Directors):</h4>(.*)</div>~Ui';
     const IMDB_GENRE        = '~href="/genre/(.*)(?:\?.*)"(?:\s+|)>(.*)</a>~Ui';
+    const IMDB_ID           = '~(tt\d{6,})~';
     const IMDB_LANGUAGES    = '~href="/language/(.*)(?:\?.*)" itemprop=\'url\'>(.*)</a>~Ui';
     const IMDB_LOCATION     = '~href="/search/title\?locations=(.*)(?:&.*)" itemprop=\'url\'>(.*)</a>~Ui';
     const IMDB_MPAA         = '~MPAA</a>\)\s+</h4>\s+<span itemprop="contentRating">Rated (.*) (?:.*)</span>~Ui';
@@ -97,7 +98,7 @@ class IMDB {
     // Define root of this script.
     private $_strRoot   = '';
     // Current version.
-    const IMDB_VERSION  = '5.5.11';
+    const IMDB_VERSION  = '5.5.12';
 
     /**
      * IMDB constructor.
@@ -197,6 +198,13 @@ class IMDB {
             $bolFind       = false;
             $this->isReady = true;
         }
+        elseif ($strId = IMDB::matchRegex($strSearch, IMDB::IMDB_ID, 1)) {
+            // DRY, haha.
+            $this->_strId  = preg_replace('~[\D]~', '', $strId);
+            $this->_strUrl = 'http://www.imdb.com/title/tt' . $this->_strId . '/';
+            $bolFind       = false;
+            $this->isReady = true;
+        }
         // Otherwise try to find one.
         else {
             $this->_strUrl = 'http://www.imdb.com/find?s=all&q=' . str_replace(' ', '+', $strSearch);
@@ -212,7 +220,7 @@ class IMDB {
         }
 
         // Check if there is a cache we can use.
-        $fCache = $this->_strRoot . '/cache/' . md5($this->_strUrl) . '.cache';
+        $fCache = $this->_strRoot . '/cache/' . md5($this->_strId) . '.cache';
         if (file_exists($fCache)) {
             $bolUseCache = true;
             $intChanged  = filemtime($fCache);

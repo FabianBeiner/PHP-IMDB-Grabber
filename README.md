@@ -20,6 +20,11 @@ Since version 5.5.0 the script is licensed under [CC BY-NC-SA 3.0](http://creati
 
 ## Changes
 
+5.5.12
+
+- Now checking if there is a valid IMDb id given as search param (this should fix https://github.com/FabianBeiner/PHP-IMDB-Grabber/issues/29)
+- Instead of using the URL as cache, now using the ID, as this is always the same.
+
 5.5.11
 
 - `getPoster('big')` is back. *(Thanks to Robert again)*
