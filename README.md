@@ -20,6 +20,10 @@ Since version 5.5.0 the script is licensed under [CC BY-NC-SA 3.0](http://creati
 
 ## Changes
 
+5.5.13
+- Fixed some regular expressions (cast, name, title, year)
+- Changed MPAA rating regex - then again, I don't know if this is MPAA or something else. I don't care. :)
+
 5.5.12
 
 - Now checking if there is a valid IMDb id given as search param (this should fix https://github.com/FabianBeiner/PHP-IMDB-Grabber/issues/29)

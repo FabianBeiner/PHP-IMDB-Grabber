@@ -23,7 +23,7 @@
  * @link    http://fabian-beiner.de
  * @license Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  *
- * @version 5.5.12 (February 14th, 2013)
+ * @version 5.5.13 (February 20th, 2013)
 */
 
 class IMDBException extends Exception {}
@@ -42,7 +42,7 @@ class IMDB {
     const IMDB_AKA          = '~Also Known As:</h4>(.*)<span~Ui';
     const IMDB_ASPECT_RATIO = '~Aspect Ratio:</h4>(.*)</div>~Ui';
     const IMDB_BUDGET       = '~Budget:</h4>(.*)<span~Ui';
-    const IMDB_CAST         = '~itemprop="actor"(?:.*)><a href="/name/nm(\d+)/(?:.*)" itemprop=\'name\'>(.*)</a>~Ui';
+    const IMDB_CAST         = '~itemprop="actor"(?:.*)><a href="/name/nm(\d+)/(?:.*)" itemprop=\'url\'> <span class="itemprop" itemprop="name">(.*)</span>~Ui';
     const IMDB_CHAR         = '~<td class="character">\s+<div>(.*)</div>\s+</td~Ui';
     const IMDB_COLOR        = '~href="/search/title\?colors=(?:.*)" itemprop=\'url\'>(.*)</a>~Ui';
     const IMDB_COMPANY      = '~Production Co:</h4>(.*)</div>~Ui';
@@ -55,8 +55,8 @@ class IMDB {
     const IMDB_ID           = '~(tt\d{6,})~';
     const IMDB_LANGUAGES    = '~href="/language/(.*)(?:\?.*)" itemprop=\'url\'>(.*)</a>~Ui';
     const IMDB_LOCATION     = '~href="/search/title\?locations=(.*)(?:&.*)" itemprop=\'url\'>(.*)</a>~Ui';
-    const IMDB_MPAA         = '~MPAA</a>\)\s+</h4>\s+<span itemprop="contentRating">Rated (.*) (?:.*)</span>~Ui';
-    const IMDB_NAME         = '~href="/name/nm(\d+)/(?:.*)" itemprop=\'(?:\w+)\'>(.*)</a>~Ui';
+    const IMDB_MPAA         = '~itemprop="contentRating" content="(\d+)"~Ui';
+    const IMDB_NAME         = '~href="/name/nm(\d+)/(?:.*)" itemprop=\'(?:\w+)\'><span class="itemprop" itemprop="name">(.*)</span>~Ui';
     const IMDB_OPENING      = '~Opening Weekend:</h4>(.*)\(~Ui';
     const IMDB_PLOT         = '~Storyline</h2>\s+<div class="inline canwrap" itemprop="description">\s+<p>(.*)(?:<em|<\/p>|<\/div>)~Ui';
     const IMDB_POSTER       = '~"src="(.*)"itemprop="image" \/>~Ui';
@@ -71,12 +71,12 @@ class IMDB {
     const IMDB_SOUND_MIX    = '~Sound Mix:</h4>(.*)</div>~Ui';
     const IMDB_SOUND_MIX_A  = '~href="/search/title\?sound_mixes=(?:.*)" itemprop=\'url\'>(.*)</a>~Ui';
     const IMDB_TAGLINE      = '~Taglines:</h4>(.*)(?:<span|<\/span>|</div>)~Ui';
-    const IMDB_TITLE        = '~<h1 class="header" itemprop="name">(.*)<span class="nobr">\((.*)\)</span>~Ui';
+    const IMDB_TITLE        = '~property=\'og:title\' content="(.*) \((?:.*)\)"~Ui';
     const IMDB_TITLE_ORIG   = '~<span class="title-extra">(.*)<i>\(original title\)<\/i>\s+</span>~Ui';
     const IMDB_TRAILER      = '~href="/video/(.*)/(?:\?.*)"(?:.*)itemprop="trailer">~Ui';
     const IMDB_URL          = '~http://(?:.*\.|.*)imdb.com/(?:t|T)itle(?:\?|/)(..\d+)~i';
     const IMDB_VOTES        = '~<span itemprop="ratingCount">(.*)</span>~Ui';
-    const IMDB_YEAR         = '~<a href="/year/(?:.*)/(?:\?.*)"(?:\s+|)>(.*)</a>~Ui';
+    const IMDB_YEAR         = '~property=\'og:title\' content="(?:.*) \((.*)\)~Ui';
     const IMDB_WRITER       = '~(?:Writer|Writers):</h4>(.*)</div>~Ui';
 
     // cURL cookie file.
@@ -98,7 +98,7 @@ class IMDB {
     // Define root of this script.
     private $_strRoot   = '';
     // Current version.
-    const IMDB_VERSION  = '5.5.12';
+    const IMDB_VERSION  = '5.5.13';
 
     /**
      * IMDB constructor.
@@ -1087,7 +1087,7 @@ class IMDB {
      */
     public function getYear() {
         if ($this->isReady) {
-            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_TITLE, 2)) {
+            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_YEAR, 1)) {
                 return substr(preg_replace('~[\D]~', '', $strReturn), 0, 4);
             }
         }
