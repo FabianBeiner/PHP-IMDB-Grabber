@@ -1000,7 +1000,7 @@ class IMDB {
     public function getTitle($bForceLocal = false) {
         if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->_strSource, ($bForceLocal ? IMDB::IMDB_TITLE : IMDB::IMDB_TITLE_ORIG), 1)) {
-                return trim($strReturn);
+                return ltrim(rtrim(trim($strReturn), '"'), '"');
             }
             if ($strReturn = $this->matchRegex($this->_strSource, ($bForceLocal ? IMDB::IMDB_TITLE_ORIG : IMDB::IMDB_TITLE), 1)) {
                 return trim($strReturn);
