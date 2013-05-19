@@ -23,7 +23,7 @@
  * @link    http://fabian-beiner.de
  * @license Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  *
- * @version 5.5.13 (February 20th, 2013)
+ * @version 5.5.14 (May 19th, 2013)
 */
 
 class IMDBException extends Exception {}
@@ -37,6 +37,8 @@ class IMDB {
     const IMDB_DEBUG     = false;
     // Define a timeout for the request of the IMDb page.
     const IMDB_TIMEOUT   = 15;
+    // Define the "Accept-Language" header language (so IMDb replies with decent localization settings).
+    const IMDB_LANG      = 'en-US, en';
 
     // Regular expressions, I would not touch them. :)
     const IMDB_AKA          = '~Also Known As:</h4>(.*)<span~Ui';
@@ -48,7 +50,7 @@ class IMDB {
     const IMDB_COMPANY      = '~Production Co:</h4>(.*)</div>~Ui';
     const IMDB_COMPANY_NAME = '~href="/company/co(\d+)(?:\?.*)" itemprop=\'url\'>(.*)</a>~Ui';
     const IMDB_COUNTRY      = '~href="/country/(\w+)\?(?:.*)" itemprop=\'url\'>(.*)</a>~Ui';
-    const IMDB_CREATOR      = '~Creators:</h4>(.*)</div>~Ui';
+    const IMDB_CREATOR      = '~(?:Creator|Creators):</h4>(.*)</div>~Ui';
     const IMDB_DESCRIPTION  = '~<p itemprop="description">(.*)(?:<a|<\/p>)~Ui';
     const IMDB_DIRECTOR     = '~(?:Director|Directors):</h4>(.*)</div>~Ui';
     const IMDB_GENRE        = '~href="/genre/(.*)(?:\?.*)"(?:\s+|)>(.*)</a>~Ui';
@@ -98,7 +100,7 @@ class IMDB {
     // Define root of this script.
     private $_strRoot   = '';
     // Current version.
-    const IMDB_VERSION  = '5.5.13';
+    const IMDB_VERSION  = '5.5.14';
 
     /**
      * IMDB constructor.
@@ -251,6 +253,7 @@ class IMDB {
             curl_setopt_array($oCurl, array (
                                             CURLOPT_VERBOSE => FALSE,
                                             CURLOPT_HEADER => TRUE,
+                                            CURLOPT_HTTPHEADER => array('Accept-Language:' . IMDB_LANG . ';q=0.5'),
                                             CURLOPT_FRESH_CONNECT => TRUE,
                                             CURLOPT_RETURNTRANSFER => TRUE,
                                             CURLOPT_TIMEOUT => IMDB::IMDB_TIMEOUT,
