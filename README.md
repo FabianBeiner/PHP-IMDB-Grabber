@@ -23,6 +23,7 @@ Since version 5.5.0 the script is licensed under [CC BY-NC-SA 3.0](http://creati
 5.5.14
 - Fixed IMDB_DIRECTOR.
 - Added IMDB_LANG (so you can define which Accept-Language header will be used). *(Thanks to bonk-se.)*
+- Fixed IMDB_TITLE_ORIG. *(Thanks to Tamás)*
 
 5.5.13
 - Fixed some regular expressions (cast, name, title, year)
