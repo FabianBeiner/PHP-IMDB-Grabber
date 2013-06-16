@@ -57,7 +57,7 @@ class IMDB {
     const IMDB_ID           = '~(tt\d{6,})~';
     const IMDB_LANGUAGES    = '~href="/language/(.*)(?:\?.*)" itemprop=\'url\'>(.*)</a>~Ui';
     const IMDB_LOCATION     = '~href="/search/title\?locations=(.*)(?:&.*)" itemprop=\'url\'>(.*)</a>~Ui';
-    const IMDB_MPAA         = '~itemprop="contentRating" content="(\d+)"~Ui';
+    const IMDB_MPAA         = '~itemprop="contentRating" content="(.*)"></span>~Ui';
     const IMDB_NAME         = '~href="/name/nm(\d+)/(?:.*)" itemprop=\'(?:\w+)\'><span class="itemprop" itemprop="name">(.*)</span>~Ui';
     const IMDB_OPENING      = '~Opening Weekend:</h4>(.*)\(~Ui';
     const IMDB_PLOT         = '~Storyline</h2>\s+<div class="inline canwrap" itemprop="description">\s+<p>(.*)(?:<em|<\/p>|<\/div>)~Ui';
@@ -810,8 +810,8 @@ class IMDB {
      */
     public function getMpaa() {
         if ($this->isReady) {
-            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_MPAA, 1)) {
-                return trim($strReturn);
+            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_MPAA)) {
+                return trim($strReturn[1][0]);
             }
         }
         return $this->strNotFound;
