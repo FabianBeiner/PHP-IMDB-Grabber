@@ -39,6 +39,8 @@ class IMDB {
     const IMDB_TIMEOUT   = 15;
     // Define the "Accept-Language" header language (so IMDb replies with decent localization settings).
     const IMDB_LANG      = 'en-US, en';
+    // Define what are we looking for ('all', 'tvtitle', 'tvepisode', 'movie')
+	const IMDB_TYPE		= 'all';
 
     // Regular expressions, I would not touch them. :)
     const IMDB_AKA          = '~Also Known As:</h4>(.*)<span~Ui';
@@ -209,7 +211,19 @@ class IMDB {
         }
         // Otherwise try to find one.
         else {
-            $this->_strUrl = 'http://www.imdb.com/find?s=all&q=' . str_replace(' ', '+', $strSearch);
+            //We set 'all' for default search
+            $params = 'all';
+            
+			if (IMDB::IMDB_TYPE == 'movie') {
+				$params = 'tt&ttype=ft&ref_=fn_ft';
+			} else if (IMDB::IMDB_TYPE == 'tvtitle') {
+				$params = 'tt&ttype=tv&ref_=fn_tv';
+			} else if (IMDB::IMDB_TYPE == 'tvepisode') {
+				$params = 'tt&ttype=ep&ref_=fn_ep';
+			}
+            
+            $this->_strUrl = 'http://www.imdb.com/find?s=' . $params . '&q=' . str_replace(' ', '+', $strSearch);
+
             $bolFind       = true;
             // Check for cached redirects of this search.
             if ($fRedirect = @file_get_contents($this->_strRoot . '/cache/' . md5($this->_strUrl) . '.redir')) {
