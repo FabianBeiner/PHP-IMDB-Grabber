@@ -35,6 +35,7 @@ $i = 0;
 foreach ($arrTests as $strTest) {
     $i++;
     $oIMDB = new IMDB($strTest, 120);
+    $oIMDB->strNotFound = 'Not found! :(';
     if ($oIMDB->isReady) {
         echo '<p>Also Known As: <b>' . $oIMDB->getAka() . '</b></p>';
         echo '<p>Aspect Ratio: <b>' . $oIMDB->getAspectRatio() . '</b></p>';

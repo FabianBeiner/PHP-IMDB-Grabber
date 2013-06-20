@@ -23,7 +23,7 @@
  * @link    http://fabian-beiner.de
  * @license Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  *
- * @version 5.5.14 (May 19th, 2013)
+ * @version 5.5.15 (Juney 20th, 2013)
 */
 
 class IMDBException extends Exception {}
@@ -39,8 +39,8 @@ class IMDB {
     const IMDB_TIMEOUT   = 15;
     // Define the "Accept-Language" header language (so IMDb replies with decent localization settings).
     const IMDB_LANG      = 'en-US, en';
-    // Define what are we looking for ('all', 'tvtitle', 'tvepisode', 'movie')
-	const IMDB_TYPE		= 'all';
+    // Define the default search type (all/tvtitle/tvepisode/movie).
+    const IMDB_SEARCHFOR = 'all';
 
     // Regular expressions, I would not touch them. :)
     const IMDB_AKA          = '~Also Known As:</h4>(.*)<span~Ui';
@@ -102,7 +102,7 @@ class IMDB {
     // Define root of this script.
     private $_strRoot   = '';
     // Current version.
-    const IMDB_VERSION  = '5.5.14';
+    const IMDB_VERSION  = '5.5.15';
 
     /**
      * IMDB constructor.
@@ -211,18 +211,18 @@ class IMDB {
         }
         // Otherwise try to find one.
         else {
-            //We set 'all' for default search
-            $params = 'all';
-            
-			if (IMDB::IMDB_TYPE == 'movie') {
-				$params = 'tt&ttype=ft&ref_=fn_ft';
-			} else if (IMDB::IMDB_TYPE == 'tvtitle') {
-				$params = 'tt&ttype=tv&ref_=fn_tv';
-			} else if (IMDB::IMDB_TYPE == 'tvepisode') {
-				$params = 'tt&ttype=ep&ref_=fn_ep';
-			}
-            
-            $this->_strUrl = 'http://www.imdb.com/find?s=' . $params . '&q=' . str_replace(' ', '+', $strSearch);
+            $strSearchFor = 'all';
+            if (strtolower(IMDB::IMDB_SEARCHFOR) == 'movie') {
+                $strSearchFor = 'tt&ttype=ft&ref_=fn_ft';
+            }
+            elseif (strtolower(IMDB::IMDB_SEARCHFOR) == 'tvtitle') {
+                $strSearchFor = 'tt&ttype=tv&ref_=fn_tv';
+            }
+            elseif (strtolower(IMDB::IMDB_SEARCHFOR) == 'tvepisode') {
+                $strSearchFor = 'tt&ttype=ep&ref_=fn_ep';
+            }
+
+            $this->_strUrl = 'http://www.imdb.com/find?s=' . $strSearchFor . '&q=' . str_replace(' ', '+', $strSearch);
 
             $bolFind       = true;
             // Check for cached redirects of this search.

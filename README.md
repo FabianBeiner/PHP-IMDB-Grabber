@@ -20,6 +20,10 @@ Since version 5.5.0 the script is licensed under [CC BY-NC-SA 3.0](http://creati
 
 ## Changes
 
+5.5.15
+- Fixed IMDB_MPAA. *(Thanks to bla0r)*
+- Added possibility to search only for TV shows etc. via IMDB_SEARCHFOR. *(Thanks to bla0r)* (Note: This should be setable via public variable someday ...)
+
 5.5.14
 - Fixed IMDB_DIRECTOR.
 - Added IMDB_LANG (so you can define which Accept-Language header will be used). *(Thanks to bonk-se.)*
