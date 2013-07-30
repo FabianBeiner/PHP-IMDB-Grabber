@@ -33,6 +33,7 @@ if ($oIMDB->isReady) {
         echo '<p>Aspect Ratio: <b>' . $oIMDB->getAspectRatio() . '</b></p>';
         echo '<p>Budget: <b>' . $oIMDB->getBudget() . '</b></p>';
         echo '<p>Cast: <b>' . $oIMDB->getCast() . '</b></p>';
+        echo '<p>Full Cast: <b>' . $oIMDB->getFullCast() . '</b></p>';
         echo '<p>Cast as URL: <b>' . $oIMDB->getCastAsUrl() . '</b></p>';
         echo '<p>Cast and Character: <b>' . $oIMDB->getCastAndCharacter() . '</b></p>';
         echo '<p>Cast and Character as URL: <b>' . $oIMDB->getCastAndCharacterAsUrl() . '</b></p>';
