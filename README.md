@@ -20,6 +20,16 @@ Since version 5.5.0 the script is licensed under [CC BY-NC-SA 3.0](http://creati
 
 ## Changes
 
+5.5.17
+- *Heavy* reformating.
+- Merged with the changes by *emersonbroga*. (Thanks!)
+- Added getFullCast().
+- A few smaller fixes.
+- Fixed MPAA.
+
+5.5.16
+- Typos.
+
 5.5.15
 - Fixed IMDB_MPAA. *(Thanks to bla0r)*
 - Added possibility to search only for TV shows etc. via IMDB_SEARCHFOR. *(Thanks to bla0r)* (Note: This should be setable via public variable someday ...)

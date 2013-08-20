@@ -37,9 +37,11 @@ foreach ($arrTests as $strTest) {
     $oIMDB = new IMDB($strTest, 120);
     $oIMDB->strNotFound = 'Not found! :(';
     if ($oIMDB->isReady) {
+        echo '<h1>' . $strTest . '</h1>';
         echo '<p>Also Known As: <b>' . $oIMDB->getAka() . '</b></p>';
         echo '<p>Aspect Ratio: <b>' . $oIMDB->getAspectRatio() . '</b></p>';
         echo '<p>Budget: <b>' . $oIMDB->getBudget() . '</b></p>';
+        echo '<p>Cast (full): <b>' . $oIMDB->getFullCast() . '</b></p>';
         echo '<p>Cast (limited to 5): <b>' . $oIMDB->getCast(5) . '</b></p>';
         echo '<p>Cast as URL (default limited to 20): <b>' . $oIMDB->getCastAsUrl(20, true, '_blank') . '</b></p>';
         echo '<p>Cast and Character (limited to 10): <b>' . $oIMDB->getCastAndCharacter(10) . '</b></p>';
