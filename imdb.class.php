@@ -23,7 +23,7 @@
  * @link    http://fabian-beiner.de
  * @license Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  *
- * @version 5.5.15 (Juney 20th, 2013)
+ * @version 5.5.16 (August 20th, 2013)
 */
 
 class IMDBException extends Exception {}
@@ -33,8 +33,8 @@ class IMDB {
     public $strNotFound  = 'n/A';
     // Define the seperator (eg. for cast).
     public $strSeperator = ' / ';
-    // Please set this to 'true' for debugging purposes only.
-    const IMDB_DEBUG     = false;
+    // Please set this to 'TRUE' for debugging purposes only.
+    const IMDB_DEBUG     = FALSE;
     // Define a timeout for the request of the IMDb page.
     const IMDB_TIMEOUT   = 15;
     // Define the "Accept-Language" header language (so IMDb replies with decent localization settings).
@@ -84,7 +84,7 @@ class IMDB {
     const IMDB_WRITER       = '~(?:Writer|Writers):</h4>(.*)</div>~Ui';
 
     // cURL cookie file.
-    private $_fCookie   = false;
+    private $_fCookie   = FALSE;
     // IMDb url.
     private $_strUrl    = NULL;
     // IMDb source.
@@ -92,17 +92,17 @@ class IMDB {
     // IMDb cache.
     private $_strCache  = 0;
     // IMDb posters directory.
-    private $_bolPoster = false;
+    private $_bolPoster = FALSE;
     // IMDb cache directory.
-    private $_bolCache  = false;
+    private $_bolCache  = FALSE;
     // IMDb movie id.
-    private $_strId     = false;
+    private $_strId     = FALSE;
     // Movie found?
-    public $isReady     = false;
+    public $isReady     = FALSE;
     // Define root of this script.
     private $_strRoot   = '';
     // Current version.
-    const IMDB_VERSION  = '5.5.15';
+    const IMDB_VERSION  = '5.5.16';
 
     /**
      * IMDB constructor.
@@ -116,13 +116,13 @@ class IMDB {
         }
         // Posters and cache directory existant?
         if (is_writable($this->_strRoot . '/posters/') || mkdir($this->_strRoot . '/posters/')) {
-            $this->_bolPoster = true;
+            $this->_bolPoster = TRUE;
         }
         else {
             throw new IMDBException($this->_strRoot . '/posters/ is not writable!');
         }
         if (is_writable($this->_strRoot . '/cache/') || mkdir($this->_strRoot . '/cache/')) {
-            $this->_bolCache = true;
+            $this->_bolCache = TRUE;
         }
         else {
             throw new IMDBException($this->_strRoot . '/cache/ is not writable!');
@@ -151,14 +151,14 @@ class IMDB {
      * @return string The match found
      * @return array  The matches found
      */
-    private function matchRegex($strContent, $strRegex, $intIndex = null) {
+    private function matchRegex($strContent, $strRegex, $intIndex = NULL) {
         preg_match_all($strRegex, $strContent, $arrMatches);
-        if ($arrMatches === FALSE) return false;
-        if ($intIndex != null && is_int($intIndex)) {
+        if ($arrMatches === FALSE) return FALSE;
+        if ($intIndex != NULL && is_int($intIndex)) {
             if ($arrMatches[$intIndex]) {
                 return $arrMatches[$intIndex][0];
             }
-            return false;
+            return FALSE;
         }
         return $arrMatches;
     }
@@ -199,15 +199,15 @@ class IMDB {
         if ($strId = IMDB::matchRegex($strSearch, IMDB::IMDB_URL, 1)) {
             $this->_strId  = preg_replace('~[\D]~', '', $strId);
             $this->_strUrl = 'http://www.imdb.com/title/tt' . $this->_strId . '/';
-            $bolFind       = false;
-            $this->isReady = true;
+            $bolFind       = FALSE;
+            $this->isReady = TRUE;
         }
         elseif ($strId = IMDB::matchRegex($strSearch, IMDB::IMDB_ID, 1)) {
             // DRY, haha.
             $this->_strId  = preg_replace('~[\D]~', '', $strId);
             $this->_strUrl = 'http://www.imdb.com/title/tt' . $this->_strId . '/';
-            $bolFind       = false;
-            $this->isReady = true;
+            $bolFind       = FALSE;
+            $this->isReady = TRUE;
         }
         // Otherwise try to find one.
         else {
@@ -224,36 +224,36 @@ class IMDB {
 
             $this->_strUrl = 'http://www.imdb.com/find?s=' . $strSearchFor . '&q=' . str_replace(' ', '+', $strSearch);
 
-            $bolFind       = true;
+            $bolFind       = TRUE;
             // Check for cached redirects of this search.
             if ($fRedirect = @file_get_contents($this->_strRoot . '/cache/' . md5($this->_strUrl) . '.redir')) {
                 if (IMDB::IMDB_DEBUG) echo '<b>- Found an old redirect:</b> ' . $fRedirect . '<br>';
                 $this->_strUrl = trim($fRedirect);
                 $this->_strId  = preg_replace('~[\D]~', '', IMDB::matchRegex($fRedirect, IMDB::IMDB_URL, 1));
-                $this->isReady = true;
-                $bolFind       = false;
+                $this->isReady = TRUE;
+                $bolFind       = FALSE;
             }
         }
 
         // Check if there is a cache we can use.
         $fCache = $this->_strRoot . '/cache/' . md5($this->_strId) . '.cache';
         if (file_exists($fCache)) {
-            $bolUseCache = true;
+            $bolUseCache = TRUE;
             $intChanged  = filemtime($fCache);
             $intNow      = time();
             $intDiff     = round(abs($intNow - $intChanged) / 60);
             if ($intDiff > $this->_intCache) {
-                $bolUseCache = false;
+                $bolUseCache = FALSE;
             }
         }
         else {
-            $bolUseCache = false;
+            $bolUseCache = FALSE;
         }
 
         if ($bolUseCache) {
             if (IMDB::IMDB_DEBUG) echo '<b>- Using cache for ' . $strSearch . ' from ' . $fCache . '</b><br>';
             $this->_strSource = file_get_contents($fCache);
-            return true;
+            return TRUE;
         }
         else {
             // Cookie path.
@@ -289,9 +289,9 @@ class IMDB {
             if ($strOutput === FALSE) {
                 if (IMDB::IMDB_DEBUG) echo '<b>! cURL error:</b> ' . $_strUrl . '<br>';
                 if ($this->_strSource = @file_get_contents($fCache)) {
-                    return true;
+                    return TRUE;
                 }
-                return false;
+                return FALSE;
             }
 
             // Get returned information.
@@ -323,7 +323,7 @@ class IMDB {
             // If it's not a redirect and the HTTP response is not 200 or 302, abort.
             elseif ($arrInfo['http_code'] != 200 && $arrInfo['http_code'] != 302) {
                 if (IMDB::IMDB_DEBUG) echo '<b>- Wrong HTTP code received, aborting:</b> ' . $arrInfo['http_code'] . '<br>';
-                return false;
+                return FALSE;
             }
 
             // Set the global source.
@@ -335,9 +335,9 @@ class IMDB {
                 file_put_contents($fCache, $this->_strSource);
             }
 
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 
     /**
@@ -425,7 +425,7 @@ class IMDB {
      *
      * @return array The movie cast (default limited to 20).
      */
-    public function getCast($intLimit = 20, $bolMore = true) {
+    public function getCast($intLimit = 20, $bolMore = TRUE) {
         if ($this->isReady) {
             $arrReturned = $this->matchRegex($this->_strSource, IMDB::IMDB_CAST);
             if (count($arrReturned[2])) {
@@ -446,7 +446,7 @@ class IMDB {
      *
      * @return array The movie cast as URL (default limited to 20).
      */
-    public function getCastAsUrl($intLimit = 20, $bolMore = true, $strTarget = '') {
+    public function getCastAsUrl($intLimit = 20, $bolMore = TRUE, $strTarget = '') {
         if ($this->isReady) {
             $arrReturned = $this->matchRegex($this->_strSource, IMDB::IMDB_CAST);
             if (count($arrReturned[2])) {
@@ -467,7 +467,7 @@ class IMDB {
      *
      * @return array The movie cast and character (default limited to 20).
      */
-    public function getCastAndCharacter($intLimit = 20, $bolMore = true) {
+    public function getCastAndCharacter($intLimit = 20, $bolMore = TRUE) {
         if ($this->isReady) {
             $arrReturned = $this->matchRegex($this->_strSource, IMDB::IMDB_CAST);
             $arrChar     = $this->matchRegex($this->_strSource, IMDB::IMDB_CHAR);
@@ -495,7 +495,7 @@ class IMDB {
      *
      * @return array The movie cast and character as URL (default limited to 20).
      */
-    public function getCastAndCharacterAsUrl($intLimit = 20, $bolMore = true, $strTarget = '') {
+    public function getCastAndCharacterAsUrl($intLimit = 20, $bolMore = TRUE, $strTarget = '') {
         if ($this->isReady) {
             $arrReturned = $this->matchRegex($this->_strSource, IMDB::IMDB_CAST);
             $arrChar     = $this->matchRegex($this->_strSource, IMDB::IMDB_CHAR);
@@ -1011,7 +1011,7 @@ class IMDB {
      * @param  bool   Try to get the local naming of the movie first.
      * @return string The movie title.
      */
-    public function getTitle($bForceLocal = false) {
+    public function getTitle($bForceLocal = FALSE) {
         if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->_strSource, ($bForceLocal ? IMDB::IMDB_TITLE : IMDB::IMDB_TITLE_ORIG), 1)) {
                 return ltrim(rtrim(trim($strReturn), '"'), '"');
