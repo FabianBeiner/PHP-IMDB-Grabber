@@ -20,8 +20,12 @@ Since version 5.5.0 the script is licensed under [CC BY-NC-SA 3.0](http://creati
 
 ## Changes
 
+5.5.19
+- Fixed IMDB_FULL_CAST and IMDB_YEAR.
+- getSitesAsUrl() only returns a link, if the url starts with "http".
+
 5.5.18
-- The latest pull request I merged broke the caching. Sorry guys, I'll never ever pull a request that easily.
+- The latest pull request I merged broke the caching. Sorry guys, I'll never ever pull a request that easily again.
 - Added caching for getFullCast().
 - Minor code changes.
 

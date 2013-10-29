@@ -23,7 +23,7 @@
  * @link    http://fabian-beiner.de
  * @license Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  *
- * @version 5.5.18 (August 21st, 2013)
+ * @version 5.5.19 (October 29th, 2013)
 */
 
 class IMDBException extends Exception {}
@@ -47,7 +47,7 @@ class IMDB {
     const IMDB_ASPECT_RATIO = '~Aspect Ratio:</h4>(.*)</div>~Ui';
     const IMDB_BUDGET       = '~Budget:</h4>(.*)<span~Ui';
     const IMDB_CAST         = '~itemprop="actor"(?:.*)><a href="/name/nm(\d+)/(?:.*)" itemprop=\'url\'> <span class="itemprop" itemprop="name">(.*)</span>~Ui';
-    const IMDB_FULL_CAST    = '~<td class="nm"><a.*?>(.*?)</a></td>~';
+    const IMDB_FULL_CAST    = '~<span class="itemprop" itemprop="name">(.*?)</span>~Ui';
     const IMDB_CHAR         = '~<td class="character">\s+<div>(.*)</div>\s+</td~Ui';
     const IMDB_COLOR        = '~href="/search/title\?colors=(?:.*)" itemprop=\'url\'>(.*)</a>~Ui';
     const IMDB_COMPANY      = '~Production Co:</h4>(.*)</div>~Ui';
@@ -81,7 +81,7 @@ class IMDB {
     const IMDB_TRAILER      = '~href="/video/(.*)/(?:\?.*)"(?:.*)itemprop="trailer">~Ui';
     const IMDB_URL          = '~http://(?:.*\.|.*)imdb.com/(?:t|T)itle(?:\?|/)(..\d+)~i';
     const IMDB_VOTES        = '~<span itemprop="ratingCount">(.*)</span>~Ui';
-    const IMDB_YEAR         = '~property=\'og:title\' content="(?:.*) \((.*)\)~Ui';
+    const IMDB_YEAR         = '~<h1 class="header">(?:\s+)<span class="itemprop" itemprop="name">(?:.*)</span>(?:\s+)<span class="nobr">\((.*)\)</span>~Ui';
     const IMDB_WRITER       = '~(?:Writer|Writers):</h4>(.*)</div>~Ui';
 
     // cURL cookie file.
@@ -99,7 +99,7 @@ class IMDB {
     // Define root of this script.
     private $_strRoot   = '';
     // Current version.
-    const IMDB_VERSION  = '5.5.18';
+    const IMDB_VERSION  = '5.5.19';
 
     /**
      * IMDB constructor.
@@ -514,7 +514,7 @@ class IMDB {
                 $arrReturn = @file_get_contents($fCache);
                 return implode($this->strSeperator, unserialize($arrReturn));
             } else {
-                $fullCastUrl = sprintf('http://www.imdb.com/title/tt%s/fullcredits?ref_=tt_cl_sm#cast', $this->_strId);
+                $fullCastUrl = sprintf('http://www.imdb.com/title/tt%s/fullcredits', $this->_strId);
                 $arrInfo     = $this->doCurl($fullCastUrl, FALSE);
                 if (!$arrInfo) {
                     return $this->strNotFound;
@@ -1072,7 +1072,9 @@ class IMDB {
             $arrReturned  = $this->matchRegex($strContainer, IMDB::IMDB_SITES_A);
             if (count($arrReturned[2])) {
                 foreach ($arrReturned[2] as $i => $strName) {
-                    $arrReturn[] = '<a href="' . $arrReturned[1][$i] . '"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
+                    if (strtolower(substr($arrReturned[1][$i], 0, 4)) == 'http') {
+                        $arrReturn[] = '<a href="' . $arrReturned[1][$i] . '"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
+                    }
                 }
                 return implode($this->strSeperator, $arrReturn);
             }
