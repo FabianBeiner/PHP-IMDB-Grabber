@@ -1072,11 +1072,11 @@ class IMDB {
             $arrReturned  = $this->matchRegex($strContainer, IMDB::IMDB_SITES_A);
             if (count($arrReturned[2])) {
                 foreach ($arrReturned[2] as $i => $strName) {
-                    if (strtolower(substr($arrReturned[1][$i], 0, 4)) == 'http') {
-                        $arrReturn[] = '<a href="' . $arrReturned[1][$i] . '"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
+                    if (strtolower(substr($arrReturned[1][$i], 0, 9)) == '/offsite/') {
+                        $arrReturn[] = '<a href="http://www.imdb.com' . $arrReturned[1][$i] . '"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
                     }
                 }
-                return implode($this->strSeperator, $arrReturn);
+                return $arrReturn != null ? implode($this->strSeperator, $arrReturn) : $this->strNotFound;
             }
         }
         return $this->strNotFound;
