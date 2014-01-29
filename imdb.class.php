@@ -932,9 +932,9 @@ class IMDB {
         if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_PLOT, 1)) {
                 if ($intLimit) {
-                    return $this->getShortText($strReturn, $intLimit);
+                    return strip_tags($this->getShortText($strReturn, $intLimit));
                 }
-                return trim($strReturn);
+                return trim(strip_tags($strReturn));
             }
         }
         return $this->strNotFound;
