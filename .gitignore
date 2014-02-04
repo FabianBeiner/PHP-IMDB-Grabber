@@ -2,3 +2,4 @@ cache/*.redir
 cache/*.cache
 cache/*.fullcast
 posters/*.jpg
+/vendor/
