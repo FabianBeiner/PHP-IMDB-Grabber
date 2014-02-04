@@ -1,10 +1,10 @@
 {
     "name": "fabianbeiner/php-imdb-grabber",
-    "description": "This class enables you to retrieve data from IMDb.com with PHP. The script is a proof of concept. It's working, but you shouldn't use it, since IMDb does not allow this method of data grabbing!",
+    "description": "This class enables you to retrieve data from IMDb.com with PHP.",
     "license": "CC BY-NC-SA 3.0",
     "authors": [
         {
-            "name": "FabianBeiner",
+            "name": "Fabian Beiner",
             "email": "mail@fabian-beiner.de"
         }
     ],
