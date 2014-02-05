@@ -439,6 +439,56 @@ class IMDB {
     }
 
     /**
+     * Returns all local names
+     *
+     * @return string The aka name.
+     */
+    public function getAkas() {
+        if ($this->isReady) {
+            $fCache = $this->_strRoot . '/cache/' . md5($this->_strId) . '.akas';
+            if (file_exists($fCache)) {
+                $bolUseCache = TRUE;
+                $intChanged  = filemtime($fCache);
+                $intNow      = time();
+                $intDiff     = round(abs($intNow - $intChanged) / 60);
+                if ($intDiff > $this->_intCache) {
+                    $bolUseCache = FALSE;
+                }
+            } else {
+                $bolUseCache = FALSE;
+            }
+
+            if ($bolUseCache) {
+                if (IMDB::IMDB_DEBUG) {
+                    echo '<b>- Using cache for Akas from ' . $fCache . '</b><br>';
+                }
+                $arrReturn = @file_get_contents($fCache);
+                return implode($this->strSeperator, unserialize($arrReturn));
+            } else {
+                $fullCastUrl = sprintf('http://www.imdb.com/title/tt%s/releaseinfo', $this->_strId);
+                $arrInfo     = $this->doCurl($fullCastUrl, FALSE);
+                if (!$arrInfo) {
+                    return $this->strNotFound;
+                }
+                $arrReturned = $this->matchRegex($arrInfo['contents'], "~<td>(.*?)<\/td>\s+<td>(.*?)<\/td>~",0);
+                if (isset($arrReturned[1]) && isset($arrReturned[2])) {
+
+                    foreach ($arrReturned[1] as $i => $strName) {
+
+                      if (strpos($strName,'(')===false){
+                        $arrReturn[] = trim($arrReturned[2][$i]).' - '.trim($strName);
+                      }
+                    }
+
+                    @file_put_contents($fCache, serialize($arrReturn));
+                    return implode($this->strSeperator, $arrReturn);
+                }
+            }
+        }
+        return $this->strNotFound;
+    }
+
+    /**
      * Returns the aspect ratio of the movie.
      *
      * @return string The aspect ratio.
