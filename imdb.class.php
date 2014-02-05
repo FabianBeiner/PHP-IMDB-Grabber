@@ -33,6 +33,8 @@ class IMDB {
     public $strNotFound  = 'n/A';
     // Define the seperator (eg. for cast).
     public $strSeperator = ' / ';
+    // Define the outpuet
+    public $arrOutput = FALSE;
     // Please set this to 'TRUE' for debugging purposes only.
     const IMDB_DEBUG     = FALSE;
     // Define a timeout for the request of the IMDb page.
@@ -156,6 +158,24 @@ class IMDB {
         }
         return $arrMatches;
     }
+
+
+    private function output($arrReturn, $bolHaveMore = FALSE) {
+        if ($this->arrOutput){
+          if ($arrReturn == null && sizeof($arrReturn) == 0 ) {
+              return array();
+          }
+          return $arrReturn;
+        }
+        else {
+          if ($arrReturn == null && sizeof($arrReturn) == 0 ) {
+              return $this->strNotFound;
+          }
+          return implode($this->strSeperator, $arrReturn) . (($bolHaveMore) ? '…' : '');
+        }
+
+    }
+
 
     /**
      * Returns a shortened text.
@@ -463,7 +483,7 @@ class IMDB {
                     echo '<b>- Using cache for Akas from ' . $fCache . '</b><br>';
                 }
                 $arrReturn = @file_get_contents($fCache);
-                return implode($this->strSeperator, unserialize($arrReturn));
+                return $this->output(unserialize($arrReturn));
             } else {
                 $fullCastUrl = sprintf('http://www.imdb.com/title/tt%s/releaseinfo', $this->_strId);
                 $arrInfo     = $this->doCurl($fullCastUrl, FALSE);
@@ -481,7 +501,7 @@ class IMDB {
                     }
 
                     @file_put_contents($fCache, serialize($arrReturn));
-                    return implode($this->strSeperator, $arrReturn);
+                    return $this->output($arrReturn);
                 }
             }
         }
@@ -531,7 +551,7 @@ class IMDB {
                     }
                     $arrReturn[] = trim($strName);
                 }
-                return implode($this->strSeperator, $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '…' : '');
+                return $this->output($arrReturn,$bolMore,$intLimit);
             }
         }
         return $this->strNotFound;
@@ -562,7 +582,7 @@ class IMDB {
                     echo '<b>- Using cache for fullCast from ' . $fCache . '</b><br>';
                 }
                 $arrReturn = @file_get_contents($fCache);
-                return implode($this->strSeperator, unserialize($arrReturn));
+                return $this->output(unserialize($arrReturn));
             } else {
                 $fullCastUrl = sprintf('http://www.imdb.com/title/tt%s/fullcredits', $this->_strId);
                 $arrInfo     = $this->doCurl($fullCastUrl, FALSE);
@@ -579,7 +599,7 @@ class IMDB {
                         $arrReturn[] = trim($strName);
                     }
                     @file_put_contents($fCache, serialize($arrReturn));
-                    return implode($this->strSeperator, $arrReturn);
+                    return $this->output($arrReturn);
                 }
             }
         }
@@ -601,7 +621,8 @@ class IMDB {
                     }
                     $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . trim($arrReturned[1][$i]) . '/"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
                 }
-                return implode($this->strSeperator, $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '…' : '');
+                $bolHaveMore =( $bolMore && (count($arrReturned[2]) > $intLimit));
+                return $this->output($arrReturn,$bolHaveMore);
             }
         }
         return $this->strNotFound;
@@ -628,7 +649,8 @@ class IMDB {
                         $arrReturn[] = trim($strName);
                     }
                 }
-                return implode($this->strSeperator, $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '…' : '');
+                $bolHaveMore =($bolMore && (count($arrReturned[2]) > $intLimit));
+                return $this->output($arrReturn,$bolHaveMore);
             }
         }
         return $this->strNotFound;
@@ -660,7 +682,8 @@ class IMDB {
                         }
                     }
                 }
-                return implode($this->strSeperator, $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '…' : '');
+                $bolHaveMore =($bolMore && (count($arrReturned[2]) > $intLimit));
+                return $this->output($arrReturn,$bolHaveMore);
             }
         }
         return $this->strNotFound;
@@ -693,7 +716,7 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     $arrReturn[] = trim($strName);
                 }
-                return implode($this->strSeperator, $arrReturn);
+                return $this->output($arrReturn);
             }
         }
         return $this->strNotFound;
@@ -712,7 +735,7 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     $arrReturn[] = '<a href="http://www.imdb.com/company/co' . trim($arrReturned[1][$i]) . '/"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
                 }
-                return implode($this->strSeperator, $arrReturn);
+                return $this->output($arrReturn);
             }
         }
         return $this->strNotFound;
@@ -730,7 +753,7 @@ class IMDB {
                 foreach ($arrReturned[2] as $strName) {
                     $arrReturn[] = trim($strName);
                 }
-                return implode($this->strSeperator, $arrReturn);
+                return $this->output($arrReturn);
             }
         }
         return $this->strNotFound;
@@ -748,7 +771,7 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     $arrReturn[] = '<a href="http://www.imdb.com/country/' . trim($arrReturned[1][$i]) . '/"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
                 }
-                return implode($this->strSeperator, $arrReturn);
+                return $this->output($arrReturn);
             }
         }
         return $this->strNotFound;
@@ -767,7 +790,7 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     $arrReturn[] = trim($strName);
                 }
-                return implode($this->strSeperator, $arrReturn);
+                return $this->output($arrReturn);
             }
         }
         return $this->strNotFound;
@@ -786,7 +809,7 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . trim($arrReturned[1][$i]) . '/"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
                 }
-                return implode($this->strSeperator, $arrReturn);
+                return $this->output($arrReturn);
             }
         }
         return $this->strNotFound;
@@ -819,7 +842,7 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     $arrReturn[] = trim($strName);
                 }
-                return implode($this->strSeperator, $arrReturn);
+                return $this->output($arrReturn);
             }
         }
         return $this->strNotFound;
@@ -838,7 +861,7 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . trim($arrReturned[1][$i]) . '/"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
                 }
-                return implode($this->strSeperator, $arrReturn);
+                return $this->output($arrReturn);
             }
         }
         return $this->strNotFound;
@@ -856,7 +879,7 @@ class IMDB {
                 foreach ($arrReturned[1] as $strName) {
                     $arrReturn[] = trim($strName);
                 }
-                return implode($this->strSeperator, array_unique($arrReturn));
+                return $this->output(array_unique($arrReturn));
             }
         }
         return $this->strNotFound;
@@ -874,7 +897,7 @@ class IMDB {
                 foreach ($arrReturned[1] as $i => $strName) {
                     $arrReturn[] = '<a href="http://www.imdb.com/genre/' . trim($strName) . '/"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
                 }
-                return implode($this->strSeperator, array_unique($arrReturn));
+                return $this->output(array_unique($arrReturn));
             }
         }
         return $this->strNotFound;
@@ -892,7 +915,7 @@ class IMDB {
                 foreach ($arrReturned[2] as $strName) {
                     $arrReturn[] = trim($strName);
                 }
-                return implode($this->strSeperator, $arrReturn);
+                return $this->output($arrReturn);
             }
         }
         return $this->strNotFound;
@@ -910,7 +933,7 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     $arrReturn[] = '<a href="http://www.imdb.com/language/' . trim($arrReturned[1][$i]) . '"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
                 }
-                return implode($this->strSeperator, $arrReturn);
+                return $this->output($arrReturn);
             }
         }
         return $this->strNotFound;
@@ -1066,7 +1089,7 @@ class IMDB {
     public function getSeasons() {
         if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_SEASONS)) {
-                $strReturn = strip_tags(implode($strReturn[1]));
+                $strReturn = strip_tags($this->output($strReturn[1]));
                 $strFind   = array(
                     '&raquo;',
                     '&nbsp;',
@@ -1076,7 +1099,7 @@ class IMDB {
                 $strReturn = str_replace($strFind, '', $strReturn);
                 $arrReturn = explode('|', $strReturn);
                 if ($arrReturn[0]) {
-                    return implode($this->strSeperator, array_reverse($arrReturn));
+                    return $this->output(array_reverse($arrReturn));
                 }
             }
         }
@@ -1091,7 +1114,7 @@ class IMDB {
     public function getSeasonsAsUrl() {
         if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_SEASONS)) {
-                $strReturn  = strip_tags(implode($strReturn[1]));
+                $strReturn  = strip_tags($this->output($strReturn[1]));
                 $strFind    = array(
                     '&raquo;',
                     '&nbsp;',
@@ -1104,7 +1127,7 @@ class IMDB {
                     foreach (array_reverse($arrSeasons) as $sSeasons) {
                         $arrReturn[] = '<a href="http://www.imdb.com/title/tt' . $this->_strId . '/episodes?season=' . $sSeasons . '">' . $sSeasons . '</a>';
                     }
-                    return implode($this->strSeperator, $arrReturn);
+                    return $this->output($arrReturn);
                 }
             }
         }
@@ -1126,7 +1149,7 @@ class IMDB {
                         $arrReturn[] = '<a href="http://www.imdb.com' . $arrReturned[1][$i] . '"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
                     }
                 }
-                return $arrReturn != null ? implode($this->strSeperator, $arrReturn) : $this->strNotFound;
+                return $this->output($arrReturn);
             }
         }
         return $this->strNotFound;
@@ -1145,7 +1168,7 @@ class IMDB {
                 foreach ($arrReturned[1] as $i => $strName) {
                     $arrReturn[] = trim($strName);
                 }
-                return implode($this->strSeperator, $arrReturn);
+                return $this->output($arrReturn);
             }
         }
         return $this->strNotFound;
@@ -1235,7 +1258,7 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     $arrReturn[] = trim($strName);
                 }
-                return implode($this->strSeperator, $arrReturn);
+                return $this->output($arrReturn);
             }
         }
         return $this->strNotFound;
@@ -1254,7 +1277,7 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . trim($arrReturned[1][$i]) . '/"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
                 }
-                return implode($this->strSeperator, $arrReturn);
+                return $this->output($arrReturn);
             }
         }
         return $this->strNotFound;
