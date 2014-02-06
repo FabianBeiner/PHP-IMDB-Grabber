@@ -30,6 +30,7 @@ include_once 'imdb.class.php';
 $oIMDB = new IMDB('New York, I Love You');
 if ($oIMDB->isReady) {
         echo '<p>Also Known As: <b>' . $oIMDB->getAka() . '</b></p>';
+	echo '<p>Also Known As (Complete): <b>' . $oIMDB->getAkas() . '</b></p>';
         echo '<p>Aspect Ratio: <b>' . $oIMDB->getAspectRatio() . '</b></p>';
         echo '<p>Budget: <b>' . $oIMDB->getBudget() . '</b></p>';
         echo '<p>Cast: <b>' . $oIMDB->getCast() . '</b></p>';
