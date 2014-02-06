@@ -1089,21 +1089,23 @@ class IMDB {
     public function getSeasons() {
         if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_SEASONS)) {
-                $strReturn = strip_tags($this->output($strReturn[1]));
-                $strFind   = array(
-                    '&raquo;',
-                    '&nbsp;',
-                    'Full episode list',
-                    ' '
-                );
-                $strReturn = str_replace($strFind, '', $strReturn);
-                $arrReturn = explode('|', $strReturn);
-                if ($arrReturn[0]) {
-                    return $this->output(array_reverse($arrReturn));
+                if (sizeof($strReturn[1])>0){
+                    $strReturn = strip_tags(implode($strReturn[1]));
+                    $strFind   = array(
+                        '&raquo;',
+                        '&nbsp;',
+                        'Full episode list',
+                        ' '
+                    );
+                    $strReturn = str_replace($strFind, '', $strReturn);
+                    $arrReturn = explode('|', $strReturn);
+                    if ($arrReturn[0]) {
+                        return $this->output(array_reverse($arrReturn));
+                    }
                 }
             }
         }
-        return $this->strNotFound;
+        return $this->output(null);
     }
 
     /**
