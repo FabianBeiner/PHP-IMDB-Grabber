@@ -69,6 +69,7 @@ class IMDB {
     const IMDB_REDIRECT     = '~Location:\s(.*)~';
     const IMDB_RELEASE_DATE = '~Release Date:</h4>(.*)(?:<span|<\/div>)~Ui';
     const IMDB_RUNTIME      = '~Runtime:</h4>\s+<time itemprop="duration" datetime="(?:.*)">(.*)</time>~Uis';
+    const IMDB_RUNTIME2     = '~\s+<time\s+itemprop="duration"\s+datetime="(?:.*)"\s+>(.*)</time>~Uis';
     const IMDB_SEARCH       = '~<td class="result_text"> <a href="\/title\/tt(\d+)\/(?:.*)"(?:\s+|)>(.*)<\/a>~Uis';
     const IMDB_SEASONS      = '~Season:</h4>\s+<span class="see-more inline">(.*)</span>\s+</div>~Ui';
     const IMDB_SITES        = '~Official Sites:</h4>(.*)(?:<a href="officialsites|</div>)~Ui';
@@ -1002,6 +1003,8 @@ class IMDB {
     public function getRuntime() {
         if ($this->isReady) {
             if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_RUNTIME, 1)) {
+                return trim($strReturn);
+            } else if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_RUNTIME2, 1)) {
                 return trim($strReturn);
             }
         }
