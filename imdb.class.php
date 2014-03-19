@@ -804,8 +804,9 @@ class IMDB {
             $arrReturned = $this->matchRegex($this->_strSource, IMDB::IMDB_GENRE);
             if (count($arrReturned[1])) {
                 foreach ($arrReturned[1] as $strName) {
-                    if($strName)
+                    if($strName) {
                         $arrReturn[] = trim($strName);
+                    }
                 }
                 return implode($this->strSeperator, array_unique($arrReturn));
             }
@@ -823,8 +824,9 @@ class IMDB {
             $arrReturned = $this->matchRegex($this->_strSource, IMDB::IMDB_GENRE);
             if (count($arrReturned[1])) {
                 foreach ($arrReturned[1] as $i => $strName) {
-                    if($strName)
+                    if($strName) {
                         $arrReturn[] = '<a href="http://www.imdb.com/genre/' . trim($strName) . '/"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
+                    }
                 }
                 return implode($this->strSeperator, array_unique($arrReturn));
             }
