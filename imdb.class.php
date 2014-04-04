@@ -39,6 +39,8 @@ class IMDB {
     const IMDB_TIMEOUT   = 15;
     // Define the "Accept-Language" header language (so IMDb replies with decent localization settings).
     const IMDB_LANG      = 'en-US, en';
+    // Define the "Accept-Charset" header to get the charset you want
+    const IMDB_CHARSET   = 'utf-8,ISO-8859-1;q=0.5';
     // Define the default search type (all/tvtitle/tvepisode/movie).
     const IMDB_SEARCHFOR = 'all';
 
@@ -85,19 +87,19 @@ class IMDB {
     const IMDB_WRITER       = '~(?:Writer|Writers):</h4>(.*)</div>~Ui';
 
     // cURL cookie file.
-    private $_fCookie   = FALSE;
+    protected $_fCookie   = FALSE;
     // IMDb url.
-    private $_strUrl    = NULL;
+    protected $_strUrl    = NULL;
     // IMDb source.
-    private $_strSource = NULL;
+    protected $_strSource = NULL;
     // IMDb cache.
-    private $_strCache  = 0;
+    protected $_strCache  = 0;
     // IMDb movie id.
-    private $_strId     = FALSE;
+    protected $_strId     = FALSE;
     // Movie found?
     public $isReady     = FALSE;
     // Define root of this script.
-    private $_strRoot   = '';
+    protected $_strRoot   = '';
     // Current version.
     const IMDB_VERSION  = '5.5.19';
 
@@ -143,7 +145,7 @@ class IMDB {
      * @return string The match found
      * @return array  The matches found
      */
-    private function matchRegex($strContent, $strRegex, $intIndex = NULL) {
+    protected function matchRegex($strContent, $strRegex, $intIndex = NULL) {
         $arrMatches = FALSE;
         preg_match_all($strRegex, $strContent, $arrMatches);
         if ($arrMatches === FALSE)
@@ -177,7 +179,7 @@ class IMDB {
      * @param string  $strSave   The path to the file
      * @return boolean
      */
-      private function fetchUrl($strSearch) {
+    protected function fetchUrl($strSearch) {
           // Remove whitespaces.
           $strSearch = trim($strSearch);
 
@@ -340,13 +342,14 @@ class IMDB {
      *
      * @return arr Array with cURL informations.
      */
-      private function doCurl($strUrl, $bolOverWriteSource = TRUE) {
+    protected function doCurl($strUrl, $bolOverWriteSource = TRUE) {
           $oCurl = curl_init($strUrl);
           curl_setopt_array($oCurl, array(
               CURLOPT_VERBOSE => FALSE,
               CURLOPT_HEADER => TRUE,
               CURLOPT_HTTPHEADER => array(
-                  'Accept-Language:' . IMDB::IMDB_LANG . ';q=0.5'
+                  'Accept-Language:' . IMDB::IMDB_LANG . ';q=0.5',
+                  'Accept-Charset:' . IMDB::IMDB_CHARSET,
               ),
               CURLOPT_FRESH_CONNECT => TRUE,
               CURLOPT_RETURNTRANSFER => TRUE,
@@ -391,7 +394,7 @@ class IMDB {
      * @param string $_strUrl The URL to the image on imdb
      * @return string The local path to the image
      */
-    private function saveImage($_strUrl) {
+    protected function saveImage($_strUrl) {
         $_strUrl = trim($_strUrl);
 
         if (preg_match('/imdb-share-logo.gif/', $_strUrl) && file_exists('posters/not-found.jpg')) {
