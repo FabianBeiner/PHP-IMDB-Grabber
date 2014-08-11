@@ -76,7 +76,7 @@ class IMDB {
     const IMDB_SITES        = '~Official Sites:</h4>(.*)(?:<a href="officialsites|</div>)~Ui';
     const IMDB_SITES_A      = '~href="(.*)" itemprop=\'url\'>(.*)</a>~Ui';
     const IMDB_SOUND_MIX    = '~Sound Mix:</h4>(.*)</div>~Ui';
-    const IMDB_SOUND_MIX_A  = '~href="/search/title\?sound_mixes=(?:.*)"itemprop=\'url\'>(.*)</a>~Ui';
+    const IMDB_SOUND_MIX_A  = '~href="/search/title\?sound_mixes=(?:.*)"(?:\s*)itemprop=\'url\'>(.*)</a>~Ui';
     const IMDB_TAGLINE      = '~Taglines:</h4>(.*)(?:<span|<\/span>|</div>)~Ui';
     const IMDB_TITLE        = '~property=\'og:title\' content="(.*) \((?:.*)\)"~Ui';
     const IMDB_TITLE_ORIG   = '~<span class="title-extra" itemprop="name">(.*)<i>\(original title\)<\/i>\s+</span>~Ui';
