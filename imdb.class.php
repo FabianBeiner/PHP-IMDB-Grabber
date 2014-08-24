@@ -23,7 +23,7 @@
  * @link    http://fabian-beiner.de
  * @license Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  *
- * @version 5.5.19 (October 29th, 2013)
+ * @version 5.5.20 (August 24th, 2014)
 */
 
 class IMDBException extends Exception {}
@@ -101,7 +101,7 @@ class IMDB {
     // Define root of this script.
     protected $_strRoot   = '';
     // Current version.
-    const IMDB_VERSION  = '5.5.19';
+    const IMDB_VERSION  = '5.5.20';
 
     /**
      * IMDB constructor.
