@@ -75,7 +75,7 @@ foreach ($arrTests as $strTest) {
         echo '<p>Sites as URL: <b>' . $oIMDB->getSitesAsUrl('_blank') . '</b></p>';
         echo '<p>Tagline: <b>' . $oIMDB->getTagline() . '</b></p>';
         echo '<p>Title: <b>' . $oIMDB->getTitle() . '</b></p>';
-        if ($oIMDB->getTrailerAsUrl() != 'n/A') {
+        if ($oIMDB->getTrailerAsUrl() != $oIMDB->strNotFound) {
             echo '<p>Trailer: <b><a href="' . $oIMDB->getTrailerAsUrl() . '">' . $oIMDB->getTrailerAsUrl() . '</a></b></p>';
         }
         else {
