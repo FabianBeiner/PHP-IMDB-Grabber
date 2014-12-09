@@ -20,6 +20,10 @@ Since version 5.5.0 the script is licensed under [CC BY-NC-SA 3.0](http://creati
 
 ## Changes
 
+5.5.21
+- getSeasons() and getSeasonsAsUrl().
+- Notice: IMDb blocks trailers to get included via iFrame.
+
 5.5.20
 - Updated lots of the IMDB_* constants. *(Thanks to bla0r)*
 - Fixed Runtime (issue #46).
@@ -240,4 +244,4 @@ The usage of this script is simple. Just have a look at imdb.example.php – you
 
 ## Example output (of imdb.example.php)
 
-![Screenshot](http://img801.imageshack.us/img801/3749/imdbc.png "Screenshot of imdb.example.php output")
+![Screenshot](http://abload.de/img/imdbkaf8x.jpg "Screenshot of imdb.example.php output")

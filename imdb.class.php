@@ -14,7 +14,7 @@
  *
  *
  * If you want to thank me for my work and the support, feel free to do this
- * through PayPal (use mail@fabian-beiner.de as payment destination) or just
+ * through PayPal (use fb@fabianbeiner.de as payment destination) or just
  * buy me a book at Amazon (http://www.amazon.de/registry/wishlist/8840JITISN9L)
  * – thank you! :-)
  *
@@ -23,7 +23,7 @@
  * @link    http://fabian-beiner.de
  * @license Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  *
- * @version 5.5.20 (August 24th, 2014)
+ * @version 5.5.21 (December 9th, 2014)
 */
 
 class IMDBException extends Exception {}
@@ -72,7 +72,7 @@ class IMDB {
     const IMDB_RELEASE_DATE = '~Release Date:</h4>(.*)(?:<span|<\/div>)~Ui';
     const IMDB_RUNTIME      = '~<time itemprop="duration" datetime="(?:.*)"(?:\s*)>(?:\s*)(.*)</time>~Uis';
     const IMDB_SEARCH       = '~<td class="result_text"> <a href="\/title\/tt(\d+)\/(?:.*)"(?:\s*)>(.*)<\/a>~Uis';
-    const IMDB_SEASONS      = '~Season:</h4>(?:\s*)<span class="see-more inline">(.*)</span>(?:\s*)</div>~Ui';
+    const IMDB_SEASONS      = '~(?:episodes\?season=(\d+))~Ui';
     const IMDB_SITES        = '~Official Sites:</h4>(.*)(?:<a href="officialsites|</div>)~Ui';
     const IMDB_SITES_A      = '~href="(.*)" itemprop=\'url\'>(.*)</a>~Ui';
     const IMDB_SOUND_MIX    = '~Sound Mix:</h4>(.*)</div>~Ui';
@@ -101,7 +101,7 @@ class IMDB {
     // Define root of this script.
     protected $_strRoot   = '';
     // Current version.
-    const IMDB_VERSION  = '5.5.20';
+    const IMDB_VERSION  = '5.5.21';
 
     /**
      * IMDB constructor.
@@ -1022,18 +1022,9 @@ class IMDB {
      */
     public function getSeasons() {
         if ($this->isReady) {
-            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_SEASONS)) {
-                $strReturn = strip_tags(implode($strReturn[1]));
-                $strFind   = array(
-                    '&raquo;',
-                    '&nbsp;',
-                    'Full episode list',
-                    ' '
-                );
-                $strReturn = str_replace($strFind, '', $strReturn);
-                $arrReturn = explode('|', $strReturn);
-                if ($arrReturn[0]) {
-                    return implode($this->strSeperator, array_reverse($arrReturn));
+            if ($arrFetch = $this->matchRegex($this->_strSource, IMDB::IMDB_SEASONS)) {
+                if ($arrFetch[1]) {
+                    return implode($this->strSeperator, array_reverse($arrFetch[1]));
                 }
             }
         }
@@ -1047,18 +1038,9 @@ class IMDB {
      */
     public function getSeasonsAsUrl() {
         if ($this->isReady) {
-            if ($strReturn = $this->matchRegex($this->_strSource, IMDB::IMDB_SEASONS)) {
-                $strReturn  = strip_tags(implode($strReturn[1]));
-                $strFind    = array(
-                    '&raquo;',
-                    '&nbsp;',
-                    'Full episode list',
-                    ' '
-                );
-                $strReturn  = str_replace($strFind, '', $strReturn);
-                $arrSeasons = explode('|', $strReturn);
-                if ($arrSeasons[0]) {
-                    foreach (array_reverse($arrSeasons) as $sSeasons) {
+            if ($arrFetch = $this->matchRegex($this->_strSource, IMDB::IMDB_SEASONS)) {
+                if ($arrFetch[1]) {
+                    foreach (array_reverse($arrFetch[1]) as $sSeasons) {
                         $arrReturn[] = '<a href="http://www.imdb.com/title/tt' . $this->_strId . '/episodes?season=' . $sSeasons . '">' . $sSeasons . '</a>';
                     }
                     return implode($this->strSeperator, $arrReturn);
