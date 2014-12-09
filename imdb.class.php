@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PHP-IMDb-Grabber -- a PHP IMDb.com scraper
  *
@@ -24,23 +25,23 @@
  * @license Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  *
  * @version 5.5.21 (December 9th, 2014)
-*/
-
-class IMDBException extends Exception {}
+ */
+class IMDBException extends Exception {
+}
 
 class IMDB {
     // Define what to return if something is not found.
-    public $strNotFound  = 'n/A';
+    public $strNotFound = 'n/A';
     // Define the seperator (eg. for cast).
     public $strSeperator = ' / ';
     // Please set this to 'TRUE' for debugging purposes only.
-    const IMDB_DEBUG     = FALSE;
+    const IMDB_DEBUG = FALSE;
     // Define a timeout for the request of the IMDb page.
-    const IMDB_TIMEOUT   = 15;
+    const IMDB_TIMEOUT = 15;
     // Define the "Accept-Language" header language (so IMDb replies with decent localization settings).
-    const IMDB_LANG      = 'en-US, en';
+    const IMDB_LANG = 'en-US, en';
     // Define the "Accept-Charset" header to get the charset you want
-    const IMDB_CHARSET   = 'utf-8,ISO-8859-1;q=0.5';
+    const IMDB_CHARSET = 'utf-8,ISO-8859-1;q=0.5';
     // Define the default search type (all/tvtitle/tvepisode/movie).
     const IMDB_SEARCHFOR = 'all';
 
@@ -87,21 +88,21 @@ class IMDB {
     const IMDB_WRITER       = '~(?:Writer|Writers):</h4>(.*)</div>~Ui';
 
     // cURL cookie file.
-    protected $_fCookie   = FALSE;
+    protected $_fCookie = FALSE;
     // IMDb url.
-    protected $_strUrl    = NULL;
+    protected $_strUrl = NULL;
     // IMDb source.
     protected $_strSource = NULL;
     // IMDb cache.
-    protected $_strCache  = 0;
+    protected $_strCache = 0;
     // IMDb movie id.
-    protected $_strId     = FALSE;
+    protected $_strId = FALSE;
     // Movie found?
-    public $isReady     = FALSE;
+    public $isReady = FALSE;
     // Define root of this script.
-    protected $_strRoot   = '';
+    protected $_strRoot = '';
     // Current version.
-    const IMDB_VERSION  = '5.5.21';
+    const IMDB_VERSION = '5.5.21';
 
     /**
      * IMDB constructor.
@@ -132,7 +133,7 @@ class IMDB {
             echo '<b>- Running:</b> IMDB::fetchUrl<br>';
         }
         // Set global cache and fetch the data.
-        $this->_intCache = (int) $intCache;
+        $this->_intCache = (int)$intCache;
         IMDB::fetchUrl($strSearch);
     }
 
@@ -142,20 +143,24 @@ class IMDB {
      * @param string  $strContent The content to search in
      * @param string  $strRegex   The regular expression
      * @param integer $intIndex   The index to return
+     *
      * @return string The match found
      * @return array  The matches found
      */
     protected function matchRegex($strContent, $strRegex, $intIndex = NULL) {
         $arrMatches = FALSE;
         preg_match_all($strRegex, $strContent, $arrMatches);
-        if ($arrMatches === FALSE)
+        if ($arrMatches === FALSE) {
             return FALSE;
+        }
         if ($intIndex != NULL && is_int($intIndex)) {
             if ($arrMatches[$intIndex]) {
                 return $arrMatches[$intIndex][0];
             }
+
             return FALSE;
         }
+
         return $arrMatches;
     }
 
@@ -169,170 +174,182 @@ class IMDB {
         $strText = trim($strText) . ' ';
         $strText = substr($strText, 0, $intLength);
         $strText = substr($strText, 0, strrpos($strText, ' '));
+
         return $strText . '…';
     }
 
     /**
      * Fetch data from the given url.
      *
-     * @param string  $strSearch The movie name / IMDb url
-     * @param string  $strSave   The path to the file
+     * @param string $strSearch The movie name / IMDb url
+     * @param string $strSave   The path to the file
+     *
      * @return boolean
      */
     protected function fetchUrl($strSearch) {
-          // Remove whitespaces.
-          $strSearch = trim($strSearch);
+        // Remove whitespaces.
+        $strSearch = trim($strSearch);
 
-          // "Remote Debug" - so I can see which version you're running.
-          // To due people complaing about broken functions while they're
-          // using old versions. Feel free to remove this.
-          if ($strSearch == '##REMOTEDEBUG##') {
-              $strSearch = 'http://www.imdb.com/title/tt1022603/';
-              echo '<pre>Running PHP-IMDB-Grabber v' . IMDB::IMDB_VERSION . '.</pre>';
-          }
+        // "Remote Debug" - so I can see which version you're running.
+        // To due people complaing about broken functions while they're
+        // using old versions. Feel free to remove this.
+        if ($strSearch == '##REMOTEDEBUG##') {
+            $strSearch = 'http://www.imdb.com/title/tt1022603/';
+            echo '<pre>Running PHP-IMDB-Grabber v' . IMDB::IMDB_VERSION . '.</pre>';
+        }
 
-          // Get the ID of the movie.
-          $strId = IMDB::matchRegex($strSearch, IMDB::IMDB_URL, 1);
-          if (!$strId) {
-              $strId = IMDB::matchRegex($strSearch, IMDB::IMDB_ID, 1);
-          }
+        // Get the ID of the movie.
+        $strId = IMDB::matchRegex($strSearch, IMDB::IMDB_URL, 1);
+        if (!$strId) {
+            $strId = IMDB::matchRegex($strSearch, IMDB::IMDB_ID, 1);
+        }
 
-          // Check if we found an ID ...
-          if ($strId) {
-              $this->_strId  = preg_replace('~[\D]~', '', $strId);
-              $this->_strUrl = 'http://www.imdb.com/title/tt' . $this->_strId . '/';
-              $bolFound      = FALSE;
-              $this->isReady = TRUE;
-          }
+        // Check if we found an ID ...
+        if ($strId) {
+            $this->_strId  = preg_replace('~[\D]~', '', $strId);
+            $this->_strUrl = 'http://www.imdb.com/title/tt' . $this->_strId . '/';
+            $bolFound      = FALSE;
+            $this->isReady = TRUE;
+        }
 
-          // ... otherwise try to find one.
-          else {
-              $strSearchFor = 'all';
-              if (strtolower(IMDB::IMDB_SEARCHFOR) == 'movie') {
-                  $strSearchFor = 'tt&ttype=ft&ref_=fn_ft';
-              } elseif (strtolower(IMDB::IMDB_SEARCHFOR) == 'tvtitle') {
-                  $strSearchFor = 'tt&ttype=tv&ref_=fn_tv';
-              } elseif (strtolower(IMDB::IMDB_SEARCHFOR) == 'tvepisode') {
-                  $strSearchFor = 'tt&ttype=ep&ref_=fn_ep';
-              }
+        // ... otherwise try to find one.
+        else {
+            $strSearchFor = 'all';
+            if (strtolower(IMDB::IMDB_SEARCHFOR) == 'movie') {
+                $strSearchFor = 'tt&ttype=ft&ref_=fn_ft';
+            }
+            elseif (strtolower(IMDB::IMDB_SEARCHFOR) == 'tvtitle') {
+                $strSearchFor = 'tt&ttype=tv&ref_=fn_tv';
+            }
+            elseif (strtolower(IMDB::IMDB_SEARCHFOR) == 'tvepisode') {
+                $strSearchFor = 'tt&ttype=ep&ref_=fn_ep';
+            }
 
-              $this->_strUrl = 'http://www.imdb.com/find?s=' . $strSearchFor . '&q=' . str_replace(' ', '+', $strSearch);
-              $bolFound      = TRUE;
+            $this->_strUrl = 'http://www.imdb.com/find?s=' . $strSearchFor . '&q=' . str_replace(' ', '+', $strSearch);
+            $bolFound      = TRUE;
 
-              // Check for cached redirects of this search.
-              $fRedirect = @file_get_contents($this->_strRoot . '/cache/' . md5($this->_strUrl) . '.redir');
-              if ($fRedirect) {
-                  if (IMDB::IMDB_DEBUG) {
-                      echo '<b>- Found an old redirect:</b> ' . $fRedirect . '<br>';
-                  }
-                  $this->_strUrl = trim($fRedirect);
-                  $this->_strId  = preg_replace('~[\D]~', '', IMDB::matchRegex($fRedirect, IMDB::IMDB_URL, 1));
-                  $this->isReady = TRUE;
-                  $bolFound      = FALSE;
-              }
-          }
+            // Check for cached redirects of this search.
+            $fRedirect = @file_get_contents($this->_strRoot . '/cache/' . md5($this->_strUrl) . '.redir');
+            if ($fRedirect) {
+                if (IMDB::IMDB_DEBUG) {
+                    echo '<b>- Found an old redirect:</b> ' . $fRedirect . '<br>';
+                }
+                $this->_strUrl = trim($fRedirect);
+                $this->_strId  = preg_replace('~[\D]~', '', IMDB::matchRegex($fRedirect, IMDB::IMDB_URL, 1));
+                $this->isReady = TRUE;
+                $bolFound      = FALSE;
+            }
+        }
 
-          // Check if there is a cache we can use.
-          $fCache = $this->_strRoot . '/cache/' . md5($this->_strId) . '.cache';
-          if (file_exists($fCache)) {
-              $bolUseCache = TRUE;
-              $intChanged  = filemtime($fCache);
-              $intNow      = time();
-              $intDiff     = round(abs($intNow - $intChanged) / 60);
-              if ($intDiff > $this->_intCache) {
-                  $bolUseCache = FALSE;
-              }
-          } else {
-              $bolUseCache = FALSE;
-          }
+        // Check if there is a cache we can use.
+        $fCache = $this->_strRoot . '/cache/' . md5($this->_strId) . '.cache';
+        if (file_exists($fCache)) {
+            $bolUseCache = TRUE;
+            $intChanged  = filemtime($fCache);
+            $intNow      = time();
+            $intDiff     = round(abs($intNow - $intChanged) / 60);
+            if ($intDiff > $this->_intCache) {
+                $bolUseCache = FALSE;
+            }
+        }
+        else {
+            $bolUseCache = FALSE;
+        }
 
-          if ($bolUseCache) {
-              if (IMDB::IMDB_DEBUG) {
-                  echo '<b>- Using cache for ' . $strSearch . ' from ' . $fCache . '</b><br>';
-              }
-              $this->_strSource = file_get_contents($fCache);
-              return TRUE;
-          } else {
-              // Cookie path.
-              if (function_exists('sys_get_temp_dir')) {
-                  $this->_fCookie = tempnam(sys_get_temp_dir(), 'imdb');
-                  if (IMDB::IMDB_DEBUG) {
-                      echo '<b>- Path to cookie:</b> ' . $this->_fCookie . '<br>';
-                  }
-              }
-              // Initialize and run the request.
-              if (IMDB::IMDB_DEBUG) {
-                  echo '<b>- Run cURL on:</b> ' . $this->_strUrl . '<br>';
-              }
+        if ($bolUseCache) {
+            if (IMDB::IMDB_DEBUG) {
+                echo '<b>- Using cache for ' . $strSearch . ' from ' . $fCache . '</b><br>';
+            }
+            $this->_strSource = file_get_contents($fCache);
 
-              $arrInfo   = $this->doCurl($this->_strUrl);
-              $strOutput = $arrInfo['contents'];
+            return TRUE;
+        }
+        else {
+            // Cookie path.
+            if (function_exists('sys_get_temp_dir')) {
+                $this->_fCookie = tempnam(sys_get_temp_dir(), 'imdb');
+                if (IMDB::IMDB_DEBUG) {
+                    echo '<b>- Path to cookie:</b> ' . $this->_fCookie . '<br>';
+                }
+            }
+            // Initialize and run the request.
+            if (IMDB::IMDB_DEBUG) {
+                echo '<b>- Run cURL on:</b> ' . $this->_strUrl . '<br>';
+            }
 
-              // Check if the request actually worked.
-              if ($strOutput === FALSE) {
-                  if (IMDB::IMDB_DEBUG) {
-                      echo '<b>! cURL error:</b> ' . $this->_strUrl . '<br>';
-                  }
-                  $this->_strSource = file_get_contents($fCache);
-                  if ($this->_strSource) {
-                      return TRUE;
-                  }
-                  return FALSE;
-              }
+            $arrInfo   = $this->doCurl($this->_strUrl);
+            $strOutput = $arrInfo['contents'];
 
-              // Check if there is a redirect given (IMDb sometimes does not return 301 for this...).
-              $fRedirect = $this->_strRoot . '/cache/' . md5($this->_strUrl) . '.redir';
-              if ($strMatch = $this->matchRegex($strOutput, IMDB::IMDB_REDIRECT, 1)) {
-                  $arrExplode = explode('?fr=', $strMatch);
-                  $strMatch   = ($arrExplode[0] ? $arrExplode[0] : $strMatch);
-                  if (IMDB::IMDB_DEBUG) {
-                      echo '<b>- Saved a new redirect:</b> ' . $fRedirect . '<br>';
-                  }
-                  file_put_contents($fRedirect, $strMatch);
-                  $this->isReady    = FALSE;
-                  // Run the cURL request again with the new url.
-                  IMDB::fetchUrl($strMatch);
-                  return TRUE;
-              }
-              // Check if any of the search regexes is matching.
-              elseif ($strMatch = $this->matchRegex($strOutput, IMDB::IMDB_SEARCH, 1)) {
-                  $strMatch = 'http://www.imdb.com/title/tt' . $strMatch . '/';
-                  if (IMDB::IMDB_DEBUG) {
-                      echo '<b>- Using the first search result:</b> ' . $strMatch . '<br>';
-                      echo '<b>- Saved a new redirect:</b> ' . $fRedirect . '<br>';
-                  }
-                  file_put_contents($fRedirect, $strMatch);
-                  // Run the cURL request again with the new url.
-                  $this->_strSource = NULL;
-                  $this->isReady    = FALSE;
-                  IMDB::fetchUrl($strMatch);
-                  return TRUE;
-              }
-              // If it's not a redirect and the HTTP response is not 200 or 302, abort.
-              elseif ($arrInfo['http_code'] != 200 && $arrInfo['http_code'] != 302) {
-                  if (IMDB::IMDB_DEBUG) {
-                      echo '<b>- Wrong HTTP code received, aborting:</b> ' . $arrInfo['http_code'] . '<br>';
-                  }
-                  return FALSE;
-              }
+            // Check if the request actually worked.
+            if ($strOutput === FALSE) {
+                if (IMDB::IMDB_DEBUG) {
+                    echo '<b>! cURL error:</b> ' . $this->_strUrl . '<br>';
+                }
+                $this->_strSource = file_get_contents($fCache);
+                if ($this->_strSource) {
+                    return TRUE;
+                }
 
-              $this->_strSource = $strOutput;
+                return FALSE;
+            }
 
-              // Set the global source.
-              $this->_strSource = preg_replace('~(\r|\n|\r\n)~', '', $this->_strSource);
+            // Check if there is a redirect given (IMDb sometimes does not return 301 for this...).
+            $fRedirect = $this->_strRoot . '/cache/' . md5($this->_strUrl) . '.redir';
+            if ($strMatch = $this->matchRegex($strOutput, IMDB::IMDB_REDIRECT, 1)) {
+                $arrExplode = explode('?fr=', $strMatch);
+                $strMatch   = ($arrExplode[0] ? $arrExplode[0] : $strMatch);
+                if (IMDB::IMDB_DEBUG) {
+                    echo '<b>- Saved a new redirect:</b> ' . $fRedirect . '<br>';
+                }
+                file_put_contents($fRedirect, $strMatch);
+                $this->isReady = FALSE;
+                // Run the cURL request again with the new url.
+                IMDB::fetchUrl($strMatch);
 
-              // Save cache.
-              if (!$bolFound) {
-                  if (IMDB::IMDB_DEBUG) {
-                      echo '<b>- Saved a new cache:</b> ' . $fCache . '<br>';
-                  }
-                  file_put_contents($fCache, $this->_strSource);
-              }
+                return TRUE;
+            }
+            // Check if any of the search regexes is matching.
+            elseif ($strMatch = $this->matchRegex($strOutput, IMDB::IMDB_SEARCH, 1)) {
+                $strMatch = 'http://www.imdb.com/title/tt' . $strMatch . '/';
+                if (IMDB::IMDB_DEBUG) {
+                    echo '<b>- Using the first search result:</b> ' . $strMatch . '<br>';
+                    echo '<b>- Saved a new redirect:</b> ' . $fRedirect . '<br>';
+                }
+                file_put_contents($fRedirect, $strMatch);
+                // Run the cURL request again with the new url.
+                $this->_strSource = NULL;
+                $this->isReady    = FALSE;
+                IMDB::fetchUrl($strMatch);
 
-              return TRUE;
-          }
-          return FALSE;
-      }
+                return TRUE;
+            }
+            // If it's not a redirect and the HTTP response is not 200 or 302, abort.
+            elseif ($arrInfo['http_code'] != 200 && $arrInfo['http_code'] != 302) {
+                if (IMDB::IMDB_DEBUG) {
+                    echo '<b>- Wrong HTTP code received, aborting:</b> ' . $arrInfo['http_code'] . '<br>';
+                }
+
+                return FALSE;
+            }
+
+            $this->_strSource = $strOutput;
+
+            // Set the global source.
+            $this->_strSource = preg_replace('~(\r|\n|\r\n)~', '', $this->_strSource);
+
+            // Save cache.
+            if (!$bolFound) {
+                if (IMDB::IMDB_DEBUG) {
+                    echo '<b>- Saved a new cache:</b> ' . $fCache . '<br>';
+                }
+                file_put_contents($fCache, $this->_strSource);
+            }
+
+            return TRUE;
+        }
+
+        return FALSE;
+    }
 
     /**
      * Run a cURL request.
@@ -343,55 +360,57 @@ class IMDB {
      * @return arr Array with cURL informations.
      */
     protected function doCurl($strUrl, $bolOverWriteSource = TRUE) {
-          $oCurl = curl_init($strUrl);
-          curl_setopt_array($oCurl, array(
-              CURLOPT_VERBOSE => FALSE,
-              CURLOPT_HEADER => TRUE,
-              CURLOPT_HTTPHEADER => array(
-                  'Accept-Language:' . IMDB::IMDB_LANG . ';q=0.5',
-                  'Accept-Charset:' . IMDB::IMDB_CHARSET,
-              ),
-              CURLOPT_FRESH_CONNECT => TRUE,
-              CURLOPT_RETURNTRANSFER => TRUE,
-              CURLOPT_TIMEOUT => IMDB::IMDB_TIMEOUT,
-              CURLOPT_CONNECTTIMEOUT => 0,
-              CURLOPT_REFERER => 'http://www.google.com',
-              CURLOPT_USERAGENT => 'Googlebot/2.1 (+http://www.google.com/bot.html)',
-              CURLOPT_FOLLOWLOCATION => FALSE,
-              CURLOPT_COOKIEFILE => $this->_fCookie
-          ));
-          $strOutput = curl_exec($oCurl);
+        $oCurl = curl_init($strUrl);
+        curl_setopt_array($oCurl, array(
+            CURLOPT_VERBOSE        => FALSE,
+            CURLOPT_HEADER         => TRUE,
+            CURLOPT_HTTPHEADER     => array(
+                'Accept-Language:' . IMDB::IMDB_LANG . ';q=0.5',
+                'Accept-Charset:' . IMDB::IMDB_CHARSET,
+            ),
+            CURLOPT_FRESH_CONNECT  => TRUE,
+            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_TIMEOUT        => IMDB::IMDB_TIMEOUT,
+            CURLOPT_CONNECTTIMEOUT => 0,
+            CURLOPT_REFERER        => 'http://www.google.com',
+            CURLOPT_USERAGENT      => 'Googlebot/2.1 (+http://www.google.com/bot.html)',
+            CURLOPT_FOLLOWLOCATION => FALSE,
+            CURLOPT_COOKIEFILE     => $this->_fCookie
+        ));
+        $strOutput = curl_exec($oCurl);
 
-          // Remove cookie.
-          if ($this->_fCookie) {
-              @unlink($this->_fCookie);
-          }
+        // Remove cookie.
+        if ($this->_fCookie) {
+            @unlink($this->_fCookie);
+        }
 
-          // Get returned information.
-          $arrInfo = curl_getinfo($oCurl);
-          curl_close($oCurl);
+        // Get returned information.
+        $arrInfo = curl_getinfo($oCurl);
+        curl_close($oCurl);
 
-          $arrInfo['contents'] = $strOutput;
+        $arrInfo['contents'] = $strOutput;
 
-          if ($bolOverWriteSource) {
-              $this->_strSource = $strOutput;
-          }
+        if ($bolOverWriteSource) {
+            $this->_strSource = $strOutput;
+        }
 
-          // If it's not a redirect and the HTTP response is not 200 or 302, abort.
-          if ($arrInfo['http_code'] != 200 && $arrInfo['http_code'] != 302) {
-              if (IMDB::IMDB_DEBUG) {
-                  echo '<b>- Wrong HTTP code received, aborting:</b> ' . $arrInfo['http_code'] . '<br>';
-              }
-              return FALSE;
-          }
+        // If it's not a redirect and the HTTP response is not 200 or 302, abort.
+        if ($arrInfo['http_code'] != 200 && $arrInfo['http_code'] != 302) {
+            if (IMDB::IMDB_DEBUG) {
+                echo '<b>- Wrong HTTP code received, aborting:</b> ' . $arrInfo['http_code'] . '<br>';
+            }
 
-          return $arrInfo;
-      }
+            return FALSE;
+        }
+
+        return $arrInfo;
+    }
 
     /**
      * Save the image locally.
      *
      * @param string $_strUrl The URL to the image on imdb
+     *
      * @return string The local path to the image
      */
     protected function saveImage($_strUrl) {
@@ -407,12 +426,12 @@ class IMDB {
         }
         $oCurl = curl_init($_strUrl);
         curl_setopt_array($oCurl, array(
-            CURLOPT_VERBOSE => FALSE,
-            CURLOPT_HEADER => FALSE,
+            CURLOPT_VERBOSE        => FALSE,
+            CURLOPT_HEADER         => FALSE,
             CURLOPT_RETURNTRANSFER => TRUE,
-            CURLOPT_TIMEOUT => IMDB::IMDB_TIMEOUT,
+            CURLOPT_TIMEOUT        => IMDB::IMDB_TIMEOUT,
             CURLOPT_CONNECTTIMEOUT => 0,
-            CURLOPT_REFERER => $_strUrl,
+            CURLOPT_REFERER        => $_strUrl,
             CURLOPT_BINARYTRANSFER => TRUE
         ));
         $sOutput = curl_exec($oCurl);
@@ -424,6 +443,7 @@ class IMDB {
         $oFile = fopen($strFilename, 'x');
         fwrite($oFile, $sOutput);
         fclose($oFile);
+
         return 'posters/' . $this->_strId . '.jpg';
     }
 
@@ -438,6 +458,7 @@ class IMDB {
                 return trim($strReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -452,6 +473,7 @@ class IMDB {
                 return trim($strReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -466,6 +488,7 @@ class IMDB {
                 return trim($strReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -484,9 +507,11 @@ class IMDB {
                     }
                     $arrReturn[] = trim($strName);
                 }
+
                 return implode($this->strSeperator, $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '…' : '');
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -506,7 +531,8 @@ class IMDB {
                 if ($intDiff > $this->_intCache) {
                     $bolUseCache = FALSE;
                 }
-            } else {
+            }
+            else {
                 $bolUseCache = FALSE;
             }
 
@@ -515,8 +541,10 @@ class IMDB {
                     echo '<b>- Using cache for fullCast from ' . $fCache . '</b><br>';
                 }
                 $arrReturn = @file_get_contents($fCache);
+
                 return implode($this->strSeperator, unserialize($arrReturn));
-            } else {
+            }
+            else {
                 $fullCastUrl = sprintf('http://www.imdb.com/title/tt%s/fullcredits', $this->_strId);
                 $arrInfo     = $this->doCurl($fullCastUrl, FALSE);
                 if (!$arrInfo) {
@@ -532,10 +560,12 @@ class IMDB {
                         $arrReturn[] = trim($strName);
                     }
                     @file_put_contents($fCache, serialize($arrReturn));
+
                     return implode($this->strSeperator, $arrReturn);
                 }
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -554,9 +584,11 @@ class IMDB {
                     }
                     $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . trim($arrReturned[1][$i]) . '/"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
                 }
+
                 return implode($this->strSeperator, $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '…' : '');
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -577,13 +609,16 @@ class IMDB {
                     $arrChar[1][$i] = trim(preg_replace('~\((.*)\)~Ui', '', strip_tags($arrChar[1][$i])));
                     if ($arrChar[1][$i]) {
                         $arrReturn[] = trim($strName) . ' as ' . trim($arrChar[1][$i]);
-                    } else {
+                    }
+                    else {
                         $arrReturn[] = trim($strName);
                     }
                 }
+
                 return implode($this->strSeperator, $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '…' : '');
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -605,17 +640,21 @@ class IMDB {
                     preg_match_all('~<a href="/character/ch(\d+)/">(.*)</a>~Ui', $arrChar[1][$i], $arrMatches);
                     if (isset($arrMatches[1][0]) && isset($arrMatches[2][0])) {
                         $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . trim($arrReturned[1][$i]) . '/"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a> as <a href="http://www.imdb.com/character/ch' . trim($arrMatches[1][0]) . '/">' . trim($arrMatches[2][0]) . '</a>';
-                    } else {
+                    }
+                    else {
                         if ($arrChar[1][$i]) {
                             $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . trim($arrReturned[1][$i]) . '/"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a> as ' . strip_tags(trim($arrChar[1][$i]));
-                        } else {
+                        }
+                        else {
                             $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . trim($arrReturned[1][$i]) . '/"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
                         }
                     }
                 }
+
                 return implode($this->strSeperator, $arrReturn) . ($bolMore && (count($arrReturned[2]) > $intLimit) ? '…' : '');
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -630,6 +669,7 @@ class IMDB {
                 return $strReturn;
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -646,9 +686,11 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     $arrReturn[] = trim($strName);
                 }
+
                 return implode($this->strSeperator, $arrReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -665,9 +707,11 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     $arrReturn[] = '<a href="http://www.imdb.com/company/co' . trim($arrReturned[1][$i]) . '/"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
                 }
+
                 return implode($this->strSeperator, $arrReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -683,9 +727,11 @@ class IMDB {
                 foreach ($arrReturned[2] as $strName) {
                     $arrReturn[] = trim($strName);
                 }
+
                 return implode($this->strSeperator, $arrReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -701,9 +747,11 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     $arrReturn[] = '<a href="http://www.imdb.com/country/' . trim($arrReturned[1][$i]) . '/"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
                 }
+
                 return implode($this->strSeperator, $arrReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -720,9 +768,11 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     $arrReturn[] = trim($strName);
                 }
+
                 return implode($this->strSeperator, $arrReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -739,9 +789,11 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . trim($arrReturned[1][$i]) . '/"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
                 }
+
                 return implode($this->strSeperator, $arrReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -756,6 +808,7 @@ class IMDB {
                 return trim($strReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -772,9 +825,11 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     $arrReturn[] = trim($strName);
                 }
+
                 return implode($this->strSeperator, $arrReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -791,9 +846,11 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . trim($arrReturned[1][$i]) . '/"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
                 }
+
                 return implode($this->strSeperator, $arrReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -811,9 +868,11 @@ class IMDB {
                         $arrReturn[] = trim($strName);
                     }
                 }
+
                 return implode($this->strSeperator, array_unique($arrReturn));
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -831,9 +890,11 @@ class IMDB {
                         $arrReturn[] = '<a href="http://www.imdb.com/genre/' . trim($strName) . '/"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
                     }
                 }
+
                 return implode($this->strSeperator, array_unique($arrReturn));
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -849,9 +910,11 @@ class IMDB {
                 foreach ($arrReturned[2] as $strName) {
                     $arrReturn[] = trim($strName);
                 }
+
                 return implode($this->strSeperator, $arrReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -867,9 +930,11 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     $arrReturn[] = '<a href="http://www.imdb.com/language/' . trim($arrReturned[1][$i]) . '"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
                 }
+
                 return implode($this->strSeperator, $arrReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -884,6 +949,7 @@ class IMDB {
                 return trim($strReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -898,6 +964,7 @@ class IMDB {
                 return '<a href="http://www.imdb.com/search/title?locations=' . urlencode(trim($strReturn)) . '"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strReturn) . '</a>';
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -912,6 +979,7 @@ class IMDB {
                 return trim($strReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -927,6 +995,7 @@ class IMDB {
                 return trim($strReturn[1][0]);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -941,9 +1010,11 @@ class IMDB {
                 if ($intLimit) {
                     return strip_tags($this->getShortText($strReturn, $intLimit));
                 }
+
                 return trim(strip_tags($strReturn));
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -969,6 +1040,7 @@ class IMDB {
             if (!$strLocal) {
                 return $this->strNotFound;
             }
+
             return $strLocal;
         }
     }
@@ -984,6 +1056,7 @@ class IMDB {
                 return trim($strReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -998,6 +1071,7 @@ class IMDB {
                 return str_replace('(', ' (', trim($strReturn));
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -1012,6 +1086,7 @@ class IMDB {
                 return trim($strReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -1028,6 +1103,7 @@ class IMDB {
                 }
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -1043,10 +1119,12 @@ class IMDB {
                     foreach (array_reverse($arrFetch[1]) as $sSeasons) {
                         $arrReturn[] = '<a href="http://www.imdb.com/title/tt' . $this->_strId . '/episodes?season=' . $sSeasons . '">' . $sSeasons . '</a>';
                     }
+
                     return implode($this->strSeperator, $arrReturn);
                 }
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -1065,9 +1143,11 @@ class IMDB {
                         $arrReturn[] = '<a href="http://www.imdb.com' . $arrReturned[1][$i] . '"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
                     }
                 }
-                return $arrReturn != null ? implode($this->strSeperator, $arrReturn) : $this->strNotFound;
+
+                return $arrReturn != NULL ? implode($this->strSeperator, $arrReturn) : $this->strNotFound;
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -1084,9 +1164,11 @@ class IMDB {
                 foreach ($arrReturned[1] as $i => $strName) {
                     $arrReturn[] = trim($strName);
                 }
+
                 return implode($this->strSeperator, $arrReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -1101,6 +1183,7 @@ class IMDB {
                 return trim($strReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -1108,6 +1191,7 @@ class IMDB {
      * Return the title.
      *
      * @param  bool   Try to get the local naming of the movie first.
+     *
      * @return string The movie title.
      */
     public function getTitle($bForceLocal = FALSE) {
@@ -1119,6 +1203,7 @@ class IMDB {
                 return trim($strReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -1132,6 +1217,7 @@ class IMDB {
                 return 'http://www.imdb.com/video/' . $strReturn . '/player';
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -1144,6 +1230,7 @@ class IMDB {
         if ($this->isReady) {
             return $this->_strUrl;
         }
+
         return $this->strNotFound;
     }
 
@@ -1158,6 +1245,7 @@ class IMDB {
                 return trim($strReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -1174,9 +1262,11 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     $arrReturn[] = trim($strName);
                 }
+
                 return implode($this->strSeperator, $arrReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -1193,9 +1283,11 @@ class IMDB {
                 foreach ($arrReturned[2] as $i => $strName) {
                     $arrReturn[] = '<a href="http://www.imdb.com/name/nm' . trim($arrReturned[1][$i]) . '/"' . ($strTarget ? ' target="' . $strTarget . '"' : '') . '>' . trim($strName) . '</a>';
                 }
+
                 return implode($this->strSeperator, $arrReturn);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -1210,6 +1302,7 @@ class IMDB {
                 return substr(preg_replace('~[\D]~', '', $strReturn), 0, 4);
             }
         }
+
         return $this->strNotFound;
     }
 
@@ -1263,6 +1356,7 @@ class IMDB {
         $oData->writers               = $this->getWriter();
         $oData->writersAsUrl          = $this->getWriterAsUrl();
         $oData->year                  = $this->getYear();
+
         return $oData;
     }
 }
