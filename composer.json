@@ -1,17 +1,23 @@
 {
-    "name": "fabianbeiner/php-imdb-grabber",
-    "description": "This class enables you to retrieve data from IMDb.com with PHP.",
-    "license": "CC BY-NC-SA 3.0",
-    "authors": [
-        {
-            "name": "Fabian Beiner",
-            "email": "fb@fabianbeiner.de"
-        }
-    ],
-    "require": {
-        "ext-curl": "*"
-    },
-    "autoload": {
-        "classmap": ["imdb.class.php"]
+  "name": "fabianbeiner/php-imdb-grabber",
+  "type": "library",
+  "description": "This PHP library enables you to scrap data from IMDB.com.",
+  "keywords": [
+    "IMDb",
+    "API",
+    "Client"
+  ],
+  "homepage": "https://github.com/FabianBeiner/PHP-IMDB-Grabber",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Fabian Beiner",
+      "email": "fb@fabianbeiner.de",
+      "homepage": "https://fabianbeiner.de/"
     }
+  ],
+  "require": {
+    "ext-curl": "*",
+    "php": ">=5.5.0"
+  }
 }
