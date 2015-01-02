@@ -81,38 +81,43 @@ class IMDB {
      * These are the regular expressions used to extract the data.
      * If you don’t know what you’re doing, you shouldn’t touch them.
      */
-    const IMDB_AKA          = '~<h5>Also Known As:<\/h5>(?:\s*)<div class="info-content">(?:\s*)"(.*)"~Ui';
-    const IMDB_ASPECT_RATIO = '~<h5>Aspect Ratio:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_CAST         = '~<td class="nm"><a href="\/name\/(.*)\/"(?:.*)>(.*)<\/a><\/td>~Ui';
-    const IMDB_CHAR         = '~<td class="char">(.*)<\/td>~Ui';
-    const IMDB_COLOR        = '~<h5>Color:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_COMPANY      = '~<h5>Company:<\/h5>(?:\s*)<div class="info-content"><a href="\/company\/(.*)\/">(.*)</a>(?:.*)<\/div>~Ui';
-    const IMDB_COUNTRY      = '~<a href="/country/(\w+)">(.*)</a>~Ui';
-    const IMDB_CREATOR      = '~<h5>(?:Creator|Creators):<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_DIRECTOR     = '~<h5>(?:Director|Directors):<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_GENRE        = '~<a href="\/Sections\/Genres\/(\w+)\/">(.*)<\/a>~Ui';
-    const IMDB_ID           = '~((?:tt\d{6,})|(?:itle\?\d{6,}))~';
-    const IMDB_LANGUAGE     = '~<a href="\/language\/(\w+)">(.*)<\/a>~Ui';
-    const IMDB_LOCATION     = '~href="\/search\/title\?locations=(.*)">(.*)<\/a>~Ui';
-    const IMDB_MPAA         = '~<h5><a href="\/mpaa">MPAA<\/a>:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_NAME         = '~href="\/name\/(.*)\/"(?:.*)>(.*)<\/a>~Ui';
-    const IMDB_NOT_FOUND    = '~<h1 class="findHeader">No results found for ~Ui';
-    const IMDB_PLOT         = '~<h5>Plot:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_POSTER       = '~<link rel="image_src" href="(.*)">~Ui';
-    const IMDB_RATING       = '~<div class="starbar-meta">(?:\s*)<b>(.*)\/10<\/b>~Ui';
-    const IMDB_RELEASE_DATE = '~<h5>Release Date:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_RUNTIME      = '~<h5>Runtime:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_SEARCH       = '~<td class="result_text"> <a href="\/title\/(tt\d{6,})\/(?:.*)"(?:\s*)>(?:.*)<\/a>~Uis';
-    const IMDB_SEASONS      = '~(?:episodes\?season=(\d+))~Ui';
-    const IMDB_SOUND_MIX    = '~<h5>Sound Mix:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_TAGLINE      = '~<h5>Tagline:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_TITLE        = '~property="og:title" content="(.*)"~Ui';
-    const IMDB_TITLE_ORIG   = '~<span class="title-extra">(.*) <i>\(original title\)<\/i></span>~Ui';
-    const IMDB_TRAILER      = '~data-video="(.*)"~Ui';
-    const IMDB_URL          = '~http://(?:.*\.|.*)imdb.com/(?:t|T)itle(?:\?|/)(..\d+)~i';
-    const IMDB_VOTES        = '~<a href="ratings" class="tn15more">(.*) votes<\/a>~Ui';
-    const IMDB_WRITER       = '~<h5>(?:Writer|Writers):<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_YEAR         = '~<a href="\/year\/(?:\d{4})\/">(.*)<\/a>~Ui';
+    const IMDB_AKA           = '~<h5>Also Known As:<\/h5>(?:\s*)<div class="info-content">(?:\s*)"(.*)"~Ui';
+    const IMDB_ASPECT_RATIO  = '~<h5>Aspect Ratio:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+    const IMDB_AWARDS        = '~<h5>Awards:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+    const IMDB_CAST          = '~<td class="nm"><a href="\/name\/(.*)\/"(?:.*)>(.*)<\/a><\/td>~Ui';
+    const IMDB_CERTIFICATION = '~<h5>Certification:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+    const IMDB_CHAR          = '~<td class="char">(.*)<\/td>~Ui';
+    const IMDB_COLOR         = '~<h5>Color:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+    const IMDB_COMPANY       = '~<h5>Company:<\/h5>(?:\s*)<div class="info-content"><a href="\/company\/(.*)\/">(.*)</a>(?:.*)<\/div>~Ui';
+    const IMDB_COUNTRY       = '~<a href="/country/(\w+)">(.*)</a>~Ui';
+    const IMDB_CREATOR       = '~<h5>(?:Creator|Creators):<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+    const IMDB_DIRECTOR      = '~<h5>(?:Director|Directors):<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+    const IMDB_GENRE         = '~<a href="\/Sections\/Genres\/(\w+)\/">(.*)<\/a>~Ui';
+    const IMDB_ID            = '~((?:tt\d{6,})|(?:itle\?\d{6,}))~';
+    const IMDB_LANGUAGE      = '~<a href="\/language\/(\w+)">(.*)<\/a>~Ui';
+    const IMDB_LOCATION      = '~href="\/search\/title\?locations=(.*)">(.*)<\/a>~Ui';
+    const IMDB_MOVIEMETER    = '~<h5>MOVIEmeter:(?:.*)<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+    const IMDB_MPAA          = '~<h5><a href="\/mpaa">MPAA<\/a>:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+    const IMDB_NAME          = '~href="\/name\/(.*)\/"(?:.*)>(.*)<\/a>~Ui';
+    const IMDB_NOT_FOUND     = '~<h1 class="findHeader">No results found for ~Ui';
+    const IMDB_PLOT          = '~<h5>Plot:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+    const IMDB_PLOT_KEYWORDS = '~<h5>Plot Keywords:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+    const IMDB_POSTER        = '~<link rel="image_src" href="(.*)">~Ui';
+    const IMDB_RATING        = '~<div class="starbar-meta">(?:\s*)<b>(.*)\/10<\/b>~Ui';
+    const IMDB_RELEASE_DATE  = '~<h5>Release Date:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+    const IMDB_RUNTIME       = '~<h5>Runtime:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+    const IMDB_SEARCH        = '~<td class="result_text"> <a href="\/title\/(tt\d{6,})\/(?:.*)"(?:\s*)>(?:.*)<\/a>~Ui';
+    const IMDB_SEASONS       = '~(?:episodes\?season=(\d+))~Ui';
+    const IMDB_SOUND_MIX     = '~<h5>Sound Mix:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+    const IMDB_TAGLINE       = '~<h5>Tagline:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+    const IMDB_TITLE         = '~property="og:title" content="(.*)"~Ui';
+    const IMDB_TITLE_ORIG    = '~<span class="title-extra">(.*) <i>\(original title\)<\/i></span>~Ui';
+    const IMDB_TRAILER       = '~data-video="(.*)"~Ui';
+    const IMDB_URL           = '~http://(?:.*\.|.*)imdb.com/(?:t|T)itle(?:\?|/)(..\d+)~i';
+    const IMDB_USER_REVIEW   = '~<h5>User Reviews:<\/h5>(?:\s*)<div class="info-content">(.*)<a~Ui';
+    const IMDB_VOTES         = '~<a href="ratings" class="tn15more">(.*) votes<\/a>~Ui';
+    const IMDB_WRITER        = '~<h5>(?:Writer|Writers):<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+    const IMDB_YEAR          = '~<a href="\/year\/(?:\d{4})\/">(.*)<\/a>~Ui';
 
     /**
      * @param string $sSearch IMDb URL or movie title to search for.
@@ -301,6 +306,20 @@ class IMDB {
     }
 
     /**
+     * @return string The awards of the movie or $sNotFound.
+     */
+    public function getAwards() {
+        if (true === $this->isReady) {
+            $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_AWARDS, 1);
+            if (false !== $sMatch) {
+                return IMDBHelper::cleanString($sMatch);
+            }
+        }
+
+        return $this->sNotFound;
+    }
+
+    /**
      * @param int  $iLimit How many cast members should be returned?
      * @param bool $bMore  Add … if there are more cast members than printed.
      *
@@ -397,6 +416,20 @@ class IMDB {
                 }
 
                 return implode($this->sSeparator, $aReturn) . (0 !== $iLimit && $bMore && (count($aMatch[2]) > $iLimit) ? '…' : '');
+            }
+        }
+
+        return $this->sNotFound;
+    }
+
+    /**
+     * @return string The certification of the movie or $sNotFound.
+     */
+    public function getCertification() {
+        if (true === $this->isReady) {
+            $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_CERTIFICATION, 1);
+            if (false !== $sMatch) {
+                return IMDBHelper::cleanString($sMatch);
             }
         }
 
@@ -654,6 +687,20 @@ class IMDB {
     }
 
     /**
+     * @return string The MOVIEmeter of the movie or $sNotFound.
+     */
+    public function getMovieMeter() {
+        if (true === $this->isReady) {
+            $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_MOVIEMETER, 1);
+            if (false !== $sMatch) {
+                return IMDBHelper::cleanString($sMatch);
+            }
+        }
+
+        return $this->sNotFound;
+    }
+
+    /**
      * @return string The MPAA of the movie or $sNotFound.
      */
     public function getMpaa() {
@@ -661,6 +708,22 @@ class IMDB {
             $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_MPAA, 1);
             if (false !== $sMatch) {
                 return IMDBHelper::cleanString($sMatch);
+            }
+        }
+
+        return $this->sNotFound;
+    }
+
+    /**
+     * @return string A list with the plot keywords or $sNotFound.
+     */
+    public function getPlotKeywords() {
+        if (true === $this->isReady) {
+            $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_PLOT_KEYWORDS, 1);
+            if (false !== $sMatch) {
+                $aReturn = explode('|', IMDBHelper::cleanString($sMatch));
+
+                return implode($this->sSeparator, $aReturn);
             }
         }
 
@@ -873,6 +936,19 @@ class IMDB {
         return $this->sNotFound;
     }
 
+    /**
+     * @return string The user review of the movie or $sNotFound.
+     */
+    public function getUserReview() {
+        if (true === $this->isReady) {
+            $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_USER_REVIEW, 1);
+            if (false !== $sMatch) {
+                return IMDBHelper::cleanString($sMatch);
+            }
+        }
+
+        return $this->sNotFound;
+    }
 
     /**
      * @return string The votes of the movie or $sNotFound.
@@ -950,6 +1026,10 @@ class IMDB {
             'name'  => 'Aspect Ratio',
             'value' => $this->getAspectRatio()
         );
+        $aData['Awards']                 = array(
+            'name'  => 'Awards',
+            'value' => $this->getAwards()
+        );
         $aData['CastLinked']             = array(
             'name'  => 'Cast',
             'value' => $this->getCastAsUrl()
@@ -965,6 +1045,10 @@ class IMDB {
         $aData['CastAndCharacter']       = array(
             'name'  => 'Cast and Character',
             'value' => $this->getCastAndCharacter()
+        );
+        $aData['Certification']          = array(
+            'name'  => 'Certification',
+            'value' => $this->getCertification()
         );
         $aData['Color']                  = array(
             'name'  => 'Color',
@@ -1026,9 +1110,17 @@ class IMDB {
             'name'  => 'Location',
             'value' => $this->getLocation()
         );
+        $aData['MovieMeter']             = array(
+            'name'  => 'MOVIEmeter',
+            'value' => $this->getMovieMeter()
+        );
         $aData['MPAA']                   = array(
             'name'  => 'MPAA',
             'value' => $this->getMpaa()
+        );
+        $aData['PlotKeywords']           = array(
+            'name'  => 'Plot Keywords',
+            'value' => $this->getPlotKeywords()
         );
         $aData['Plot']                   = array(
             'name'  => 'Plot',
@@ -1077,6 +1169,10 @@ class IMDB {
         $aData['Url']                    = array(
             'name'  => 'Url',
             'value' => $this->getUrl()
+        );
+        $aData['UserReview']             = array(
+            'name'  => 'User Review',
+            'value' => $this->getUserReview()
         );
         $aData['Votes']                  = array(
             'name'  => 'Votes',
@@ -1140,9 +1236,11 @@ class IMDBHelper extends IMDB {
             'Full synopsis &raquo;',
             'Add summary &raquo;',
             'Add synopsis &raquo;',
-            'See more &raquo;'
+            'See more &raquo;',
+            'See why on IMDbPro.'
         );
         $aReplace = array(
+            '',
             '',
             '',
             '',
