@@ -13,4 +13,4 @@ All notable changes to this project will be documented in this file.
 - Removed `getFullCast()`, because `getCast()` now returns the full cast.
 
 [Unreleased]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.0...HEAD
-[6.0.0]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/5.5.20...v6.0.0
+[6.0.0]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/5.5.21...v6.0.0
