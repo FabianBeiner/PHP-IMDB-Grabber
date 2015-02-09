@@ -314,7 +314,7 @@ class IMDB {
             $bUseCache = false;
 
 
-            if (is_readable($sCacheFile) && false) {
+            if (is_readable($sCacheFile)) {
         
                 $iDiff = round(abs(time() - filemtime($sCacheFile)) / 60);
                 if ($iDiff < $this->iCache || false) {
@@ -356,8 +356,6 @@ class IMDB {
                             $aReturn[] = array('title'=>IMDBHelper::cleanString($aReturned[2][$i]), 'country'=> IMDBHelper::cleanString($strName));
                         }
                     }
-
-                    print_r($aReturn);
 
                     file_put_contents($sCacheFile, serialize($aReturn));
                     return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound, $aReturn);
