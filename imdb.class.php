@@ -78,6 +78,11 @@ class IMDB {
     public $sUrl = null;
 
     /**
+     * @var bool Return reponses eclosed in array
+     */
+    public $bArrayOutput = false;
+
+    /**
      * These are the regular expressions used to extract the data.
      * If you don’t know what you’re doing, you shouldn’t touch them.
      */
@@ -118,6 +123,9 @@ class IMDB {
     const IMDB_VOTES         = '~<a href="ratings" class="tn15more">(.*) votes<\/a>~Ui';
     const IMDB_WRITER        = '~<h5>(?:Writer|Writers):<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
     const IMDB_YEAR          = '~<a href="\/year\/(?:\d{4})\/">(.*)<\/a>~Ui';
+
+
+
 
     /**
      * @param string $sSearch IMDb URL or movie title to search for.
@@ -291,6 +299,74 @@ class IMDB {
         return $this->sNotFound;
     }
 
+
+    /**
+     * Returns all local names
+     *
+     * @return string The aka name.
+     */
+    public function getAkas() {
+
+
+        if (true === $this->isReady) {
+           // Does a cache of this movie exist?
+            $sCacheFile = $this->sRoot . '/cache/' . md5($this->iId) . '_akas.cache';
+            $bUseCache = false;
+
+
+            if (is_readable($sCacheFile)) {
+        
+                $iDiff = round(abs(time() - filemtime($sCacheFile)) / 60);
+                if ($iDiff < $this->iCache || false) {
+                    if (true === self::IMDB_DEBUG) {
+                        echo '<pre><b>Using cache:</b> ' . basename($sCacheFile) . '</pre>';
+                    }
+                    $bUseCache = true;
+                    $sSource = file_get_contents($sCacheFile);
+                }
+            }
+
+            if ($bUseCache) {
+                if (IMDB::IMDB_DEBUG) {
+                    echo '<b>- Using cache for Akas from ' . $sCacheFile . '</b><br>';
+                }
+                $aRawReturn = file_get_contents($sCacheFile);
+                $aReturn = unserialize($aRawReturn);
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound, $aReturn);
+
+            } else {
+                $fullAkas = sprintf('http://www.imdb.com/title/tt%s/releaseinfo', $this->iId);
+                $aCurlInfo = IMDBHelper::runCurl($fullAkas);
+                $sSource   = $aCurlInfo['contents'];
+
+                if (false === $sSource) {
+                    if (true === self::IMDB_DEBUG) {
+                        echo '<pre><b>cURL error:</b> ' . var_dump($aCurlInfo) . '</pre>';
+                    }
+
+                    return false;
+                }
+
+                $aReturned = IMDBHelper::matchRegex($sSource, "~<td>(.*?)<\/td>\s+<td>(.*?)<\/td>~");
+
+                if ($aReturned) {
+                    $aReturn = array();
+                    foreach ($aReturned[1] as $i => $strName) {
+                          if (strpos($strName,'(')===false){
+                            $aReturn[] = array('title'=>IMDBHelper::cleanString($aReturned[2][$i]), 'country'=> IMDBHelper::cleanString($strName));
+                        }
+                    }
+
+                    file_put_contents($sCacheFile, serialize($aReturn));
+                    return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound, $aReturn);
+                }
+            }
+        }
+
+
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound);
+    }
+
     /**
      * @return string “Aspect Ratio” or $sNotFound.
      */
@@ -336,11 +412,14 @@ class IMDB {
                     $aReturn[] = IMDBHelper::cleanString($sName);
                 }
 
-                return implode($this->sSeparator, $aReturn) . (0 !== $iLimit && $bMore && (count($aMatch[2]) > $iLimit) ? '…' : '');
+                $bMore = (0 !== $iLimit && $bMore && (count($aMatch[2]) > $iLimit) ? '…' : '');
+
+                $bHaveMore = ($bMore && (count($aMatch[2]) > $iLimit));
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound, $aReturn, $bHaveMore);
             }
         }
 
-        return $this->sNotFound;
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound);
     }
 
     /**
@@ -361,7 +440,8 @@ class IMDB {
                     $aReturn[] = '<a href="http://www.imdb.com/name/' . IMDBHelper::cleanString($aMatch[1][$i]) . '/"' . ($sTarget ? ' target="' . $sTarget . '"' : '') . '>' . IMDBHelper::cleanString($sName) . '</a>';
                 }
 
-                return implode($this->sSeparator, $aReturn) . (0 !== $iLimit && $bMore && (count($aMatch[2]) > $iLimit) ? '…' : '');
+                $bHaveMore = ($bMore && (count($aMatch[2]) > $iLimit));
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound, $aReturn, $bHaveMore);
             }
         }
 
@@ -387,11 +467,13 @@ class IMDB {
                     $aReturn[] = IMDBHelper::cleanString($sName) . ' as ' . IMDBHelper::cleanString($aMatchChar[1][$i]);
                 }
 
-                return implode($this->sSeparator, $aReturn) . (0 !== $iLimit && $bMore && (count($aMatch[2]) > $iLimit) ? '…' : '');
+                $bHaveMore = ($bMore && (count($aMatch[2]) > $iLimit));
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound, $aReturn, $bHaveMore);
+
             }
         }
 
-        return $this->sNotFound;
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound);
     }
 
     /**
@@ -415,11 +497,13 @@ class IMDB {
                     $aReturn[] = '<a href="http://www.imdb.com/name/' . IMDBHelper::cleanString($aMatch[1][$i]) . '/"' . ($sTarget ? ' target="' . $sTarget . '"' : '') . '>' . IMDBHelper::cleanString($sName) . '</a> as ' . IMDBHelper::cleanString($aMatchChar[1][$i]);
                 }
 
-                return implode($this->sSeparator, $aReturn) . (0 !== $iLimit && $bMore && (count($aMatch[2]) > $iLimit) ? '…' : '');
+                $bHaveMore = ($bMore && (count($aMatch[2]) > $iLimit));
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound, $aReturn, $bHaveMore);
+
             }
         }
 
-        return $this->sNotFound;
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound);
     }
 
     /**
@@ -507,11 +591,11 @@ class IMDB {
                     $aReturn[] = '<a href="http://www.imdb.com/country/' . trim($aMatch[1][$i]) . '/"' . ($sTarget ? ' target="' . $sTarget . '"' : '') . '>' . IMDBHelper::cleanString($sName) . '</a>';
                 }
 
-                return implode($this->sSeparator, $aReturn);
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound, $aReturn);
             }
         }
 
-        return $this->sNotFound;
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound);
     }
 
     /**
@@ -542,11 +626,11 @@ class IMDB {
                     $aReturn[] = '<a href="http://www.imdb.com/name/' . IMDBHelper::cleanString($aMatch[1][$i]) . '/"' . ($sTarget ? ' target="' . $sTarget . '"' : '') . '>' . IMDBHelper::cleanString($sName) . '</a>';
                 }
 
-                return implode($this->sSeparator, $aReturn);
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound, $aReturn);
             }
         }
 
-        return $this->sNotFound;
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound);
     }
 
     /**
@@ -577,11 +661,11 @@ class IMDB {
                     $aReturn[] = '<a href="http://www.imdb.com/name/' . IMDBHelper::cleanString($aMatch[1][$i]) . '/"' . ($sTarget ? ' target="' . $sTarget . '"' : '') . '>' . IMDBHelper::cleanString($sName) . '</a>';
                 }
 
-                return implode($this->sSeparator, $aReturn);
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound, $aReturn);
             }
         }
 
-        return $this->sNotFound;
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound);
     }
 
     /**
@@ -611,11 +695,11 @@ class IMDB {
                     $aReturn[] = '<a href="http://www.imdb.com/Sections/Genres/' . IMDBHelper::cleanString($aMatch[1][$i]) . '/"' . ($sTarget ? ' target="' . $sTarget . '"' : '') . '>' . IMDBHelper::cleanString($sName) . '</a>';
                 }
 
-                return implode($this->sSeparator, $aReturn);
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound, $aReturn);
             }
         }
 
-        return $this->sNotFound;
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound);
     }
 
     /**
@@ -645,11 +729,11 @@ class IMDB {
                     $aReturn[] = '<a href="http://www.imdb.com/language/' . IMDBHelper::cleanString($aMatch[1][$i]) . '"' . ($sTarget ? ' target="' . $sTarget . '"' : '') . '>' . IMDBHelper::cleanString($sName) . '</a>';
                 }
 
-                return implode($this->sSeparator, $aReturn);
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound, $aReturn);
             }
         }
 
-        return $this->sNotFound;
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound);
     }
 
     /**
@@ -679,11 +763,11 @@ class IMDB {
                     $aReturn[] = '<a href="http://www.imdb.com/search/title?locations=' . IMDBHelper::cleanString($aMatch[1][$i]) . '"' . ($sTarget ? ' target="' . $sTarget . '"' : '') . '>' . IMDBHelper::cleanString($sName) . '</a>';
                 }
 
-                return implode($this->sSeparator, $aReturn);
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound, $aReturn);
             }
         }
 
-        return $this->sNotFound;
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound);
     }
 
     /**
@@ -697,7 +781,7 @@ class IMDB {
             }
         }
 
-        return $this->sNotFound;
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound);
     }
 
     /**
@@ -723,11 +807,11 @@ class IMDB {
             if (false !== $sMatch) {
                 $aReturn = explode('|', IMDBHelper::cleanString($sMatch));
 
-                return implode($this->sSeparator, $aReturn);
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound, $aReturn);
             }
         }
 
-        return $this->sNotFound;
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound);
     }
 
     /**
@@ -807,6 +891,22 @@ class IMDB {
         return $this->sNotFound;
     }
 
+
+    /**
+    * Release date doesn't contain all the information we need to create a media and 
+    * we need this function that checks if users can vote target media (if can, it's released).
+    *
+    * @return  true If the media is released
+    */
+    public function isReleased() {
+        $strReturn = $this->getReleaseDate();
+        if ($strReturn == $this->sNotFound || $strReturn == 'Not yet released') {
+            return false;
+        }
+        return true;
+    }
+
+
     /**
      * @return string The runtime of the movie or $sNotFound.
      */
@@ -848,11 +948,11 @@ class IMDB {
                     $aReturn[] = '<a href="http://www.imdb.com/title/tt' . $this->iId . '/episodes?season=' . $sName . '"' . ($sTarget ? ' target="' . $sTarget . '"' : '') . '>' . $sName . '</a>';
                 }
 
-                return implode($this->sSeparator, $aReturn);
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound, $aReturn);
             }
         }
 
-        return $this->sNotFound;
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound);
     }
 
     /**
@@ -992,7 +1092,7 @@ class IMDB {
                     $aReturn[] = '<a href="http://www.imdb.com/name/' . IMDBHelper::cleanString($aMatch[1][$i]) . '/"' . ($sTarget ? ' target="' . $sTarget . '"' : '') . '>' . IMDBHelper::cleanString($sName) . '</a>';
                 }
 
-                return implode($this->sSeparator, $aReturn);
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, $this->sNotFound, $aReturn);
             }
         }
 
@@ -1021,6 +1121,10 @@ class IMDB {
         $aData['Aka']                    = array(
             'name'  => 'Also Known As',
             'value' => $this->getAka()
+        );
+        $aData['Akas']                    = array(
+            'name'  => '(all) Also Known As',
+            'value' => $this->getAkas()
         );
         $aData['AspectRatio']            = array(
             'name'  => 'Aspect Ratio',
@@ -1138,6 +1242,10 @@ class IMDB {
             'name'  => 'Release Date',
             'value' => $this->getReleaseDate()
         );
+        $aData['IsReleased']            = array(
+            'name'  => 'Is released',
+            'value' => $this->isReleased()
+        );
         $aData['Runtime']                = array(
             'name'  => 'Runtime',
             'value' => $this->getRuntime()
@@ -1224,6 +1332,47 @@ class IMDBHelper extends IMDB {
 
         return $aMatches;
     }
+
+    /**
+     * Prefered output in responses with multiple elements
+     *
+     * @param bool $bArrayOutput Native array or string wtih separators.
+     * @param string $sSeparator String separator.
+     * @param string $sNotFound Not found text.
+     * @param array $aReturn Original input.
+     * @param bool $bHaveMore Have more elements indicator.
+     *
+     * @return string Multiple results separeted by selected separator string.
+     * @return array  Multiple results enclosed into native array.     
+     */
+    public static function arrayOutput($bArrayOutput, $sSeparator, $sNotFound, $aReturn = null, $bHaveMore = false) {
+        if ($bArrayOutput){
+          if ($aReturn == null || !is_array($aReturn)) {
+              return array();
+          }
+
+          if ($bHaveMore) {
+            $aReturn[] = '…';
+          }
+
+          return $aReturn;
+        }
+        else {
+          if ($aReturn == null || !is_array($aReturn)) {
+              return $sNotFound;
+          }
+
+          foreach ($aReturn as $i => $value) {
+            if (is_array($value)) {
+                $aReturn[$i] = implode($sSeparator, $value);
+            }
+          }
+          
+          return implode($sSeparator, $aReturn) . (($bHaveMore) ? '…' : '');
+        }
+
+    }
+
 
     /**
      * @param string $sInput Input (eg. HTML).
