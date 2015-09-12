@@ -7,24 +7,24 @@
     <style>
         body {
             background-color: #E5E5E5;
-            color:            #222;
-            font-family:      "Open Sans", sans-serif;
-            font-size:        15px;
-            max-width:        1000px;
-            margin:           20px auto;
-            width:            100%;
+            color: #222;
+            font-family: "Open Sans", sans-serif;
+            font-size: 15px;
+            max-width: 1000px;
+            margin: 20px auto;
+            width: 100%;
         }
 
         p {
-            margin:  0 0 10px;
+            margin: 0 0 10px;
             padding: 0;
         }
 
         hr {
-            clear:      both;
-            margin:     25px 0;
-            border:     1px #000 solid;
-            height:     1px;
+            clear: both;
+            margin: 25px 0;
+            border: 1px #000 solid;
+            height: 1px;
             background: #FFF;
         }
 
@@ -34,12 +34,12 @@
 
         a:hover, a:focus, a:active {
             text-decoration: none;
-            color:           #222;
+            color: #222;
         }
 
         h1 {
-            font-size:   32px;
-            text-align:  center;
+            font-size: 32px;
+            text-align: center;
             font-weight: 700;
         }
     </style>

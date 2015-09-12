@@ -7,23 +7,23 @@
     <style>
         body {
             background-color: #E5E5E5;
-            color:            #222;
-            font-family:      "Open Sans", sans-serif;
-            font-size:        15px;
-            max-width:        1000px;
-            margin:           20px auto;
-            width:            100%;
+            color: #222;
+            font-family: "Open Sans", sans-serif;
+            font-size: 15px;
+            max-width: 1000px;
+            margin: 20px auto;
+            width: 100%;
         }
 
         p {
-            margin:  0 0 10px;
+            margin: 0 0 10px;
             padding: 0;
         }
 
         hr {
-            margin:     25px 0;
-            border:     1px #000 solid;
-            height:     1px;
+            margin: 25px 0;
+            border: 1px #000 solid;
+            height: 1px;
             background: #FFF;
         }
 
@@ -33,12 +33,12 @@
 
         a:hover, a:focus, a:active {
             text-decoration: none;
-            color:           #222;
+            color: #222;
         }
 
         h1 {
-            font-size:   32px;
-            text-align:  center;
+            font-size: 32px;
+            text-align: center;
             font-weight: 700;
         }
     </style>
@@ -47,26 +47,25 @@
 <?php
 include_once '../imdb.class.php';
 
-$aTests = array(
-    'http://www.imdb.com/title/tt0421974/',
-    'http://www.imdb.com/title/tt0094618/',
-    'http://www.imdb.com/title/tt0448157/',
-    'Matrix',
-    'Donner Pass',
-    'If only',
-    'http://www.imdb.com/title/tt1604113/',
-    'Wyse Guys',
-    'http://www.imdb.com/title/tt2005268/',
-    'Wer ist Clark Rockefeller?',
-    'North by Northwest',
-    'Iron Man 2',
-    'One Tree Hill',
-    'Formosa Betrayed',
-    'New York, I Love You',
-    'http://us.imdb.com/Title?0144117',
-    'http://www.imdb.com/title/tt1022603/',
-    'Fabian Beiner never made a movie. Yet!'
-);
+$aTests = array('http://www.imdb.com/title/tt1392190/',
+                'http://www.imdb.com/title/tt0421974/',
+                'http://www.imdb.com/title/tt0094618/',
+                'http://www.imdb.com/title/tt0448157/',
+                'Matrix',
+                'Donner Pass',
+                'If only',
+                'http://www.imdb.com/title/tt1604113/',
+                'Wyse Guys',
+                'http://www.imdb.com/title/tt2005268/',
+                'Wer ist Clark Rockefeller?',
+                'North by Northwest',
+                'Iron Man 2',
+                'One Tree Hill',
+                'Formosa Betrayed',
+                'New York, I Love You',
+                'http://us.imdb.com/Title?0144117',
+                'http://www.imdb.com/title/tt1022603/',
+                'Fabian Beiner never made a movie. Yet!');
 
 set_time_limit(count($aTests) * 15);
 
