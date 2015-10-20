@@ -22,5 +22,5 @@
   },
   "autoload": {
         "files": ["imdb.class.php"]
-    }
+  }
 }
