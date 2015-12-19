@@ -1,6 +1,16 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [6.0.2] - 2015-12-19
+### Changed
+- Added more test cases to `imdb.example.php`.
+- Fixed `getYear` (#70 & #71).
+- Reformatted `imdb.class.php` (again…) and fixed some third-party spelling issues.
+- Fixed `cleanString` (#69).
+
+### Removed
+- `getMovieMeter`.
+
 ## [6.0.1] - 2015-09-12
 ### Changed
 - `LICENSE` year updated.
@@ -25,3 +35,4 @@ All notable changes to this project will be documented in this file.
 [Unreleased]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.1...HEAD
 [6.0.0]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/5.5.21...v6.0.0
 [6.0.1]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.0...v6.0.1
+[6.0.2]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.1...v6.0.2

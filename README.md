@@ -122,10 +122,6 @@ if ($oIMDB->isReady) {
 
 `getLocationAsUrl($sTarget = '')` - `$sTarget` defines a target
 
-**MOVIEmeter**
-
-`getMovieMeter()`
-
 **MPAA**
 
 `getMpaa()`
