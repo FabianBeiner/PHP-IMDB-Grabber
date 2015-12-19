@@ -47,7 +47,10 @@
 <?php
 include_once '../imdb.class.php';
 
-$aTests = array('http://www.imdb.com/title/tt1392190/',
+$aTests = array('tt1124379',
+                'tt0187775 ',
+                'http://www.imdb.com/title/tt1231587/',
+                'http://www.imdb.com/title/tt1392190/',
                 'http://www.imdb.com/title/tt0421974/',
                 'http://www.imdb.com/title/tt0094618/',
                 'http://www.imdb.com/title/tt0448157/',
