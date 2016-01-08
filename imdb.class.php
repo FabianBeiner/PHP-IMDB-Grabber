@@ -14,7 +14,7 @@
  * @author  Fabian Beiner <fb@fabianbeiner.de>
  * @license http://opensource.org/licenses/MIT The MIT License
  * @link    https://github.com/FabianBeiner/PHP-IMDB-Grabber GitHub Repository
- * @version 6.0.2
+ * @version 6.0.3
  */
 class IMDB
 {
@@ -51,7 +51,7 @@ class IMDB
     /**
      * @var null|int The ID of the movie.
      */
-    private $iId = null;
+    public $iId = null;
 
     /**
      * @var string What to search for?
@@ -810,7 +810,7 @@ class IMDB
      *
      * @return bool|string Path to the poster.
      */
-    public function getPoster($sSize = 'small', $bDownload = true) {
+    public function getPoster($sSize = 'small', $bDownload = false) {
         if (true === $this->isReady) {
             $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_POSTER, 1);
             if (false !== $sMatch) {
@@ -821,7 +821,7 @@ class IMDB
                     return IMDBHelper::cleanString($sMatch);
                 } else {
                     $sLocal = IMDBHelper::saveImage($sMatch, $this->iId);
-                    if (file_exists($sLocal)) {
+                    if (file_exists(dirname(__FILE__) . '/' . $sLocal)) {
                         return $sLocal;
                     } else {
                         return $sMatch;

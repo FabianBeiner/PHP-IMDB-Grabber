@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [6.0.3] - 2016-01-08
+### Changed
+- Fixed `getPoster`. It most likely always did a hot link to IMDB instead of the local image. The default is now to hot link to IMDb with the small resolution.
+- Made the private `$iId` variable public. You can now access the ID of the movie without any problems (eg. `$oIMDB->iId`).
+- Reformatted `imdb.example.php` and also fixed a small issue there.
+
 ## [6.0.2] - 2015-12-19
 ### Changed
 - Added more test cases to `imdb.example.php`.
@@ -36,3 +42,4 @@ All notable changes to this project will be documented in this file.
 [6.0.0]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/5.5.21...v6.0.0
 [6.0.1]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.0...v6.0.1
 [6.0.2]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.1...v6.0.2
+[6.0.3]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.2...v6.0.3
