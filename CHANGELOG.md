@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [6.0.4] - 2016-06-06
+### Changed
+- Fixed `IMDB_SEASONS`.
+
 ## [6.0.3] - 2016-01-08
 ### Changed
 - Fixed `getPoster`. It most likely always did a hot link to IMDB instead of the local image. The default is now to hot link to IMDb with the small resolution.
@@ -38,8 +42,9 @@ All notable changes to this project will be documented in this file.
 - Switched to the “combined” page. This enables easier scrapping, but we lose some methods (like `getBudget()` or `getDescription()`). Then again, a few new ones where added. See README.
 - Removed `getFullCast()`, because `getCast()` now returns the full cast.
 
-[Unreleased]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.1...HEAD
+[Unreleased]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.4...HEAD
 [6.0.0]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/5.5.21...v6.0.0
 [6.0.1]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.0...v6.0.1
 [6.0.2]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.1...v6.0.2
 [6.0.3]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.2...v6.0.3
+[6.0.4]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.3...v6.0.4
