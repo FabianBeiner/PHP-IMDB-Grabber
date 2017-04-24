@@ -14,7 +14,7 @@
  * @author  Fabian Beiner <fb@fabianbeiner.de>
  * @license http://opensource.org/licenses/MIT The MIT License
  * @link    https://github.com/FabianBeiner/PHP-IMDB-Grabber GitHub Repository
- * @version 6.0.4
+ * @version 6.0.5
  */
 class IMDB
 {
@@ -34,19 +34,85 @@ class IMDB
     const IMDB_TIMEOUT = 15;
 
     /**
-     * @var int Maximum cache time.
+     * These are the regular expressions used to extract the data.
+     * If you don’t know what you’re doing, you shouldn’t touch them.
      */
-    private $iCache = 1440;
+    const IMDB_AKA           = '~<h5>Also Known As:<\/h5>(?:\s*)<div class="info-content">(?:\s*)"(.*)"~Ui';
+
+    const IMDB_ASPECT_RATIO  = '~<h5>Aspect Ratio:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+
+    const IMDB_AWARDS        = '~<h5>Awards:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+
+    const IMDB_CAST          = '~<td class="nm"><a href="\/name\/(.*)\/"(?:.*)>(.*)<\/a><\/td>~Ui';
+
+    const IMDB_CERTIFICATION = '~<h5>Certification:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+
+    const IMDB_CHAR          = '~<td class="char">(.*)<\/td>~Ui';
+
+    const IMDB_COLOR         = '~<h5>Color:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+
+    const IMDB_COMPANY       = '~<h5>Company:<\/h5>(?:\s*)<div class="info-content"><a href="\/company\/(.*)\/">(.*)</a>(?:.*)<\/div>~Ui';
+
+    const IMDB_COUNTRY       = '~<a href="/country/(\w+)">(.*)</a>~Ui';
+
+    const IMDB_CREATOR       = '~<h5>(?:Creator|Creators):<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+
+    const IMDB_DIRECTOR      = '~<h5>(?:Director|Directors):<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+
+    const IMDB_GENRE         = '~<a href="\/Sections\/Genres\/([a-zA-Z_][\w-]*+)\/">(.*)<\/a>~Ui';
+
+    const IMDB_ID            = '~((?:tt\d{6,})|(?:itle\?\d{6,}))~';
+
+    const IMDB_LANGUAGE      = '~<a href="\/language\/(\w+)">(.*)<\/a>~Ui';
+
+    const IMDB_LOCATION      = '~href="\/search\/title\?locations=(.*)">(.*)<\/a>~Ui';
+
+    const IMDB_MPAA          = '~<h5><a href="\/mpaa">MPAA<\/a>:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+
+    const IMDB_NAME          = '~href="\/name\/(.*)\/"(?:.*)>(.*)<\/a>~Ui';
+
+    const IMDB_NOT_FOUND     = '~<h1 class="findHeader">No results found for ~Ui';
+
+    const IMDB_PLOT          = '~<h5>Plot:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+
+    const IMDB_PLOT_KEYWORDS = '~<h5>Plot Keywords:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+
+    const IMDB_POSTER        = '~<link rel="image_src" href="(.*)">~Ui';
+
+    const IMDB_RATING        = '~<div class="starbar-meta">(?:\s*)<b>(.*)\/10<\/b>~Ui';
+
+    const IMDB_RELEASE_DATE  = '~<h5>Release Date:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+
+    const IMDB_RUNTIME       = '~<h5>Runtime:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+
+    const IMDB_SEARCH        = '~<td class="result_text"> <a href="\/title\/(tt\d{6,})\/(?:.*)"(?:\s*)>(?:.*)<\/a>~Ui';
+
+    const IMDB_SEASONS       = '~episodes\?season=(?:\d+)">(\d+)<~Ui';
+
+    const IMDB_SOUND_MIX     = '~<h5>Sound Mix:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+
+    const IMDB_TAGLINE       = '~<h5>Tagline:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+
+    const IMDB_TITLE         = '~property="og:title" content="(.*)"~Ui';
+
+    const IMDB_TITLE_ORIG    = '~<span class="title-extra">(.*) <i>\(original title\)<\/i></span>~Ui';
+
+    const IMDB_TRAILER       = '~data-video="(.*)"~Ui';
+
+    const IMDB_URL           = '~http://(?:.*\.|.*)imdb.com/(?:t|T)itle(?:\?|/)(..\d+)~i';
+
+    const IMDB_USER_REVIEW   = '~<h5>User Reviews:<\/h5>(?:\s*)<div class="info-content">(.*)<a~Ui';
+
+    const IMDB_VOTES         = '~<a href="ratings" class="tn15more">(.*) votes<\/a>~Ui';
+
+    const IMDB_WRITER        = '~<h5>(?:Writer|Writers):<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
+
+    const IMDB_YEAR          = '~content="(?:.*)\(*(\d{4})\)~Ui';
 
     /**
-     * @var null|string The root of the script.
+     * @var string The string returned, if nothing is found.
      */
-    private $sRoot = null;
-
-    /**
-     * @var null|string Holds the source.
-     */
-    private $sSource = null;
+    public static $sNotFound = 'n/A';
 
     /**
      * @var null|int The ID of the movie.
@@ -54,19 +120,9 @@ class IMDB
     public $iId = null;
 
     /**
-     * @var string What to search for?
-     */
-    private $sSearchFor = 'all';
-
-    /**
      * @var bool Is the content ready?
      */
     public $isReady = false;
-
-    /**
-     * @var string The string returned, if nothing is found.
-     */
-    public static $sNotFound = 'n/A';
 
     /**
      * @var string Char that separates multiple entries.
@@ -84,45 +140,24 @@ class IMDB
     public $bArrayOutput = false;
 
     /**
-     * These are the regular expressions used to extract the data.
-     * If you don’t know what you’re doing, you shouldn’t touch them.
+     * @var int Maximum cache time.
      */
-    const IMDB_AKA           = '~<h5>Also Known As:<\/h5>(?:\s*)<div class="info-content">(?:\s*)"(.*)"~Ui';
-    const IMDB_ASPECT_RATIO  = '~<h5>Aspect Ratio:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_AWARDS        = '~<h5>Awards:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_CAST          = '~<td class="nm"><a href="\/name\/(.*)\/"(?:.*)>(.*)<\/a><\/td>~Ui';
-    const IMDB_CERTIFICATION = '~<h5>Certification:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_CHAR          = '~<td class="char">(.*)<\/td>~Ui';
-    const IMDB_COLOR         = '~<h5>Color:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_COMPANY       = '~<h5>Company:<\/h5>(?:\s*)<div class="info-content"><a href="\/company\/(.*)\/">(.*)</a>(?:.*)<\/div>~Ui';
-    const IMDB_COUNTRY       = '~<a href="/country/(\w+)">(.*)</a>~Ui';
-    const IMDB_CREATOR       = '~<h5>(?:Creator|Creators):<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_DIRECTOR      = '~<h5>(?:Director|Directors):<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_GENRE         = '~<a href="\/Sections\/Genres\/([a-zA-Z_][\w-]*+)\/">(.*)<\/a>~Ui';
-    const IMDB_ID            = '~((?:tt\d{6,})|(?:itle\?\d{6,}))~';
-    const IMDB_LANGUAGE      = '~<a href="\/language\/(\w+)">(.*)<\/a>~Ui';
-    const IMDB_LOCATION      = '~href="\/search\/title\?locations=(.*)">(.*)<\/a>~Ui';
-    const IMDB_MPAA          = '~<h5><a href="\/mpaa">MPAA<\/a>:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_NAME          = '~href="\/name\/(.*)\/"(?:.*)>(.*)<\/a>~Ui';
-    const IMDB_NOT_FOUND     = '~<h1 class="findHeader">No results found for ~Ui';
-    const IMDB_PLOT          = '~<h5>Plot:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_PLOT_KEYWORDS = '~<h5>Plot Keywords:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_POSTER        = '~<link rel="image_src" href="(.*)">~Ui';
-    const IMDB_RATING        = '~<div class="starbar-meta">(?:\s*)<b>(.*)\/10<\/b>~Ui';
-    const IMDB_RELEASE_DATE  = '~<h5>Release Date:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_RUNTIME       = '~<h5>Runtime:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_SEARCH        = '~<td class="result_text"> <a href="\/title\/(tt\d{6,})\/(?:.*)"(?:\s*)>(?:.*)<\/a>~Ui';
-    const IMDB_SEASONS       = '~episodes\?season=(?:\d+)">(\d+)<~Ui';
-    const IMDB_SOUND_MIX     = '~<h5>Sound Mix:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_TAGLINE       = '~<h5>Tagline:<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_TITLE         = '~property="og:title" content="(.*)"~Ui';
-    const IMDB_TITLE_ORIG    = '~<span class="title-extra">(.*) <i>\(original title\)<\/i></span>~Ui';
-    const IMDB_TRAILER       = '~data-video="(.*)"~Ui';
-    const IMDB_URL           = '~http://(?:.*\.|.*)imdb.com/(?:t|T)itle(?:\?|/)(..\d+)~i';
-    const IMDB_USER_REVIEW   = '~<h5>User Reviews:<\/h5>(?:\s*)<div class="info-content">(.*)<a~Ui';
-    const IMDB_VOTES         = '~<a href="ratings" class="tn15more">(.*) votes<\/a>~Ui';
-    const IMDB_WRITER        = '~<h5>(?:Writer|Writers):<\/h5>(?:\s*)<div class="info-content">(.*)<\/div>~Ui';
-    const IMDB_YEAR          = '~content="(?:.*)\(*(\d{4})\)~Ui';
+    private $iCache = 1440;
+
+    /**
+     * @var null|string The root of the script.
+     */
+    private $sRoot = null;
+
+    /**
+     * @var null|string Holds the source.
+     */
+    private $sSource = null;
+
+    /**
+     * @var string What to search for?
+     */
+    private $sSearchFor = 'all';
 
     /**
      * @param string $sSearch    IMDb URL or movie title to search for.
@@ -142,11 +177,11 @@ class IMDB
         if ( ! function_exists('curl_init')) {
             throw new IMDBException('You need to enable the PHP cURL extension.');
         }
-        if (in_array($sSearchFor, array('movie',
-                                        'tv',
-                                        'episode',
-                                        'game',
-                                        'all'))) {
+        if (in_array($sSearchFor, ['movie',
+                                   'tv',
+                                   'episode',
+                                   'game',
+                                   'all'])) {
             $this->sSearchFor = $sSearchFor;
         }
         if (true === self::IMDB_DEBUG) {
@@ -262,9 +297,9 @@ class IMDB
             return false;
         }
 
-        $this->sSource = str_replace(array("\n",
-                                           "\r\n",
-                                           "\r"), '', $sSource);
+        $this->sSource = str_replace(["\n",
+                                      "\r\n",
+                                      "\r"], '', $sSource);
         $this->isReady = true;
 
         // Save cache.
@@ -276,6 +311,105 @@ class IMDB
         }
 
         return true;
+    }
+
+    /**
+     * @return array All data.
+     */
+    public function getAll() {
+        $aData                           = [];
+        $aData['Aka']                    = ['name'  => 'Also Known As',
+                                            'value' => $this->getAka()];
+        $aData['Akas']                   = ['name'  => '(all) Also Known As',
+                                            'value' => $this->getAkas()];
+        $aData['AspectRatio']            = ['name'  => 'Aspect Ratio',
+                                            'value' => $this->getAspectRatio()];
+        $aData['Awards']                 = ['name'  => 'Awards',
+                                            'value' => $this->getAwards()];
+        $aData['CastLinked']             = ['name'  => 'Cast',
+                                            'value' => $this->getCastAsUrl()];
+        $aData['Cast']                   = ['name'  => 'Cast',
+                                            'value' => $this->getCast()];
+        $aData['CastAndCharacterLinked'] = ['name'  => 'Cast and Character',
+                                            'value' => $this->getCastAndCharacterAsUrl()];
+        $aData['CastAndCharacter']       = ['name'  => 'Cast and Character',
+                                            'value' => $this->getCastAndCharacter()];
+        $aData['Certification']          = ['name'  => 'Certification',
+                                            'value' => $this->getCertification()];
+        $aData['Color']                  = ['name'  => 'Color',
+                                            'value' => $this->getColor()];
+        $aData['CompanyLinked']          = ['name'  => 'Company',
+                                            'value' => $this->getCompanyAsUrl()];
+        $aData['Company']                = ['name'  => 'Company',
+                                            'value' => $this->getCompany()];
+        $aData['CountryLinked']          = ['name'  => 'Country',
+                                            'value' => $this->getCountryAsUrl()];
+        $aData['Country']                = ['name'  => 'Country',
+                                            'value' => $this->getCountry()];
+        $aData['CreatorLinked']          = ['name'  => 'Creator',
+                                            'value' => $this->getCreatorAsUrl()];
+        $aData['Creator']                = ['name'  => 'Creator',
+                                            'value' => $this->getCreator()];
+        $aData['DirectorLinked']         = ['name'  => 'Director',
+                                            'value' => $this->getDirectorAsUrl()];
+        $aData['Director']               = ['name'  => 'Director',
+                                            'value' => $this->getDirector()];
+        $aData['GenreLinked']            = ['name'  => 'Genre',
+                                            'value' => $this->getGenreAsUrl()];
+        $aData['Genre']                  = ['name'  => 'Genre',
+                                            'value' => $this->getGenre()];
+        $aData['LanguageLinked']         = ['name'  => 'Language',
+                                            'value' => $this->getLanguageAsUrl()];
+        $aData['Language']               = ['name'  => 'Language',
+                                            'value' => $this->getLanguage()];
+        $aData['LocationLinked']         = ['name'  => 'Location',
+                                            'value' => $this->getLocationAsUrl()];
+        $aData['Location']               = ['name'  => 'Location',
+                                            'value' => $this->getLocation()];
+        $aData['MPAA']                   = ['name'  => 'MPAA',
+                                            'value' => $this->getMpaa()];
+        $aData['PlotKeywords']           = ['name'  => 'Plot Keywords',
+                                            'value' => $this->getPlotKeywords()];
+        $aData['Plot']                   = ['name'  => 'Plot',
+                                            'value' => $this->getPlot()];
+        $aData['Poster']                 = ['name'  => 'Poster',
+                                            'value' => $this->getPoster('big')];
+        $aData['Rating']                 = ['name'  => 'Rating',
+                                            'value' => $this->getRating()];
+        $aData['ReleaseDate']            = ['name'  => 'Release Date',
+                                            'value' => $this->getReleaseDate()];
+        $aData['IsReleased']             = ['name'  => 'Is released',
+                                            'value' => $this->isReleased()];
+        $aData['Runtime']                = ['name'  => 'Runtime',
+                                            'value' => $this->getRuntime()];
+        $aData['SeasonsLinked']          = ['name'  => 'Seasons',
+                                            'value' => $this->getSeasonsAsUrl()];
+        $aData['Seasons']                = ['name'  => 'Seasons',
+                                            'value' => $this->getSeasons()];
+        $aData['SoundMix']               = ['name'  => 'Sound Mix',
+                                            'value' => $this->getSoundMix()];
+        $aData['Tagline']                = ['name'  => 'Tagline',
+                                            'value' => $this->getTagline()];
+        $aData['Title']                  = ['name'  => 'Title',
+                                            'value' => $this->getTitle()];
+        $aData['TrailerLinked']          = ['name'  => 'Trailer',
+                                            'value' => $this->getTrailerAsUrl()];
+        $aData['Url']                    = ['name'  => 'Url',
+                                            'value' => $this->getUrl()];
+        $aData['UserReview']             = ['name'  => 'User Review',
+                                            'value' => $this->getUserReview()];
+        $aData['Votes']                  = ['name'  => 'Votes',
+                                            'value' => $this->getVotes()];
+        $aData['WriterLinked']           = ['name'  => 'Writer',
+                                            'value' => $this->getWriterAsUrl()];
+        $aData['Writer']                 = ['name'  => 'Writer',
+                                            'value' => $this->getWriter()];
+        $aData['Year']                   = ['name'  => 'Year',
+                                            'value' => $this->getYear()];
+
+        array_multisort($aData);
+
+        return $aData;
     }
 
     /**
@@ -331,11 +465,11 @@ class IMDB
                 $aReturned = IMDBHelper::matchRegex($sSource, "~<td>(.*?)<\/td>\s+<td>(.*?)<\/td>~");
 
                 if ($aReturned) {
-                    $aReturn = array();
+                    $aReturn = [];
                     foreach ($aReturned[1] as $i => $strName) {
                         if (strpos($strName, '(') === false) {
-                            $aReturn[] = array('title'   => IMDBHelper::cleanString($aReturned[2][$i]),
-                                               'country' => IMDBHelper::cleanString($strName));
+                            $aReturn[] = ['title'   => IMDBHelper::cleanString($aReturned[2][$i]),
+                                          'country' => IMDBHelper::cleanString($strName)];
                         }
                     }
 
@@ -378,34 +512,6 @@ class IMDB
     }
 
     /**
-     * @param int  $iLimit How many cast members should be returned?
-     * @param bool $bMore  Add … if there are more cast members than printed.
-     *
-     * @return string A list with cast members or $sNotFound.
-     */
-    public function getCast($iLimit = 0, $bMore = true) {
-        if (true === $this->isReady) {
-            $aMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_CAST);
-            if (count($aMatch[2])) {
-                foreach ($aMatch[2] as $i => $sName) {
-                    if (0 !== $iLimit && $i >= $iLimit) {
-                        break;
-                    }
-                    $aReturn[] = IMDBHelper::cleanString($sName);
-                }
-
-                $bMore = (0 !== $iLimit && $bMore && (count($aMatch[2]) > $iLimit) ? '…' : '');
-
-                $bHaveMore = ($bMore && (count($aMatch[2]) > $iLimit));
-
-                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn, $bHaveMore);
-            }
-        }
-
-        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound);
-    }
-
-    /**
      * @param int    $iLimit  How many cast members should be returned?
      * @param bool   $bMore   Add … if there are more cast members than printed.
      * @param string $sTarget Add a target to the links?
@@ -436,20 +542,20 @@ class IMDB
      * @param int  $iLimit How many cast members should be returned?
      * @param bool $bMore  Add … if there are more cast members than printed.
      *
-     * @return string  A list with cast members and their character or
-     *                 $sNotFound.
+     * @return string A list with cast members or $sNotFound.
      */
-    public function getCastAndCharacter($iLimit = 0, $bMore = true) {
+    public function getCast($iLimit = 0, $bMore = true) {
         if (true === $this->isReady) {
-            $aMatch     = IMDBHelper::matchRegex($this->sSource, self::IMDB_CAST);
-            $aMatchChar = IMDBHelper::matchRegex($this->sSource, self::IMDB_CHAR);
+            $aMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_CAST);
             if (count($aMatch[2])) {
                 foreach ($aMatch[2] as $i => $sName) {
                     if (0 !== $iLimit && $i >= $iLimit) {
                         break;
                     }
-                    $aReturn[] = IMDBHelper::cleanString($sName) . ' as ' . IMDBHelper::cleanString($aMatchChar[1][$i]);
+                    $aReturn[] = IMDBHelper::cleanString($sName);
                 }
+
+                $bMore = (0 !== $iLimit && $bMore && (count($aMatch[2]) > $iLimit) ? '…' : '');
 
                 $bHaveMore = ($bMore && (count($aMatch[2]) > $iLimit));
 
@@ -491,6 +597,34 @@ class IMDB
     }
 
     /**
+     * @param int  $iLimit How many cast members should be returned?
+     * @param bool $bMore  Add … if there are more cast members than printed.
+     *
+     * @return string  A list with cast members and their character or
+     *                 $sNotFound.
+     */
+    public function getCastAndCharacter($iLimit = 0, $bMore = true) {
+        if (true === $this->isReady) {
+            $aMatch     = IMDBHelper::matchRegex($this->sSource, self::IMDB_CAST);
+            $aMatchChar = IMDBHelper::matchRegex($this->sSource, self::IMDB_CHAR);
+            if (count($aMatch[2])) {
+                foreach ($aMatch[2] as $i => $sName) {
+                    if (0 !== $iLimit && $i >= $iLimit) {
+                        break;
+                    }
+                    $aReturn[] = IMDBHelper::cleanString($sName) . ' as ' . IMDBHelper::cleanString($aMatchChar[1][$i]);
+                }
+
+                $bHaveMore = ($bMore && (count($aMatch[2]) > $iLimit));
+
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn, $bHaveMore);
+            }
+        }
+
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound);
+    }
+
+    /**
      * @return string The certification of the movie or $sNotFound.
      */
     public function getCertification() {
@@ -519,20 +653,6 @@ class IMDB
     }
 
     /**
-     * @return string The company producing the movie or $sNotFound.
-     */
-    public function getCompany() {
-        if (true === $this->isReady) {
-            $sMatch = $this->getCompanyAsUrl();
-            if (self::$sNotFound !== $sMatch) {
-                return IMDBHelper::cleanString($sMatch);
-            }
-        }
-
-        return self::$sNotFound;
-    }
-
-    /**
      * @param string $sTarget Add a target to the links?
      *
      * @return string The linked company producing the movie or $sNotFound.
@@ -549,11 +669,11 @@ class IMDB
     }
 
     /**
-     * @return string A list with countries or $sNotFound.
+     * @return string The company producing the movie or $sNotFound.
      */
-    public function getCountry() {
+    public function getCompany() {
         if (true === $this->isReady) {
-            $sMatch = $this->getCountryAsUrl();
+            $sMatch = $this->getCompanyAsUrl();
             if (self::$sNotFound !== $sMatch) {
                 return IMDBHelper::cleanString($sMatch);
             }
@@ -583,11 +703,11 @@ class IMDB
     }
 
     /**
-     * @return string A list with the creators or $sNotFound.
+     * @return string A list with countries or $sNotFound.
      */
-    public function getCreator() {
+    public function getCountry() {
         if (true === $this->isReady) {
-            $sMatch = $this->getCreatorAsUrl();
+            $sMatch = $this->getCountryAsUrl();
             if (self::$sNotFound !== $sMatch) {
                 return IMDBHelper::cleanString($sMatch);
             }
@@ -618,11 +738,11 @@ class IMDB
     }
 
     /**
-     * @return string A list with the directors or $sNotFound.
+     * @return string A list with the creators or $sNotFound.
      */
-    public function getDirector() {
+    public function getCreator() {
         if (true === $this->isReady) {
-            $sMatch = $this->getDirectorAsUrl();
+            $sMatch = $this->getCreatorAsUrl();
             if (self::$sNotFound !== $sMatch) {
                 return IMDBHelper::cleanString($sMatch);
             }
@@ -653,11 +773,11 @@ class IMDB
     }
 
     /**
-     * @return string A list with the genres or $sNotFound.
+     * @return string A list with the directors or $sNotFound.
      */
-    public function getGenre() {
+    public function getDirector() {
         if (true === $this->isReady) {
-            $sMatch = $this->getGenreAsUrl();
+            $sMatch = $this->getDirectorAsUrl();
             if (self::$sNotFound !== $sMatch) {
                 return IMDBHelper::cleanString($sMatch);
             }
@@ -687,11 +807,11 @@ class IMDB
     }
 
     /**
-     * @return string A list with the languages or $sNotFound.
+     * @return string A list with the genres or $sNotFound.
      */
-    public function getLanguage() {
+    public function getGenre() {
         if (true === $this->isReady) {
-            $sMatch = $this->getLanguageAsUrl();
+            $sMatch = $this->getGenreAsUrl();
             if (self::$sNotFound !== $sMatch) {
                 return IMDBHelper::cleanString($sMatch);
             }
@@ -721,11 +841,11 @@ class IMDB
     }
 
     /**
-     * @return string A list with the location or $sNotFound.
+     * @return string A list with the languages or $sNotFound.
      */
-    public function getLocation() {
+    public function getLanguage() {
         if (true === $this->isReady) {
-            $sMatch = $this->getLocationAsUrl();
+            $sMatch = $this->getLanguageAsUrl();
             if (self::$sNotFound !== $sMatch) {
                 return IMDBHelper::cleanString($sMatch);
             }
@@ -752,6 +872,20 @@ class IMDB
         }
 
         return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound);
+    }
+
+    /**
+     * @return string A list with the location or $sNotFound.
+     */
+    public function getLocation() {
+        if (true === $this->isReady) {
+            $sMatch = $this->getLocationAsUrl();
+            if (self::$sNotFound !== $sMatch) {
+                return IMDBHelper::cleanString($sMatch);
+            }
+        }
+
+        return self::$sNotFound;
     }
 
     /**
@@ -891,20 +1025,6 @@ class IMDB
     }
 
     /**
-     * @return string A list with the seasons or $sNotFound.
-     */
-    public function getSeasons() {
-        if (true === $this->isReady) {
-            $sMatch = $this->getSeasonsAsUrl();
-            if (self::$sNotFound !== $sMatch) {
-                return IMDBHelper::cleanString($sMatch);
-            }
-        }
-
-        return self::$sNotFound;
-    }
-
-    /**
      * @param string $sTarget Add a target to the links?
      *
      * @return string A list with the linked seasons or $sNotFound.
@@ -922,6 +1042,20 @@ class IMDB
         }
 
         return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound);
+    }
+
+    /**
+     * @return string A list with the seasons or $sNotFound.
+     */
+    public function getSeasons() {
+        if (true === $this->isReady) {
+            $sMatch = $this->getSeasonsAsUrl();
+            if (self::$sNotFound !== $sMatch) {
+                return IMDBHelper::cleanString($sMatch);
+            }
+        }
+
+        return self::$sNotFound;
     }
 
     /**
@@ -1034,20 +1168,6 @@ class IMDB
     }
 
     /**
-     * @return string A list with the writers or $sNotFound.
-     */
-    public function getWriter() {
-        if (true === $this->isReady) {
-            $sMatch = $this->getWriterAsUrl();
-            if (self::$sNotFound !== $sMatch) {
-                return IMDBHelper::cleanString($sMatch);
-            }
-        }
-
-        return self::$sNotFound;
-    }
-
-    /**
      * @param string $sTarget Add a target to the links?
      *
      * @return string A list with the linked writers or $sNotFound.
@@ -1069,6 +1189,20 @@ class IMDB
     }
 
     /**
+     * @return string A list with the writers or $sNotFound.
+     */
+    public function getWriter() {
+        if (true === $this->isReady) {
+            $sMatch = $this->getWriterAsUrl();
+            if (self::$sNotFound !== $sMatch) {
+                return IMDBHelper::cleanString($sMatch);
+            }
+        }
+
+        return self::$sNotFound;
+    }
+
+    /**
      * @return string The year of the movie or $sNotFound.
      */
     public function getYear() {
@@ -1080,105 +1214,6 @@ class IMDB
         }
 
         return self::$sNotFound;
-    }
-
-    /**
-     * @return array All data.
-     */
-    public function getAll() {
-        $aData                           = array();
-        $aData['Aka']                    = array('name'  => 'Also Known As',
-                                                 'value' => $this->getAka());
-        $aData['Akas']                   = array('name'  => '(all) Also Known As',
-                                                 'value' => $this->getAkas());
-        $aData['AspectRatio']            = array('name'  => 'Aspect Ratio',
-                                                 'value' => $this->getAspectRatio());
-        $aData['Awards']                 = array('name'  => 'Awards',
-                                                 'value' => $this->getAwards());
-        $aData['CastLinked']             = array('name'  => 'Cast',
-                                                 'value' => $this->getCastAsUrl());
-        $aData['Cast']                   = array('name'  => 'Cast',
-                                                 'value' => $this->getCast());
-        $aData['CastAndCharacterLinked'] = array('name'  => 'Cast and Character',
-                                                 'value' => $this->getCastAndCharacterAsUrl());
-        $aData['CastAndCharacter']       = array('name'  => 'Cast and Character',
-                                                 'value' => $this->getCastAndCharacter());
-        $aData['Certification']          = array('name'  => 'Certification',
-                                                 'value' => $this->getCertification());
-        $aData['Color']                  = array('name'  => 'Color',
-                                                 'value' => $this->getColor());
-        $aData['CompanyLinked']          = array('name'  => 'Company',
-                                                 'value' => $this->getCompanyAsUrl());
-        $aData['Company']                = array('name'  => 'Company',
-                                                 'value' => $this->getCompany());
-        $aData['CountryLinked']          = array('name'  => 'Country',
-                                                 'value' => $this->getCountryAsUrl());
-        $aData['Country']                = array('name'  => 'Country',
-                                                 'value' => $this->getCountry());
-        $aData['CreatorLinked']          = array('name'  => 'Creator',
-                                                 'value' => $this->getCreatorAsUrl());
-        $aData['Creator']                = array('name'  => 'Creator',
-                                                 'value' => $this->getCreator());
-        $aData['DirectorLinked']         = array('name'  => 'Director',
-                                                 'value' => $this->getDirectorAsUrl());
-        $aData['Director']               = array('name'  => 'Director',
-                                                 'value' => $this->getDirector());
-        $aData['GenreLinked']            = array('name'  => 'Genre',
-                                                 'value' => $this->getGenreAsUrl());
-        $aData['Genre']                  = array('name'  => 'Genre',
-                                                 'value' => $this->getGenre());
-        $aData['LanguageLinked']         = array('name'  => 'Language',
-                                                 'value' => $this->getLanguageAsUrl());
-        $aData['Language']               = array('name'  => 'Language',
-                                                 'value' => $this->getLanguage());
-        $aData['LocationLinked']         = array('name'  => 'Location',
-                                                 'value' => $this->getLocationAsUrl());
-        $aData['Location']               = array('name'  => 'Location',
-                                                 'value' => $this->getLocation());
-        $aData['MPAA']                   = array('name'  => 'MPAA',
-                                                 'value' => $this->getMpaa());
-        $aData['PlotKeywords']           = array('name'  => 'Plot Keywords',
-                                                 'value' => $this->getPlotKeywords());
-        $aData['Plot']                   = array('name'  => 'Plot',
-                                                 'value' => $this->getPlot());
-        $aData['Poster']                 = array('name'  => 'Poster',
-                                                 'value' => $this->getPoster('big'));
-        $aData['Rating']                 = array('name'  => 'Rating',
-                                                 'value' => $this->getRating());
-        $aData['ReleaseDate']            = array('name'  => 'Release Date',
-                                                 'value' => $this->getReleaseDate());
-        $aData['IsReleased']             = array('name'  => 'Is released',
-                                                 'value' => $this->isReleased());
-        $aData['Runtime']                = array('name'  => 'Runtime',
-                                                 'value' => $this->getRuntime());
-        $aData['SeasonsLinked']          = array('name'  => 'Seasons',
-                                                 'value' => $this->getSeasonsAsUrl());
-        $aData['Seasons']                = array('name'  => 'Seasons',
-                                                 'value' => $this->getSeasons());
-        $aData['SoundMix']               = array('name'  => 'Sound Mix',
-                                                 'value' => $this->getSoundMix());
-        $aData['Tagline']                = array('name'  => 'Tagline',
-                                                 'value' => $this->getTagline());
-        $aData['Title']                  = array('name'  => 'Title',
-                                                 'value' => $this->getTitle());
-        $aData['TrailerLinked']          = array('name'  => 'Trailer',
-                                                 'value' => $this->getTrailerAsUrl());
-        $aData['Url']                    = array('name'  => 'Url',
-                                                 'value' => $this->getUrl());
-        $aData['UserReview']             = array('name'  => 'User Review',
-                                                 'value' => $this->getUserReview());
-        $aData['Votes']                  = array('name'  => 'Votes',
-                                                 'value' => $this->getVotes());
-        $aData['WriterLinked']           = array('name'  => 'Writer',
-                                                 'value' => $this->getWriterAsUrl());
-        $aData['Writer']                 = array('name'  => 'Writer',
-                                                 'value' => $this->getWriter());
-        $aData['Year']                   = array('name'  => 'Year',
-                                                 'value' => $this->getYear());
-
-        array_multisort($aData);
-
-        return $aData;
     }
 }
 
@@ -1226,7 +1261,7 @@ class IMDBHelper extends IMDB
     public static function arrayOutput($bArrayOutput, $sSeparator, $sNotFound, $aReturn = null, $bHaveMore = false) {
         if ($bArrayOutput) {
             if ($aReturn == null || ! is_array($aReturn)) {
-                return array();
+                return [];
             }
 
             if ($bHaveMore) {
@@ -1255,18 +1290,18 @@ class IMDBHelper extends IMDB
      * @return string Cleaned string.
      */
     public static function cleanString($sInput) {
-        $aSearch  = array('Full summary &raquo;',
-                          'Full synopsis &raquo;',
-                          'Add summary &raquo;',
-                          'Add synopsis &raquo;',
-                          'See more &raquo;',
-                          'See why on IMDbPro.');
-        $aReplace = array('',
-                          '',
-                          '',
-                          '',
-                          '',
-                          '');
+        $aSearch  = ['Full summary &raquo;',
+                     'Full synopsis &raquo;',
+                     'Add summary &raquo;',
+                     'Add synopsis &raquo;',
+                     'See more &raquo;',
+                     'See why on IMDbPro.'];
+        $aReplace = ['',
+                     '',
+                     '',
+                     '',
+                     '',
+                     ''];
         $sInput   = strip_tags($sInput);
         $sInput   = str_replace('&nbsp;', ' ', $sInput);
         $sInput   = str_replace($aSearch, $aReplace, $sInput);
@@ -1299,43 +1334,6 @@ class IMDBHelper extends IMDB
     }
 
     /**
-     * @param string $sUrl      The URL to fetch.
-     * @param bool   $bDownload Download?
-     *
-     * @return bool|mixed Array on success, false on failure.
-     */
-    public static function runCurl($sUrl, $bDownload = false) {
-        $oCurl = curl_init($sUrl);
-        curl_setopt_array($oCurl, array(CURLOPT_BINARYTRANSFER => ($bDownload ? true : false),
-                                        CURLOPT_CONNECTTIMEOUT => self::IMDB_TIMEOUT,
-                                        CURLOPT_ENCODING       => '',
-                                        CURLOPT_FOLLOWLOCATION => false,
-                                        CURLOPT_FRESH_CONNECT  => true,
-                                        CURLOPT_HEADER         => ($bDownload ? false : true),
-                                        CURLOPT_HTTPHEADER     => array('Accept-Language:' . self::IMDB_LANG,
-                                                                        'Accept-Charset:' . 'utf-8, iso-8859-1;q=0.8',),
-                                        CURLOPT_REFERER        => 'http://www.google.com',
-                                        CURLOPT_RETURNTRANSFER => true,
-                                        CURLOPT_TIMEOUT        => self::IMDB_TIMEOUT,
-                                        CURLOPT_USERAGENT      => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-                                        CURLOPT_VERBOSE        => false));
-        $sOutput   = curl_exec($oCurl);
-        $aCurlInfo = curl_getinfo($oCurl);
-        curl_close($oCurl);
-        $aCurlInfo['contents'] = $sOutput;
-
-        if (200 !== $aCurlInfo['http_code'] && 302 !== $aCurlInfo['http_code']) {
-            if (true === self::IMDB_DEBUG) {
-                echo '<pre><b>cURL returned wrong HTTP code “' . $aCurlInfo['http_code'] . '”, aborting.</b></pre>';
-            }
-
-            return false;
-        }
-
-        return $aCurlInfo;
-    }
-
-    /**
      * @param string $sUrl The URL to the image to download.
      * @param int    $iId  The ID of the movie.
      *
@@ -1362,6 +1360,45 @@ class IMDBHelper extends IMDB
         fclose($oFile);
 
         return 'posters/' . $iId . '.jpg';
+    }
+
+    /**
+     * @param string $sUrl      The URL to fetch.
+     * @param bool   $bDownload Download?
+     *
+     * @return bool|mixed Array on success, false on failure.
+     */
+    public static function runCurl($sUrl, $bDownload = false) {
+        $oCurl = curl_init($sUrl);
+        curl_setopt_array($oCurl, [CURLOPT_BINARYTRANSFER => ($bDownload ? true : false),
+                                   CURLOPT_CONNECTTIMEOUT => self::IMDB_TIMEOUT,
+                                   CURLOPT_ENCODING       => '',
+                                   CURLOPT_FOLLOWLOCATION => false,
+                                   CURLOPT_FRESH_CONNECT  => true,
+                                   CURLOPT_HEADER         => ($bDownload ? false : true),
+                                   CURLOPT_HTTPHEADER     => ['Accept-Language:' . self::IMDB_LANG,
+                                                              'Accept-Charset:' . 'utf-8;q=0.8'],
+                                   CURLOPT_REFERER        => 'https://www.google.com/',
+                                   CURLOPT_RETURNTRANSFER => true,
+                                   CURLOPT_SSL_VERIFYHOST => 0,
+                                   CURLOPT_SSL_VERIFYPEER => 0,
+                                   CURLOPT_TIMEOUT        => self::IMDB_TIMEOUT,
+                                   CURLOPT_USERAGENT      => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+                                   CURLOPT_VERBOSE        => false]);
+        $sOutput   = curl_exec($oCurl);
+        $aCurlInfo = curl_getinfo($oCurl);
+        curl_close($oCurl);
+        $aCurlInfo['contents'] = $sOutput;
+
+        if (200 !== $aCurlInfo['http_code'] && 302 !== $aCurlInfo['http_code']) {
+            if (true === self::IMDB_DEBUG) {
+                echo '<pre><b>cURL returned wrong HTTP code “' . $aCurlInfo['http_code'] . '”, aborting.</b></pre>';
+            }
+
+            return false;
+        }
+
+        return $aCurlInfo;
     }
 }
 

@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [6.0.5] - 2016-06-06
+### Changed
+- Disabled `CURLOPT_SSL_VERIFYPEER` and `CURLOPT_SSL_VERIFYHOST` in the `runCurl` method. Please check http://php.net/manual/en/function.curl-setopt.php for more details on these configuration settings. This should fix the problem of downloading posters without valid certificates and stuff like that.
+- Reformatted some code and stuff. *(Yeah, the code quality of this project is bad, I know.)*
+- Requires PHP 5.6+ in `composer.json`.
+
 ## [6.0.4] - 2016-06-06
 ### Changed
 - Fixed `IMDB_SEASONS`.
@@ -48,3 +54,4 @@ All notable changes to this project will be documented in this file.
 [6.0.2]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.1...v6.0.2
 [6.0.3]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.2...v6.0.3
 [6.0.4]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.3...v6.0.4
+[6.0.5]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.4...v6.0.5
