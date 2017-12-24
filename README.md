@@ -1,6 +1,6 @@
 # PHP IMDb.com Grabber
 
-**This PHP library enables you to scrap data from IMDB.com.**
+**This PHP library enables you to scrape data from IMDB.com.**
 
 *The script is a proof of concept. It’s mostly working, but you shouldn’t use it. IMDb doesn’t allow this method of data fetching. I personally do not use or promote this script, you’re fully responsive if you’re using it.*
 

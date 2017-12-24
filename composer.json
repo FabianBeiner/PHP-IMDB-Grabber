@@ -1,7 +1,7 @@
 {
   "name": "fabianbeiner/php-imdb-grabber",
   "type": "library",
-  "description": "This PHP library enables you to scrap data from IMDB.com.",
+  "description": "This PHP library enables you to scrape data from IMDB.com.",
   "keywords": [
     "IMDb",
     "API",
