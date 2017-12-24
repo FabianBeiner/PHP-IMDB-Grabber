@@ -1,6 +1,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [6.0.6] - 2017-12-24 🎄
+### Changed
+- Now using the `/reference` page instead of the `/combined` one.
+- Using `sha1` instead of `md5` for filenames of the caches. This should invalidate all old ones automatically. **I'd recommend cleaning `/cache` anyway!**
+- Updated almost all regular expressions. *Thanks to @paulitap for the great work!*
+- Closed #87 🙌
+- Fixed a typo. *Why did nobody tell me before? 😞*
+- Some smaller changes I can't remember.
+
 ## [6.0.5] - 2016-06-06
 ### Changed
 - Disabled `CURLOPT_SSL_VERIFYPEER` and `CURLOPT_SSL_VERIFYHOST` in the `runCurl` method. Please check http://php.net/manual/en/function.curl-setopt.php for more details on these configuration settings. This should fix the problem of downloading posters without valid certificates and stuff like that.
