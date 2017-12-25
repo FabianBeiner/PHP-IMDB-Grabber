@@ -49,6 +49,7 @@ include_once '../imdb.class.php';
 
 $aTests = [
     'http://www.imdb.com/title/tt0033467/',
+    'http://www.imdb.com/title/tt5680152/reference',
     'http://www.imdb.com/title/tt0460681/',
     'tt1124379',
     'tt0187775 ',
