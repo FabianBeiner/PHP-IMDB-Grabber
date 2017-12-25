@@ -6,15 +6,15 @@
  * This PHP library enables you to scrape data from IMDB.com.
  *
  *
- * If you want to thank me for this library, please buy me something at Amazon:
- * https://www.amazon.de/gp/registry/wishlist/8840JITISN9L/ - thank you in
- * advance! :)
+ * If you want to thank me for this library, please buy me something at Amazon
+ * (https://www.amazon.de/hz/wishlist/ls/8840JITISN9L/) or use
+ * https://www.paypal.me/FabianBeiner. Thank you! 🙌
  *
  *
  * @author  Fabian Beiner <fb@fabianbeiner.de>
- * @license http://opensource.org/licenses/MIT The MIT License
- * @link    https://github.com/FabianBeiner/PHP-IMDB-Grabber GitHub Repository
- * @version 6.0.6
+ * @license https://opensource.org/licenses/MIT The MIT License
+ * @link    https://github.com/FabianBeiner/PHP-IMDB-Grabber/ GitHub Repository
+ * @version 6.0.7
  */
 class IMDB
 {
@@ -26,7 +26,7 @@ class IMDB
     /**
      * Set the preferred language for the User Agent.
      */
-    const IMDB_LANG = 'en, en-US;q=0.8';
+    const IMDB_LANG = 'en-US,en;q=0.9';
 
     /**
      * Define the timeout for cURL requests.
@@ -53,7 +53,7 @@ class IMDB
     const IMDB_LANGUAGE      = '~<a href="\/language\/(\w+)">(.*)<\/a>~Ui';
     const IMDB_LOCATION      = '~href="\/search\/title\?locations=(.*)">(.*)<\/a>~Ui';
     const IMDB_MPAA          = '~<li class="ipl-inline-list__item">(?:\s+)(G|PG|PG-13|R|NC-17|NR|UR)(?:\s+)<\/li>~Ui';
-    const IMDB_NAME          = '~href="/name/(.+)/?(?:\?[^"]*)?"[^>]*>(.+)</a>~Ui'; //TODO
+    const IMDB_NAME          = '~href="/name/(.+)/?(?:\?[^"]*)?"[^>]*>(.+)</a>~Ui';
     const IMDB_NOT_FOUND     = '~<h1 class="findHeader">No results found for ~Ui';
     const IMDB_PLOT          = '~<td[^>]*>\s*Plot\s*Summary\s*</td>\s*<td>\s*<p>(.+)</p>~Ui';
     const IMDB_PLOT_KEYWORDS = '~<td[^>]*>Plot\s*Keywords</td>\s*<td>(.+)(?:<a\s*href="/title/[^>]*>[^<]*</a>\s*</li>\s*</ul>\s*)?</td>~Ui';
@@ -65,8 +65,8 @@ class IMDB
     const IMDB_SEASONS       = '~episodes\?season=(?:\d+)">(\d+)<~Ui';
     const IMDB_SOUND_MIX     = '~<td[^>]*>\s*Sound\s*Mix\s*</td>\s*<td>(.+)</td>~Ui';
     const IMDB_TAGLINE       = '~<td[^>]*>\s*Taglines\s*</td>\s*<td>(.+)</td>~Ui';
-    const IMDB_TITLE         = '~itemprop="name">(.*)<span~Ui';
-    const IMDB_TITLE_ORIG    = '~</h1>([^<]*)<span\s*class="titlereference-original-title-label~Ui';
+    const IMDB_TITLE         = '~itemprop="name">(.*)(<\/h3>|<span)~Ui';
+    const IMDB_TITLE_ORIG    = '~</h3>(?:\s+)(.*)(?:\s+)<span class=\"titlereference-original-title-label~Ui';
     const IMDB_TRAILER       = '~href="videoplayer/(vi[0-9]*)"~Ui';
     const IMDB_URL           = '~http://(?:.*\.|.*)imdb.com/(?:t|T)itle(?:\?|/)(..\d+)~i';
     const IMDB_USER_REVIEW   = '~href="/title/[t0-9]*/reviews"[^>]*>([^<]*)\s*User~Ui';
@@ -1593,21 +1593,22 @@ class IMDBHelper extends IMDB
                           [
                               CURLOPT_BINARYTRANSFER => ($bDownload ? true : false),
                               CURLOPT_CONNECTTIMEOUT => self::IMDB_TIMEOUT,
-                              CURLOPT_ENCODING       => '',
-                              CURLOPT_FOLLOWLOCATION => false,
-                              CURLOPT_FRESH_CONNECT  => true,
+                              CURLOPT_ENCODING       => 'gzip,deflate',
+                              CURLOPT_FOLLOWLOCATION => 0,
+                              CURLOPT_FRESH_CONNECT  => 1,
                               CURLOPT_HEADER         => ($bDownload ? false : true),
                               CURLOPT_HTTPHEADER     => [
-                                  'Accept-Language:' . self::IMDB_LANG,
-                                  'Accept-Charset:' . 'utf-8;q=0.8'
+                                  'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                                  'Accept-Charset: utf-8, iso-8859-1;q=0.5',
+                                  'Accept-Language: ' . self::IMDB_LANG
                               ],
-                              CURLOPT_REFERER        => 'https://www.google.com/',
-                              CURLOPT_RETURNTRANSFER => true,
+                              CURLOPT_REFERER        => 'http://www.imdb.com',
+                              CURLOPT_RETURNTRANSFER => 1,
                               CURLOPT_SSL_VERIFYHOST => 0,
                               CURLOPT_SSL_VERIFYPEER => 0,
                               CURLOPT_TIMEOUT        => self::IMDB_TIMEOUT,
-                              CURLOPT_USERAGENT      => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-                              CURLOPT_VERBOSE        => false
+                              CURLOPT_USERAGENT      => 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.108 Safari/537.36',
+                              CURLOPT_VERBOSE        => true
                           ]);
         $sOutput   = curl_exec($oCurl);
         $aCurlInfo = curl_getinfo($oCurl);
