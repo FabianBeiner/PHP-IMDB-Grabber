@@ -8,7 +8,7 @@ The technique used is called “[web scraping](http://en.wikipedia.org/wiki/Web_
 
 ## License
 
-[The MIT License (MIT)](http://fabianbeiner.mit-license.org/ "The MIT License")
+[The MIT License (MIT)](https://fabianbeiner.mit-license.org/ "The MIT License")
 
 ## Usage
 

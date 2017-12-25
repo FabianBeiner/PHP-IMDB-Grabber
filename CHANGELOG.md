@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [6.0.7] - 2017-12-25
+### Changed
+- Updated the title regex.
+- Optimized cURL options.
+
 ## [6.0.6] - 2017-12-24 🎄
 ### Changed
 - Now using the `/reference` page instead of the `/combined` one.
