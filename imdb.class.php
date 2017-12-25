@@ -66,7 +66,7 @@ class IMDB
     const IMDB_SOUND_MIX     = '~<td[^>]*>\s*Sound\s*Mix\s*</td>\s*<td>(.+)</td>~Ui';
     const IMDB_TAGLINE       = '~<td[^>]*>\s*Taglines\s*</td>\s*<td>(.+)</td>~Ui';
     const IMDB_TITLE         = '~itemprop="name">(.*)<span~Ui';
-    const IMDB_TITLE_ORIG    = '~</h1>([^<]*)<span\s*class="titlereference-original-title-label~Ui';
+    const IMDB_TITLE_ORIG    = '~</h3>\s+(.*)\s+<span\s*class="titlereference-original-title-label~Ui';
     const IMDB_TRAILER       = '~href="videoplayer/(vi[0-9]*)"~Ui';
     const IMDB_URL           = '~http://(?:.*\.|.*)imdb.com/(?:t|T)itle(?:\?|/)(..\d+)~i';
     const IMDB_USER_REVIEW   = '~href="/title/[t0-9]*/reviews"[^>]*>([^<]*)\s*User~Ui';
