@@ -52,7 +52,7 @@ class IMDB
     const IMDB_ID            = '~((?:tt\d{6,})|(?:itle\?\d{6,}))~';
     const IMDB_LANGUAGE      = '~<a href="\/language\/(\w+)">(.*)<\/a>~Ui';
     const IMDB_LOCATION      = '~href="\/search\/title\?locations=(.*)">(.*)<\/a>~Ui';
-    const IMDB_MPAA          = '~<li class="ipl-inline-list__item">(?:\s+)(G|PG|PG-13|R|NC-17|NR|UR)(?:\s+)<\/li>~Ui';
+    const IMDB_MPAA          = '~<li class="ipl-inline-list__item">(?:\s+)(TV-Y|TV-Y7|TV-G|TV-PG|TV-14|TV-MA|G|PG|PG-13|R|NC-17|NR|UR)(?:\s+)<\/li>~Ui';
     const IMDB_NAME          = '~href="/name/(.+)/?(?:\?[^"]*)?"[^>]*>(.+)</a>~Ui';
     const IMDB_NOT_FOUND     = '~<h1 class="findHeader">No results found for ~Ui';
     const IMDB_PLOT          = '~<td[^>]*>\s*Plot\s*Summary\s*</td>\s*<td>\s*<p>(.+)</p>~Ui';
@@ -72,7 +72,7 @@ class IMDB
     const IMDB_USER_REVIEW   = '~href="/title/[t0-9]*/reviews"[^>]*>([^<]*)\s*User~Ui';
     const IMDB_VOTES         = '~"ipl-rating-star__total-votes">\s*\((.*)\)\s*<~Ui';
     const IMDB_WRITER        = '~<div[^>]*>\s*(?:Writer|Writers)\s*:\s*<ul[^>]*>(.+)</ul>~Ui';
-    const IMDB_YEAR          = '~<span class="titlereference-title-year">(?:\s*)\(<a href="\/search\/title\?year=(?:.*)>(\d{4})<\/a>~Ui';
+    const IMDB_YEAR          = '~og:title\' content="(?:.*)\((?:.*)(\d{4})(?:.*)\)~Ui';
 
     /**
      * @var string The string returned, if nothing is found.
