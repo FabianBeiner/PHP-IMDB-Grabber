@@ -42,6 +42,10 @@ if ($oIMDB->isReady) {
 
 `getAwards()`
 
+**Budget**
+
+`getBudget()`
+
 **Cast**
 
 `getCast($iLimit = 0, $bMore = true)` - `$iLimit` defines the maximum amount of people returned, `$bMore` if "…" should be added to the string if needed
