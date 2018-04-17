@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [6.0.8] - 2018-04-18
+### Changed
+- Switched everything to https.
+- Updated `imdb.tests.php`.
+- Added `getBudget()`. *Thanks, @bla0r!*
+
 ## [6.0.7] - 2017-12-25
 ### Changed
 - Updated the title regex.
@@ -69,3 +75,6 @@ All notable changes to this project will be documented in this file.
 [6.0.3]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.2...v6.0.3
 [6.0.4]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.3...v6.0.4
 [6.0.5]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.4...v6.0.5
+[6.0.6]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.5...v6.0.6
+[6.0.7]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.6...v6.0.7
+[6.0.8]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.7...v6.0.8

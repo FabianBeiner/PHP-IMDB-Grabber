@@ -48,20 +48,20 @@
 include_once '../imdb.class.php';
 
 $aTests = [
-    'http://www.imdb.com/title/tt0033467/',
-    'http://www.imdb.com/title/tt5680152/reference',
+    'https://www.imdb.com/title/tt0033467/',
+    'https://www.imdb.com/title/tt5680152/reference',
     'http://www.imdb.com/title/tt0460681/',
     'tt1124379',
     'tt0187775 ',
     'http://www.imdb.com/title/tt1231587/',
-    'http://www.imdb.com/title/tt1392190/',
+    'https://www.imdb.com/title/tt1392190/',
     'http://www.imdb.com/title/tt0421974/',
-    'http://www.imdb.com/title/tt0094618/',
+    'https://www.imdb.com/title/tt0094618/',
     'http://www.imdb.com/title/tt0448157/',
     'Matrix',
     'Donner Pass',
     'If only',
-    'http://www.imdb.com/title/tt1604113/',
+    'https://www.imdb.com/title/tt1604113/',
     'Wyse Guys',
     'http://www.imdb.com/title/tt2005268/',
     'Wer ist Clark Rockefeller?',
@@ -70,7 +70,7 @@ $aTests = [
     'One Tree Hill',
     'Formosa Betrayed',
     'New York, I Love You',
-    'http://us.imdb.com/Title?0144117',
+    'https://us.imdb.com/Title?0144117',
     'http://www.imdb.com/title/tt1022603/',
     'Fabian Beiner never made a movie. Yet!'
 ];
