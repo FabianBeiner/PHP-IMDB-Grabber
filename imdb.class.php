@@ -1623,7 +1623,7 @@ class IMDBHelper extends IMDB
                               CURLOPT_SSL_VERIFYPEER => 0,
                               CURLOPT_TIMEOUT        => self::IMDB_TIMEOUT,
                               CURLOPT_USERAGENT      => 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.108 Safari/537.36',
-                              CURLOPT_VERBOSE        => true
+                              CURLOPT_VERBOSE        => false
                           ]);
         $sOutput   = curl_exec($oCurl);
         $aCurlInfo = curl_getinfo($oCurl);
