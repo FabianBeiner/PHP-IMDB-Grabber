@@ -2,29 +2,29 @@
 
 **This PHP library enables you to scrape data from IMDB.com.**
 
-*The script is a proof of concept. It’s mostly working, but you shouldn’t use it. IMDb doesn’t allow this method of data fetching. I personally do not use or promote this script, you’re fully responsive if you’re using it.*
+*This script is a proof of concept. It’s working, but you shouldn’t use it. IMDb doesn’t allow this method of data fetching. I do not use or promote this script. You’re responsible for using it.*
 
-The technique used is called “[web scraping](http://en.wikipedia.org/wiki/Web_scraping "Web scraping at Wikipedia")”. This means, if IMDb changes anything within their HTML source, the script is most likely going to fail. I won’t update this regularly, so don’t count on it to be working all the time.
+The technique used is called “[web scraping](http://en.wikipedia.org/wiki/Web_scraping "Web scraping at Wikipedia").”
+ Which means, if IMDb changes any of their HTML, the script is going to fail. I won’t update this on a regular basis, so don’t count on it to be working all the time.
 
 ## License
 
 [The MIT License (MIT)](https://fabianbeiner.mit-license.org/ "The MIT License")
 
-## Usage
+## Example Usage
 
 ```php
 <?php
 include_once 'imdb.class.php';
-$oIMDB = new IMDB('Movie Title or IMDB URL');
-if ($oIMDB->isReady) {
-        [… Do something, see below …]
-    }
-    else {
-        [… Movie was not found …]
-    }
+$IMDB = new IMDB('Movie Title or IMDB URL');
+if ($IMDB->isReady) {
+    print_r($IMDB->getAll());
+} else {
+    echo 'Movie not found. 😞';
 }
-?>
 ```
+
+## Available Methods
 
 **Get all available data**
 
@@ -33,6 +33,10 @@ if ($oIMDB->isReady) {
 **Also Known As**
 
 `getAka()`
+
+**All local names**
+
+`getAkas()`
 
 **Aspect Ratio**
 
@@ -94,6 +98,10 @@ if ($oIMDB->isReady) {
 
 `getCreatorAsUrl($sTarget = '')` - `$sTarget` defines a target
 
+**Description**
+
+`getDescription()`
+
 **Director**
 
 `getDirector()`
@@ -130,13 +138,13 @@ if ($oIMDB->isReady) {
 
 `getMpaa()`
 
-**Plot Keywords**
-
-`getPlotKeywords()`
-
 **Plot**
 
 `getPlot($iLimit = 0)` - `$iLimit` defines the maximum characters returned
+
+**Plot Keywords**
+
+`getPlotKeywords()`
 
 **Poster**
 
