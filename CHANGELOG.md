@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [6.1.0] - 2018-04-25
+### Changed
+- Added `getDescription()`.
+- Improved `getAll()`;
+- Fixed some smaller stuff. *Gosh, it's time for a rewrite!*
+- Updated `imdb.tests.php`, README, and license year.
+
 ## [6.0.8] - 2018-04-18
 ### Changed
 - Switched everything to https.
