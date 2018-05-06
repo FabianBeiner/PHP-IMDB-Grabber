@@ -526,8 +526,11 @@ class IMDB
                             $sMatch = IMDBHelper::cleanString($sMatch);
                         }
                     }
-
-                    $aReturn[] = $sMatch;
+                    
+                    $aReturn[] = [
+                        'cast'   => IMDBHelper::cleanString($aMatch[4][$i]),
+                        'image'  => $sMatch
+                    ];
                 }
 
                 $bMore = (0 !== $iLimit && $bMore && (count($aMatch[4]) > $iLimit) ? '…' : '');
