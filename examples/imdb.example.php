@@ -95,6 +95,11 @@ if ($oIMDB->isReady) {
          '" style="float:left;margin:4px 10px 10px 0;"> <b>About the movie:</b> ' .
          $oIMDB->getPlot() .
          '</p>';
+    echo '<h2>Cast</h2>';
+    $castImages = $oIMDB->getCastImages(5, false, 'small');
+    foreach (explode(' / ', $oIMDB->getCast(5, false)) as $name) {
+        echo '<img src="' . $castImages[$name] . '" alt="' . $name . '">' . $name . '<br>';
+    }
 } else {
     echo '<p>Movie not found!</p>';
 }
