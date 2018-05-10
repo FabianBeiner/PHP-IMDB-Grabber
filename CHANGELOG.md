@@ -1,9 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [6.1.2] - 2018-05-10
+### Changed
+- Some smaller improvements, updates, etc.
+
 ## [6.1.1] - 2018-05-06
 ### Changed
-- Added `getCastImage()`.
+- Added `getCastImages()`.
 
 ## [6.1.0] - 2018-04-25
 ### Changed
@@ -79,7 +83,7 @@ All notable changes to this project will be documented in this file.
 - Switched to the “combined” page. This enables easier scrapping, but we lose some methods (like `getBudget()` or `getDescription()`). Then again, a few new ones where added. See README.
 - Removed `getFullCast()`, because `getCast()` now returns the full cast.
 
-[Unreleased]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.0...HEAD
+[Unreleased]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.2...HEAD
 [6.0.0]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/5.5.21...v6.0.0
 [6.0.1]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.0...v6.0.1
 [6.0.2]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.1...v6.0.2
@@ -90,3 +94,5 @@ All notable changes to this project will be documented in this file.
 [6.0.7]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.6...v6.0.7
 [6.0.8]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.7...v6.0.8
 [6.1.0]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.8...v6.1.0
+[6.1.1]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.0...v6.1.1
+[6.1.2]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.1...v6.1.2

@@ -54,9 +54,9 @@ if ($IMDB->isReady) {
 
 `getCast($iLimit = 0, $bMore = true)` - `$iLimit` defines the maximum amount of people returned, `$bMore` if "…" should be added to the string if needed
 
-**Cast** (with images)
+**Cast Images**
 
-`getCastImage($iLimit = 0, $bMore = true, $sSize = 'small', $bDownload = false)` - `$iLimit` defines the maximum amount of people returned, `$bMore` if "…" should be added to the string if needed, `$sSize` defines the size of the cast image "small, mid and big", `$bDownload` if the cast image should be downloaded or not
+`getCastImages($iLimit = 0, $bMore = true, $sSize = 'small', $bDownload = false)` - `$iLimit` defines the maximum amount of people returned, `$bMore` if "…" should be added to the string if needed, `$sSize` defines the size of the cast image "small, mid and big", `$bDownload` if the cast image should be downloaded or not
 
 **Cast (with links)**
 
