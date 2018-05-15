@@ -14,7 +14,7 @@
  * @author  Fabian Beiner <fb@fabianbeiner.de>
  * @license https://opensource.org/licenses/MIT The MIT License
  * @link    https://github.com/FabianBeiner/PHP-IMDB-Grabber/ GitHub Repository
- * @version 6.1.2
+ * @version 6.1.3
  */
 class IMDB
 {
@@ -524,7 +524,21 @@ class IMDB
                         if (file_exists(dirname(__FILE__) . '/' . $sLocal)) {
                             $sMatch = $sLocal;
                         } else {
-                            $sMatch = IMDBHelper::cleanString($sMatch);
+                            //the 'big' image isn't available, try the 'mid' one (vice versa)
+                            if ('big' === strtolower($sSize) && false !== strstr($aMatch[2][$i], '@._')) {
+                                //trying the 'mid' one
+                                $sMatch = substr($aMatch[2][$i], 0, strpos($aMatch[2][$i], '@._')) . '@._V1_UX214_AL_.jpg';
+                            } else {
+                                //trying the 'big' one
+                                $sMatch = substr($aMatch[2][$i], 0, strpos($aMatch[2][$i], '@._')) . '@.jpg';
+                            }
+                            
+                            $sLocal = IMDBHelper::saveImageCast($sMatch, $aMatch[3][$i]);
+                            if (file_exists(dirname(__FILE__) . '/' . $sLocal)) {
+                                $sMatch = $sLocal;
+                            } else {
+                                $sMatch = IMDBHelper::cleanString($aMatch[2][$i]);
+                            }
                         }
                     }
 
