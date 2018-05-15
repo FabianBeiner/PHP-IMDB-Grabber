@@ -1102,6 +1102,67 @@ class IMDB
         return self::$sNotFound;
     }
 
+        /**
+     * Returns all local names
+     *
+     * @return string country
+     * @return string release date
+     */
+    public function getReleaseDates()
+    {
+        if (true === $this->isReady) {
+            // Does a cache of this movie exist?
+            $sCacheFile = $this->sRoot . '/cache/' . sha1($this->iId) . '_akas.cache';
+            $bUseCache  = false;
+
+            if (is_readable($sCacheFile)) {
+                $iDiff = round(abs(time() - filemtime($sCacheFile)) / 60);
+                if ($iDiff < $this->iCache || false) {
+                    $bUseCache = true;
+                }
+            }
+
+            if ($bUseCache) {
+                $aRawReturn = file_get_contents($sCacheFile);
+                $aReturn    = unserialize($aRawReturn);
+
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
+            } else {
+                $fullAkas  = sprintf('https://www.imdb.com/title/tt%s/releaseinfo', $this->iId);
+                $aCurlInfo = IMDBHelper::runCurl($fullAkas);
+                $sSource   = $aCurlInfo['contents'];
+
+                if (false === $sSource) {
+                    if (true === self::IMDB_DEBUG) {
+                        echo '<pre><b>cURL error:</b> ' . var_dump($aCurlInfo) . '</pre>';
+                    }
+
+                    return false;
+                }
+                
+                $aReturned = IMDBHelper::matchRegex($sSource, "~>(.*)<\/a><\/td>\s+<td class="release_date">(.*)<\/td>~");
+
+                if ($aReturned) {
+                    $aReturn = [];
+                    foreach ($aReturned[1] as $i => $strName) {
+                        if (strpos($strName, '(') === false) {
+                            $aReturn[] = [
+                                'country' => IMDBHelper::cleanString($strName)
+                                'releasedate'   => IMDBHelper::cleanString($aReturned[2][$i]),
+                            ];
+                        }
+                    }
+
+                    file_put_contents($sCacheFile, serialize($aReturn));
+
+                    return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
+                }
+            }
+        }
+
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound);
+    }
+    
     /**
      * @return string The runtime of the movie or $sNotFound.
      */
