@@ -1154,7 +1154,7 @@ class IMDB
                     return false;
                 }
                 
-                $aReturned = IMDBHelper::matchRegex($sSource, "~>(.*)<\/a><\/td>\s+<td class="release_date">(.*)<\/td>~");
+                $aReturned = IMDBHelper::matchRegex($sSource, '~>(.*)<\/a><\/td>\s+<td class="release_date">(.*)<\/td>~');
 
                 if ($aReturned) {
                     $aReturn = [];
