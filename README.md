@@ -162,6 +162,10 @@ if ($IMDB->isReady) {
 
 `getReleaseDate()`
 
+**Release Dates**
+
+`getReleaseDates()` returning all release dates for each country
+
 **Runtime**
 
 `getRuntime()`

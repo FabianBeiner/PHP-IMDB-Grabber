@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [6.1.3] - 2018-05-15
+### Changed
+- Added `getReleaseDates()`
+- Fixed `getCastImages()`
+
 ## [6.1.2] - 2018-05-10
 ### Changed
 - Some smaller improvements, updates, etc.
