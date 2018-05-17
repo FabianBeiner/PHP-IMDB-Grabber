@@ -1161,8 +1161,8 @@ class IMDB
                     foreach ($aReturned[1] as $i => $strName) {
                         if (strpos($strName, '(') === false) {
                             $aReturn[] = [
-                                'country' => IMDBHelper::cleanString($strName)
-                                'releasedate'   => IMDBHelper::cleanString($aReturned[2][$i]),
+                                'country' => IMDBHelper::cleanString($strName),
+                                'releasedate'   => IMDBHelper::cleanString($aReturned[2][$i])
                             ];
                         }
                     }
