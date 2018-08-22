@@ -14,7 +14,7 @@
  * @author  Fabian Beiner <fb@fabianbeiner.de>
  * @license https://opensource.org/licenses/MIT The MIT License
  * @link    https://github.com/FabianBeiner/PHP-IMDB-Grabber/ GitHub Repository
- * @version 6.1.3
+ * @version 6.1.4
  */
 class IMDB
 {
@@ -528,12 +528,13 @@ class IMDB
                             //the 'big' image isn't available, try the 'mid' one (vice versa)
                             if ('big' === strtolower($sSize) && false !== strstr($aMatch[2][$i], '@._')) {
                                 //trying the 'mid' one
-                                $sMatch = substr($aMatch[2][$i], 0, strpos($aMatch[2][$i], '@._')) . '@._V1_UX214_AL_.jpg';
+                                $sMatch =
+                                    substr($aMatch[2][$i], 0, strpos($aMatch[2][$i], '@._')) . '@._V1_UX214_AL_.jpg';
                             } else {
                                 //trying the 'big' one
                                 $sMatch = substr($aMatch[2][$i], 0, strpos($aMatch[2][$i], '@._')) . '@.jpg';
                             }
-                            
+
                             $sLocal = IMDBHelper::saveImageCast($sMatch, $aMatch[3][$i]);
                             if (file_exists(dirname(__FILE__) . '/' . $sLocal)) {
                                 $sMatch = $sLocal;
@@ -899,7 +900,7 @@ class IMDB
 
         return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound);
     }
-    
+
     /**
      * @return string cumulative worldwide gross or $sNotFound.
      */
@@ -914,7 +915,7 @@ class IMDB
 
         return self::$sNotFound;
     }
-    
+
     /**
      * @return string A list with the languages or $sNotFound.
      */
@@ -1132,7 +1133,7 @@ class IMDB
         return self::$sNotFound;
     }
 
-        /**
+    /**
      * Returns all local names
      *
      * @return string country
@@ -1169,16 +1170,17 @@ class IMDB
 
                     return false;
                 }
-                
-                $aReturned = IMDBHelper::matchRegex($sSource, '~>(.*)<\/a><\/td>\s+<td class="release_date">(.*)<\/td>~');
+
+                $aReturned =
+                    IMDBHelper::matchRegex($sSource, '~>(.*)<\/a><\/td>\s+<td class="release_date">(.*)<\/td>~');
 
                 if ($aReturned) {
                     $aReturn = [];
                     foreach ($aReturned[1] as $i => $strName) {
                         if (strpos($strName, '(') === false) {
                             $aReturn[] = [
-                                'country' => IMDBHelper::cleanString($strName),
-                                'releasedate'   => IMDBHelper::cleanString($aReturned[2][$i])
+                                'country'     => IMDBHelper::cleanString($strName),
+                                'releasedate' => IMDBHelper::cleanString($aReturned[2][$i])
                             ];
                         }
                     }
@@ -1192,7 +1194,7 @@ class IMDB
 
         return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound);
     }
-    
+
     /**
      * @return string The runtime of the movie or $sNotFound.
      */

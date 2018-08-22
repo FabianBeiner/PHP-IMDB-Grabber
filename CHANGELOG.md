@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [6.1.4] - 2018-08-22
+### Changed
+- Added `getGross()`. *Thanks, @bla0r!*
+
 ## [6.1.3] - 2018-05-15
 ### Changed
 - Added `getReleaseDates()`
@@ -101,3 +105,6 @@ All notable changes to this project will be documented in this file.
 [6.1.0]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.0.8...v6.1.0
 [6.1.1]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.0...v6.1.1
 [6.1.2]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.1...v6.1.2
+[6.1.3]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.2...v6.1.3
+[6.1.4]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.3...v6.1.4
+[Unreleased]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.4...HEAD
