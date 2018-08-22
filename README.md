@@ -122,6 +122,10 @@ if ($IMDB->isReady) {
 
 `getGenreAsUrl($sTarget = '')` - `$sTarget` defines a target
 
+**Gross**
+
+`getGross()` to get cumulative worldwide gross
+
 **Language**
 
 `getLanguage()`
