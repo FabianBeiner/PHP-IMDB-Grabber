@@ -205,7 +205,6 @@ class IMDB
                     $sParameters = '&s=tt';
             }
 
-            // $this->sUrl = 'https://www.imdb.com/find?q=' . str_replace(' ', '+', $sSearch) . $sParameters;
             $this->sUrl = 'https://www.imdb.com/find?q=' . rawurlencode(str_replace(' ', '+', $sSearch)) . $sParameters;
             $bSearch    = true;
 
