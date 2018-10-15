@@ -111,5 +111,5 @@ All notable changes to this project will be documented in this file.
 [6.1.2]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.1...v6.1.2
 [6.1.3]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.2...v6.1.3
 [6.1.4]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.3...v6.1.4
-[6.1.4]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.4...v6.1.5
+[6.1.5]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.4...v6.1.5
 [Unreleased]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.5...HEAD
