@@ -14,7 +14,7 @@
  * @author  Fabian Beiner <fb@fabianbeiner.de>
  * @license https://opensource.org/licenses/MIT The MIT License
  * @link    https://github.com/FabianBeiner/PHP-IMDB-Grabber/ GitHub Repository
- * @version 6.1.4
+ * @version 6.1.5
  */
 class IMDB
 {
@@ -205,7 +205,7 @@ class IMDB
                     $sParameters = '&s=tt';
             }
 
-            $this->sUrl = 'https://www.imdb.com/find?q=' . str_replace(' ', '+', $sSearch) . $sParameters;
+            $this->sUrl = 'https://www.imdb.com/find?q=' . rawurlencode(str_replace(' ', '+', $sSearch)) . $sParameters;
             $bSearch    = true;
 
             // Was this search already performed and cached?

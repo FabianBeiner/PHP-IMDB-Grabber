@@ -48,6 +48,7 @@
 include_once '../imdb.class.php';
 
 $aTests = [
+    'Der Prinz von Ägypten',
     'https://www.imdb.com/title/tt0063634',
     'https://www.imdb.com/title/tt4456850/',
     'https://www.imdb.com/title/tt0033467/',
