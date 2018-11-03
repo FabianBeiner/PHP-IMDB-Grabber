@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [6.1.6] - 2018-11-03
+### Changed
+- Added getLocations() method. *Thanks, @defro!*
+
 ## [6.1.5] - 2018-10-15
 ### Changed
 - Fixed a problem with German Umlauts. *Thanks, @DLX23!*
@@ -112,4 +116,5 @@ All notable changes to this project will be documented in this file.
 [6.1.3]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.2...v6.1.3
 [6.1.4]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.3...v6.1.4
 [6.1.5]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.4...v6.1.5
-[Unreleased]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.5...HEAD
+[6.1.6]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.5...v6.1.6
+[Unreleased]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.6...HEAD
