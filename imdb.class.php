@@ -55,6 +55,7 @@ class IMDB
     const IMDB_ID            = '~((?:tt\d{6,})|(?:itle\?\d{6,}))~';
     const IMDB_LANGUAGE      = '~<a href="\/language\/(\w+)">(.*)<\/a>~Ui';
     const IMDB_LOCATION      = '~href="\/search\/title\?locations=(.*)">(.*)<\/a>~Ui';
+    const IMDB_LOCATIONS     = '~href="\/search\/title\?locations=[^>]*>\s?(.*)\s?<\/a>[^"]*<dd>\s?(.*)\s<\/dd>~Ui';
     const IMDB_MPAA          = '~<li class="ipl-inline-list__item">(?:\s+)(TV-Y|TV-Y7|TV-G|TV-PG|TV-14|TV-MA|G|PG|PG-13|R|NC-17|NR|UR)(?:\s+)<\/li>~Ui';
     const IMDB_NAME          = '~href="/name/(.+)/?(?:\?[^"]*)?"[^>]*>(.+)</a>~Ui';
     const IMDB_DESCRIPTION   = '~<section class="titlereference-section-overview">\s+<div>(.*)</div>\s+<hr>~Ui';
@@ -998,6 +999,72 @@ class IMDB
                 }
 
                 return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
+            }
+        }
+
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound);
+    }
+
+    /**
+     * Returns all locations
+     *
+     * @return string location
+     * @return string specification
+     */
+    public function getLocations()
+    {
+        if (true === $this->isReady) {
+            // Does a cache of this movie exist?
+            $sCacheFile = $this->sRoot . '/cache/' . sha1($this->iId) . '_locations.cache';
+            $bUseCache  = false;
+
+            if (is_readable($sCacheFile)) {
+                $iDiff = round(abs(time() - filemtime($sCacheFile)) / 60);
+                if ($iDiff < $this->iCache || false) {
+                    $bUseCache = true;
+                }
+            }
+
+            if ($bUseCache) {
+                $aRawReturn = file_get_contents($sCacheFile);
+                $aReturn    = unserialize($aRawReturn);
+
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
+            } else {
+                $fullLocations  = sprintf('https://www.imdb.com/title/tt%s/locations', $this->iId);
+                $aCurlInfo = IMDBHelper::runCurl($fullLocations);
+                $sSource   = $aCurlInfo['contents'];
+
+                if (false === $sSource) {
+                    if (true === self::IMDB_DEBUG) {
+                        echo '<pre><b>cURL error:</b> ' . var_dump($aCurlInfo) . '</pre>';
+                    }
+
+                    return false;
+                }
+
+                $aReturned =
+                    IMDBHelper::matchRegex($sSource, self::IMDB_LOCATIONS);
+
+                if ($aReturned) {
+                    $aReturn = [];
+                    foreach ($aReturned[1] as $i => $strName) {
+                        if (strpos($strName, '(') === false) {
+                            $aReturn[] = [
+                                'location'      => IMDBHelper::cleanString($strName)
+                            ];
+                        }
+                        if (strpos($aReturned[2][$i], '(') !== false) {
+                            $aReturn[] = [
+                                'specification' => IMDBHelper::cleanString($aReturned[2][$i])
+                            ];
+                        }
+                    }
+
+                    file_put_contents($sCacheFile, serialize($aReturn));
+
+                    return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
+                }
             }
         }
 
