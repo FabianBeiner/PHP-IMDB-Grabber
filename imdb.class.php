@@ -14,7 +14,7 @@
  * @author  Fabian Beiner <fb@fabianbeiner.de>
  * @license https://opensource.org/licenses/MIT The MIT License
  * @link    https://github.com/FabianBeiner/PHP-IMDB-Grabber/ GitHub Repository
- * @version 6.1.5
+ * @version 6.1.6
  */
 class IMDB
 {
@@ -1031,9 +1031,9 @@ class IMDB
 
                 return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
             } else {
-                $fullLocations  = sprintf('https://www.imdb.com/title/tt%s/locations', $this->iId);
-                $aCurlInfo = IMDBHelper::runCurl($fullLocations);
-                $sSource   = $aCurlInfo['contents'];
+                $fullLocations = sprintf('https://www.imdb.com/title/tt%s/locations', $this->iId);
+                $aCurlInfo     = IMDBHelper::runCurl($fullLocations);
+                $sSource       = $aCurlInfo['contents'];
 
                 if (false === $sSource) {
                     if (true === self::IMDB_DEBUG) {
@@ -1043,15 +1043,14 @@ class IMDB
                     return false;
                 }
 
-                $aReturned =
-                    IMDBHelper::matchRegex($sSource, self::IMDB_LOCATIONS);
+                $aReturned = IMDBHelper::matchRegex($sSource, self::IMDB_LOCATIONS);
 
                 if ($aReturned) {
                     $aReturn = [];
                     foreach ($aReturned[1] as $i => $strName) {
                         if (strpos($strName, '(') === false) {
                             $aReturn[] = [
-                                'location'      => IMDBHelper::cleanString($strName)
+                                'location' => IMDBHelper::cleanString($strName)
                             ];
                         }
                         if (strpos($aReturned[2][$i], '(') !== false) {
