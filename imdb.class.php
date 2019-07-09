@@ -64,6 +64,7 @@ class IMDB
     const IMDB_PLOT_KEYWORDS = '~<td[^>]*>Plot\s*Keywords</td>\s*<td>(.+)(?:<a\s*href="/title/[^>]*>[^<]*</a>\s*</li>\s*</ul>\s*)?</td>~Ui';
     const IMDB_POSTER        = '~<link\s*rel=\'image_src\'\s*href="(.*)">~Ui';
     const IMDB_RATING        = '~class="ipl-rating-star__rating">(.*)<~Ui';
+    const IMDB_RATING_COUNT  = '~class="ipl-rating-star__total-votes">\((.*)\)<~Ui';
     const IMDB_RELEASE_DATE  = '~href="/title/[t0-9]*/releaseinfo">(.*)<~Ui';
     const IMDB_RUNTIME       = '~<td[^>]*>\s*Runtime\s*</td>\s*<td>(.+)</td>~Ui';
     const IMDB_SEARCH        = '~<td class="result_text"> <a href="\/title\/(tt\d{6,})\/(?:.*)"(?:\s*)>(?:.*)<\/a>~Ui';
@@ -1162,6 +1163,21 @@ class IMDB
             $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_RATING, 1);
             if (false !== $sMatch) {
                 return IMDBHelper::cleanString($sMatch);
+            }
+        }
+
+        return self::$sNotFound;
+    }
+    
+	/**
+     * @return string The rating count of the movie or $sNotFound.
+     */
+    public function getRatingCount()
+    {
+        if (true === $this->isReady) {
+            $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_RATING_COUNT, 1);
+            if (false !== $sMatch) {
+                return str_replace(',','',IMDBHelper::cleanString($sMatch));
             }
         }
 
