@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [6.1.7] - 2020-02-19
+### Changed
+- Improved `getPoster()` method. You can now get different image smaller sizes (`xxs, xs, s`). *Thanks, @phyozawtun!*
+
 ## [6.1.6] - 2018-11-03
 ### Changed
 - Added getLocations() method. *Thanks, @defro!*
@@ -117,4 +121,5 @@ All notable changes to this project will be documented in this file.
 [6.1.4]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.3...v6.1.4
 [6.1.5]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.4...v6.1.5
 [6.1.6]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.5...v6.1.6
-[Unreleased]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.6...HEAD
+[6.1.7]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.6...v6.1.7
+[Unreleased]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.7...HEAD
