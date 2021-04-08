@@ -370,7 +370,7 @@ class IMDB
                     return false;
                 }
 
-                $aReturned = IMDBHelper::matchRegex($sSource, "~<td>(.*?)<\/td>\s+<td>(.*?)<\/td>~");
+                $aReturned = IMDBHelper::matchRegex($sSource, "~<td class=\"aka-item__name\">(.*?)<\/td>\s+<td class=\"aka-item__title\">(.*?)<\/td>~");
 
                 if ($aReturned) {
                     $aReturn = [];
@@ -1225,7 +1225,7 @@ class IMDB
     {
         if (true === $this->isReady) {
             // Does a cache of this movie exist?
-            $sCacheFile = $this->sRoot . '/cache/' . sha1($this->iId) . '_akas.cache';
+            $sCacheFile = $this->sRoot . '/cache/' . sha1($this->iId) . '_dates.cache';
             $bUseCache  = false;
 
             if (is_readable($sCacheFile)) {
@@ -1255,7 +1255,7 @@ class IMDB
 
                 $aReturned = IMDBHelper::matchRegex(
                     $sSource,
-                    '~>(.*)<\/a><\/td>\s+<td class="release_date">(.*)<\/td>~'
+                    '~>(.*)\s+<\/a><\/td>\s+<td class=\"release-date-item__date\" align=\"right\">(.*)<\/td>~'
                 );
 
                 if ($aReturned) {
