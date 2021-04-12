@@ -394,6 +394,135 @@ class IMDB
     }
 
     /**
+     * Returns meta score
+     *
+     * @return string metascore
+     * @return string reviews
+     */
+    public function getMetaScore()
+    {
+        if (true === $this->isReady) {
+            // Does a cache of this movie exist?
+            $sCacheFile = $this->sRoot . '/cache/' . sha1($this->iId) . '_metascore.cache';
+            $bUseCache  = false;
+
+            if (is_readable($sCacheFile)) {
+                $iDiff = round(abs(time() - filemtime($sCacheFile)) / 60);
+                if ($iDiff < $this->iCache || false) {
+                    $bUseCache = true;
+                }
+            }
+
+            if ($bUseCache) {
+                $aRawReturn = file_get_contents($sCacheFile);
+                $aReturn    = unserialize($aRawReturn);
+
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
+            } else {
+                $fullCritics  = sprintf('https://www.imdb.com/title/tt%s/criticreviews', $this->iId);
+                $aCurlInfo = IMDBHelper::runCurl($fullCritics);
+                $sSource   = $aCurlInfo['contents'];
+
+                if (false === $sSource) {
+                    if (true === self::IMDB_DEBUG) {
+                        echo '<pre><b>cURL error:</b> ' . var_dump($aCurlInfo) . '</pre>';
+                    }
+
+                    return false;
+                }
+
+                $aReturned = IMDBHelper::matchRegex(
+                    $sSource,
+                    '~metascore_wrap(?:.*)\s+(?:.*)\s+(?:.*)ratingValue\">([0-9]+)<\/span>(?:\s+(?:.*)){4}ratingCount\">([0-9]+)~'
+                );
+
+                if ($aReturned) {
+                    $aReturn = [];                        
+                    $aReturn[] = [
+                        'metascore' => IMDBHelper::cleanString($aReturned[1][0]),
+                        'reviews' => IMDBHelper::cleanString($aReturned[2][0]),
+                    ];
+
+                    file_put_contents($sCacheFile, serialize($aReturn));
+
+                    return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
+                }
+            }
+        }
+
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound);
+    }
+
+    /**
+     * Returns Critic Reviews based on Metascore
+     *
+     * @return string rating
+     * @return string url
+     * @return string publisher
+     * @return string author
+     * @return string review
+     */
+
+    public function getMetaCritics()
+    {
+        if (true === $this->isReady) {
+            // Does a cache of this movie exist?
+            $sCacheFile = $this->sRoot . '/cache/' . sha1($this->iId) . '_criticreviews.cache';
+            $bUseCache  = false;
+
+            if (is_readable($sCacheFile)) {
+                $iDiff = round(abs(time() - filemtime($sCacheFile)) / 60);
+                if ($iDiff < $this->iCache || false) {
+                    $bUseCache = true;
+                }
+            }
+
+            if ($bUseCache) {
+                $aRawReturn = file_get_contents($sCacheFile);
+                $aReturn    = unserialize($aRawReturn);
+
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
+            } else {
+                $fullCritics  = sprintf('https://www.imdb.com/title/tt%s/criticreviews', $this->iId);
+                $aCurlInfo = IMDBHelper::runCurl($fullCritics);
+                $sSource   = $aCurlInfo['contents'];
+
+                if (false === $sSource) {
+                    if (true === self::IMDB_DEBUG) {
+                        echo '<pre><b>cURL error:</b> ' . var_dump($aCurlInfo) . '</pre>';
+                    }
+
+                    return false;
+                }
+
+                $aReturned = IMDBHelper::matchRegex(
+                    $sSource,
+                    '~"ratingValue\">([0-9]+)<\/span>\s+<\/div>\s+<\/td>\s+(?:.*)\s+(?:<a\s+href=\"(.*)\"\s+)?(?:.*)\"name\">(.*)<\/span>(?:.*)\"name\">(.*)<\/span><\/span>(?:<\/a>)?\s+(?:.*)\"reviewbody\"> (.*)<\/div>~'
+                );
+
+                if ($aReturned) {
+                    $aReturn = [];
+                    foreach ($aReturned[1] as $i => $strScore) {
+                            $aReturn[] = [
+                                'rating'     => IMDBHelper::cleanString($strScore),
+                                'url' => IMDBHelper::cleanString($aReturned[2][$i]),
+                                'publisher' => IMDBHelper::cleanString($aReturned[3][$i]),
+                                'author' => IMDBHelper::cleanString($aReturned[4][$i]),
+                                'review' => IMDBHelper::cleanString($aReturned[5][$i]),
+                            ];
+                    }
+
+                    file_put_contents($sCacheFile, serialize($aReturn));
+
+                    return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
+                }
+            }
+        }
+
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound);
+    }
+    
+    /**
      * @return string “Aspect Ratio” or $sNotFound.
      */
     public function getAspectRatio()
