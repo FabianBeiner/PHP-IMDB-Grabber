@@ -45,7 +45,8 @@ class IMDB
     const IMDB_CERTIFICATION = '~<td[^>]*>\s*Certification\s*</td>\s*<td>(.+)</td>~Ui';
     const IMDB_CHAR          = '~<td class="character">(?:\s+)<div>(.*)(?:\s+)(?: /| \(.*\)|<\/div>)~Ui';
     const IMDB_COLOR         = '~<a href="\/search\/title\?colors=(?:.*)">(.*)<\/a>~Ui';
-    const IMDB_COMPANY       = '~href="[^"]*update=[t0-9]+:production_companies[^"]*">Edit</a>\s*</header>\s*<ul\s*class="simpleList">.+<a href="\/company\/(.*)\/">(.*)</a>~Ui';
+    const IMDB_COMPANIES     = '~production_companies&ref_=(?:.*)">Edit</a>\s+</header>\s+<ul class="simpleList">(.*)Distributors</h4>~Uis';
+    const IMDB_COMPANY       = '~<li>\s+<a href="\/company\/(co[0-9]+)\/">(.*?)</a>~';
     const IMDB_COUNTRY       = '~<a href="/country/(\w+)">(.*)</a>~Ui';
     const IMDB_CREATOR       = '~<div[^>]*>\s*(?:Creator|Creators)\s*:\s*<ul[^>]*>(.+)</ul>~Uxsi';
     const IMDB_DIRECTOR      = '~<div[^>]*>\s*(?:Director|Directors)\s*:\s*<ul[^>]*>(.+)</ul>~Uxsi';
@@ -835,17 +836,27 @@ class IMDB
     public function getCompanyAsUrl($sTarget = '')
     {
         if (true === $this->isReady) {
-            $aMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_COMPANY);
-            if (isset($aMatch[2][0])) {
-                return '<a href="https://www.imdb.com/company/' . IMDBHelper::cleanString(
-                        $aMatch[1][0]
-                    ) . '/"' . ($sTarget ? ' target="' . $sTarget . '"' : '') . '>' . IMDBHelper::cleanString(
-                        $aMatch[2][0]
-                    ) . '</a>';
+            $aMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_COMPANIES);
+            $aReturn = [];
+            if (isset($aMatch[1][0])) {
+                $bMatch = IMDBHelper::matchRegex($aMatch[1][0], self::IMDB_COMPANY);
+                if (count($bMatch[2])) {
+                    foreach ($bMatch[2] as $i => $sName) {
+                        
+                        $aReturn[] = '<a href="https://www.imdb.com/company/' . IMDBHelper::cleanString(
+                        $bMatch[1][$i]
+                        ) . '/"' . ($sTarget ? ' target="' . $sTarget . '"' : '') . '>' . IMDBHelper::cleanString(
+                        $sName
+                        ) . '</a>';
+                        
+                    }
+
+                    return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
+                }
             }
         }
 
-        return self::$sNotFound;
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound);
     }
 
     /**
