@@ -146,6 +146,14 @@ if ($IMDB->isReady) {
 
 `getMpaa()`
 
+**Metacritics
+
+`getMetaCritics()` - returns all critic reviews
+
+**Metascore**
+
+`getMetaScore()` - returns the average score and number of votes based on metacritic.
+
 **Plot**
 
 `getPlot($iLimit = 0)` - `$iLimit` defines the maximum characters returned
