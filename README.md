@@ -146,7 +146,7 @@ if ($IMDB->isReady) {
 
 `getMpaa()`
 
-**Metacritics
+**Metacritics**
 
 `getMetaCritics()` - returns all critic reviews
 
@@ -205,6 +205,10 @@ if ($IMDB->isReady) {
 **Trailer**
 
 `getTrailerAsUrl($bEmbed = false)` - `$bEmbed` defines if you want to link to player directly or not.
+
+**Type**
+
+`getType()` - returns the type of the title (movie, tv episode, tv series)
 
 **Url**
 
