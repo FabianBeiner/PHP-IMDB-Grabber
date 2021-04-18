@@ -74,6 +74,7 @@ class IMDB
     const IMDB_TITLE         = '~itemprop="name">(.*)(<\/h3>|<span)~Ui';
     const IMDB_TITLE_ORIG    = '~</h3>(?:\s+)(.*)(?:\s+)<span class=\"titlereference-original-title-label~Ui';
     const IMDB_TRAILER       = '~href="videoplayer/(vi[0-9]*)"~Ui';
+    const IMDB_TYPE          = '~href="/genre/(?:[a-zA-Z_-]*)/?">(?:[a-zA-Z_ -]*)</a>\s+</li>\s+(?:.*item">)\s+(?:<a href="(?:.*)</a>\s+</li>\s+(?:.*item">)\s+)?([a-zA-Z_ -]*)\s+</li>~Ui';
     const IMDB_URL           = '~https?://(?:.*\.|.*)imdb.com/(?:t|T)itle(?:\?|/)(..\d+)~i';
     const IMDB_USER_REVIEW   = '~href="/title/[t0-9]*/reviews"[^>]*>([^<]*)\s*User~Ui';
     const IMDB_VOTES         = '~"ipl-rating-star__total-votes">\s*\((.*)\)\s*<~Ui';
@@ -1545,6 +1546,22 @@ class IMDB
         return self::$sNotFound;
     }
 
+    /**
+     *
+     * @return string type of the title or $sNotFound.
+     */
+    public function getType()
+    {
+        if (true === $this->isReady) {
+            $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_TYPE, 1);
+            if (false !== $sMatch && "" !== $sMatch) {
+                return IMDBHelper::cleanString($sMatch);
+            }   
+        }
+
+        return self::$sNotFound;
+    }
+    
     /**
      * @return string The IMDb URL.
      */
