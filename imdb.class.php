@@ -58,7 +58,8 @@ class IMDB
     const IMDB_LOCATIONS     = '~href="\/search\/title\?locations=[^>]*>\s?(.*)\s?<\/a>[^"]*<dd>\s?(.*)\s<\/dd>~Ui';
     const IMDB_MPAA          = '~<li class="ipl-inline-list__item">(?:\s+)(TV-Y|TV-Y7|TV-G|TV-PG|TV-14|TV-MA|G|PG|PG-13|R|NC-17|NR|UR)(?:\s+)<\/li>~Ui';
     const IMDB_NAME          = '~href="/name/(.+)/?(?:\?[^"]*)?"[^>]*>(.+)</a>~Ui';
-    const IMDB_DESCRIPTION   = '~\s+<div>\s+(.*)\s+</div>\s+<hr>~Ui';
+    const IMDB_MOVIE_DESC    = '~<div>\s+(.*)\s+</div>\s+<hr>\s+<div class="titlereference-overview-section">~Ui';
+    const IMDB_SERIES_DESC   = '~<div>\s+(?:.*?</a>\s+</span>\s+</div>\s+<hr>\s+<div>\s+)(.*)\s+</div>\s+<hr>\s+<div class="titlereference-overview-section">~Ui';
     const IMDB_NOT_FOUND     = '~<h1 class="findHeader">No results found for ~Ui';
     const IMDB_PLOT          = '~<td[^>]*>\s*Plot\s*Summary\s*</td>\s*<td>\s*<p>(.+)</p>~Ui';
     const IMDB_PLOT_KEYWORDS = '~<td[^>]*>Plot\s*Keywords</td>\s*<td>(.+)(?:<a\s*href="/title/[^>]*>[^<]*</a>\s*</li>\s*</ul>\s*)?</td>~Ui';
@@ -949,10 +950,16 @@ class IMDB
     public function getDescription()
     {
         if (true === $this->isReady) {
-            $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_DESCRIPTION, 1);
+            $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_SERIES_DESC, 1);
             if (false !== $sMatch) {
                 return IMDBHelper::cleanString($sMatch);
             }
+
+            $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_MOVIE_DESC, 1);
+            if (false !== $sMatch) {
+                return IMDBHelper::cleanString($sMatch);
+            }
+            
         }
 
         return self::$sNotFound;
