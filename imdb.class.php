@@ -49,6 +49,8 @@ class IMDB
     const IMDB_COMPANY       = '~<li>\s+<a href="\/company\/(co[0-9]+)\/">(.*?)</a>~';
     const IMDB_COUNTRY       = '~<a href="/country/(\w+)">(.*)</a>~Ui';
     const IMDB_CREATOR       = '~<div[^>]*>\s*(?:Creator|Creators)\s*:\s*<ul[^>]*>(.+)</ul>~Uxsi';
+    const IMDB_DISTRIBUTOR   = '@href="[^"]*update=[t0-9]+:distributors[^"]*">Edit</a>\s*</header>\s*<ul\s*class="simpleList">(.*):special_effects_companies@Uis';
+    const IMDB_DISTRIBUTORS  = '@\/company\/(co[0-9]+)\/">(.*?)<\/a>\s+(?:\(([0-9]+)\))?\s+(?:\((.*?)\))?\s+(?:\((.*?)\))?\s+(?:\((?:.*?)\))?\s+</li>@';
     const IMDB_DIRECTOR      = '~<div[^>]*>\s*(?:Director|Directors)\s*:\s*<ul[^>]*>(.+)</ul>~Uxsi';
     const IMDB_GENRE         = '~href="/genre/([a-zA-Z_-]*)/?">([a-zA-Z_ -]*)</a>~Ui';
     const IMDB_GROSS         = '~pl-zebra-list__label">Cumulative Worldwide Gross<\/td>\s+<td>\s+(.*)\s+<~Uxsi';
@@ -1007,6 +1009,76 @@ class IMDB
         return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound);
     }
 
+    /**
+     * @param string $sTarget Add a target to the links?
+     *
+     * @return array A list (name, url, year, country, type) with Distributors or $sNotFound.
+     */
+    public function getDistributor($iLimit = 0, $bMore = true) 
+    {
+        if (true === $this->isReady) {
+            $aMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_DISTRIBUTOR);
+            $aReturn = [];
+            if (isset($aMatch[1][0])) {
+                $bMatch = IMDBHelper::matchRegex($aMatch[1][0], self::IMDB_DISTRIBUTORS);
+                if (count($bMatch[2])) {
+                    foreach ($bMatch[2] as $i => $sName) {
+                        if (0 !== $iLimit && $i >= $iLimit) {
+                            break;
+                        }
+                        $aReturn[] = [
+                            'distributor'     => IMDBHelper::cleanString($sName),
+                            'url' => 'https://www.imdb.com/company/' . IMDBHelper::cleanString($bMatch[1][$i]) .'',
+                            'year' => IMDBHelper::cleanString($bMatch[3][$i]),
+                            'country' => IMDBHelper::cleanString($bMatch[4][$i]),
+                            'type' => IMDBHelper::cleanString($bMatch[5][$i]),
+                        ];
+                    }
+
+                    $bMore = (0 !== $iLimit && $bMore && (count($aMatch[2]) > $iLimit) ? 'â€¦' : '');
+
+                    $bHaveMore = ($bMore && (count($aMatch[2]) > $iLimit));
+
+                    return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn, $bHaveMore);
+                
+                }
+            }
+        }
+
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound);
+    }
+
+    /**
+     * @param string $sTarget Add a target to the links?
+     *
+     * @return string A list with the linked distributors or $sNotFound.
+     */
+    public function getDistributorAsUrl($sTarget = '')
+    {
+        if (true === $this->isReady) {
+            $aMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_DISTRIBUTOR);
+            $aReturn = [];
+            if (isset($aMatch[1][0])) {
+                $bMatch = IMDBHelper::matchRegex($aMatch[1][0], self::IMDB_DISTRIBUTORS);
+                if (count($bMatch[2])) {
+                    foreach ($bMatch[2] as $i => $sName) {
+                        
+                        $aReturn[] = '<a href="https://www.imdb.com/company/' . IMDBHelper::cleanString(
+                        $bMatch[1][$i]
+                        ) . '/"' . ($sTarget ? ' target="' . $sTarget . '"' : '') . '>' . IMDBHelper::cleanString(
+                        $sName
+                        ) . '</a>';
+                        
+                    }
+
+                    return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
+                }
+            }
+        }
+
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound);
+    }
+    
     /**
      * @return string A list with the genres or $sNotFound.
      */
