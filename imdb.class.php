@@ -62,6 +62,7 @@ class IMDB
     const IMDB_NAME          = '~href="/name/(.+)/?(?:\?[^"]*)?"[^>]*>(.+)</a>~Ui';
     const IMDB_MOVIE_DESC    = '~<div>\s+(.*)\s+</div>\s+<hr>\s+<div class="titlereference-overview-section">~Ui';
     const IMDB_SERIES_DESC   = '~<div>\s+(?:.*?</a>\s+</span>\s+</div>\s+<hr>\s+<div>\s+)(.*)\s+</div>\s+<hr>\s+<div class="titlereference-overview-section">~Ui';
+    const IMDB_SERIESEP_DESC = '~All Episodes(?:.*?)</li>\s+(?:.*?)?</ul>\s+</span>\s+<hr>\s+</div>\s+<div>\s+(.*?)\s+</div>\s+<hr>~';
     const IMDB_NOT_FOUND     = '~<h1 class="findHeader">No results found for ~Ui';
     const IMDB_PLOT          = '~<td[^>]*>\s*Plot\s*Summary\s*</td>\s*<td>\s*<p>(.+)</p>~Ui';
     const IMDB_PLOT_KEYWORDS = '~<td[^>]*>Plot\s*Keywords</td>\s*<td>(.+)(?:<a\s*href="/title/[^>]*>[^<]*</a>\s*</li>\s*</ul>\s*)?</td>~Ui';
@@ -75,6 +76,7 @@ class IMDB
     const IMDB_SOUND_MIX     = '~<td[^>]*>\s*Sound\s*Mix\s*</td>\s*<td>(.+)</td>~Ui';
     const IMDB_TAGLINE       = '~<td[^>]*>\s*Taglines\s*</td>\s*<td>(.+)</td>~Ui';
     const IMDB_TITLE         = '~itemprop="name">(.*)(<\/h3>|<span)~Ui';
+    const IMDB_TITLE_EP      = '~titlereference-watch-ribbon"(?:.*)itemprop="name">(.*?)\s+<span\sclass="titlereference-title-year">~Ui';
     const IMDB_TITLE_ORIG    = '~</h3>(?:\s+)(.*)(?:\s+)<span class=\"titlereference-original-title-label~Ui';
     const IMDB_TRAILER       = '~href="videoplayer/(vi[0-9]*)"~Ui';
     const IMDB_TYPE          = '~href="/genre/(?:[a-zA-Z_-]*)/?">(?:[a-zA-Z_ -]*)</a>\s+</li>\s+(?:.*item">)\s+(?:<a href="(?:.*)</a>\s+</li>\s+(?:.*item">)\s+)?([a-zA-Z_ -]*)\s+</li>~Ui';
@@ -952,6 +954,11 @@ class IMDB
     public function getDescription()
     {
         if (true === $this->isReady) {
+            $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_SERIESEP_DESC, 1);
+            if (false !== $sMatch) {
+                return IMDBHelper::cleanString($sMatch);
+            }
+            
             $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_SERIES_DESC, 1);
             if (false !== $sMatch) {
                 return IMDBHelper::cleanString($sMatch);
@@ -1077,6 +1084,23 @@ class IMDB
         }
 
         return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound);
+    }
+    
+    /**
+     * @return string The episode title of the tv show or $sNotFound.
+     */
+    public function getEpisodeTitle()
+    {
+        if (true === $this->isReady) {
+            if (preg_match('/Episode/i', $this->getType())) {
+                $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_TITLE_EP, 1);
+                if (false !== $sMatch && "" !== $sMatch) {
+                    return IMDBHelper::cleanString($sMatch);
+                }  
+            }
+        }
+
+        return self::$sNotFound;
     }
     
     /**
