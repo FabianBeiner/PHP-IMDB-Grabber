@@ -114,6 +114,14 @@ if ($IMDB->isReady) {
 
 `getDirectorAsUrl($sTarget = '')` - `$sTarget` defines a target
 
+**Distributor**
+
+`getDistributor($iLimit = 0, $bMore = true)` - `$iLimit` defines the maximum amount of distributors returned, `$bMore` if "…" should be added to the string if needed
+
+**Distributor (with links)**
+
+`getDistributorAsUrl($sTarget = '')` - `$sTarget` defines a target
+
 **Genre**
 
 `getGenre()`
