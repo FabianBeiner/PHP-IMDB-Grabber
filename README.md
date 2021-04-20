@@ -122,6 +122,10 @@ if ($IMDB->isReady) {
 
 `getDistributorAsUrl($sTarget = '')` - `$sTarget` defines a target
 
+**Episode**
+
+`getEpisodeTitle()` - returns the episode title of the tv show
+
 **Genre**
 
 `getGenre()`
