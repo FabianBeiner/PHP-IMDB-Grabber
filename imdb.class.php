@@ -731,11 +731,12 @@ class IMDB
                     if (0 !== $iLimit && $i >= $iLimit) {
                         break;
                     }
+                    $sChar = str_replace(' / ', ' and ', $aMatchChar[1][$i]);
                     $aReturn[] = '<a href="https://www.imdb.com/name/' . IMDBHelper::cleanString(
                             $aMatch[1][$i]
                         ) . '/"' . ($sTarget ? ' target="' . $sTarget . '"' : '') . '>' . IMDBHelper::cleanString(
                             $sName
-                        ) . '</a> as ' . IMDBHelper::cleanString($aMatchChar[1][$i]);
+                        ) . '</a> as ' . IMDBHelper::cleanString($sChar);
                 }
 
                 $bHaveMore = ($bMore && (count($aMatch[2]) > $iLimit));
@@ -771,7 +772,8 @@ class IMDB
                     if (0 !== $iLimit && $i >= $iLimit) {
                         break;
                     }
-                    $aReturn[] = IMDBHelper::cleanString($sName) . ' as ' . IMDBHelper::cleanString($aMatchChar[1][$i]);
+                    $sChar = str_replace(' / ', ' and ', $aMatchChar[1][$i]);
+                    $aReturn[] = IMDBHelper::cleanString($sName) . ' as ' . IMDBHelper::cleanString($sChar);
                 }
 
                 $bHaveMore = ($bMore && (count($aMatch[2]) > $iLimit));
