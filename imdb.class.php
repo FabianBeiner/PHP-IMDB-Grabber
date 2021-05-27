@@ -64,7 +64,7 @@ class IMDB
     const IMDB_SERIES_DESC   = '~<div>\s+(?:.*?</a>\s+</span>\s+</div>\s+<hr>\s+<div>\s+)(.*)\s+</div>\s+<hr>\s+<div class="titlereference-overview-section">~Ui';
     const IMDB_SERIESEP_DESC = '~All Episodes(?:.*?)</li>\s+(?:.*?)?</ul>\s+</span>\s+<hr>\s+</div>\s+<div>\s+(.*?)\s+</div>\s+<hr>~';
     const IMDB_NOT_FOUND     = '~<h1 class="findHeader">No results found for ~Ui';
-    const IMDB_PLOT          = '~<td[^>]*>\s*Plot\s*Summary\s*</td>\s*<td>\s*<p>(.+)</p>~Ui';
+    const IMDB_PLOT          = '~<td[^>]*>\s*Plot\s*Summary\s*</td>\s*<td>\s*<p>\s*(.*)\s*<em~Ui';
     const IMDB_PLOT_KEYWORDS = '~<td[^>]*>Plot\s*Keywords</td>\s*<td>(.+)(?:<a\s*href="/title/[^>]*>[^<]*</a>\s*</li>\s*</ul>\s*)?</td>~Ui';
     const IMDB_POSTER        = '~<link\s*rel=\'image_src\'\s*href="(.*)">~Ui';
     const IMDB_RATING        = '~class="ipl-rating-star__rating">(.*)<~Ui';
