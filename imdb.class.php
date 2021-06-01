@@ -63,7 +63,7 @@ class IMDB
     const IMDB_MOVIE_DESC    = '~<div>\s+(.*)\s+</div>\s+<hr>\s+<div class="titlereference-overview-section">~Ui';
     const IMDB_SERIES_DESC   = '~<div>\s+(?:.*?</a>\s+</span>\s+</div>\s+<hr>\s+<div>\s+)(.*)\s+</div>\s+<hr>\s+<div class="titlereference-overview-section">~Ui';
     const IMDB_SERIESEP_DESC = '~All Episodes(?:.*?)</li>\s+(?:.*?)?</ul>\s+</span>\s+<hr>\s+</div>\s+<div>\s+(.*?)\s+</div>\s+<hr>~';
-    const IMDB_NOT_FOUND     = '~<h1 class="findHeader">No results found for ~Ui';
+    const IMDB_NOT_FOUND     = '~<span>No results.</span>~Ui';
     const IMDB_PLOT          = '~<td[^>]*>\s*Plot\s*Summary\s*</td>\s*<td>\s*<p>\s*(.*)\s*<em~Ui';
     const IMDB_PLOT_KEYWORDS = '~<td[^>]*>Plot\s*Keywords</td>\s*<td>(.+)(?:<a\s*href="/title/[^>]*>[^<]*</a>\s*</li>\s*</ul>\s*)?</td>~Ui';
     const IMDB_POSTER        = '~<link\s*rel=\'image_src\'\s*href="(.*)">~Ui';
@@ -71,7 +71,7 @@ class IMDB
     const IMDB_RATING_COUNT  = '~class="ipl-rating-star__total-votes">\((.*)\)<~Ui';
     const IMDB_RELEASE_DATE  = '~href="/title/[t0-9]*/releaseinfo">(.*)<~Ui';
     const IMDB_RUNTIME       = '~<td[^>]*>\s*Runtime\s*</td>\s*<td>(.+)</td>~Ui';
-    const IMDB_SEARCH        = '~<td class="result_text"> <a href="\/title\/(tt\d{6,})\/(?:.*)"(?:\s*)>(?:.*)<\/a>~Ui';
+    const IMDB_SEARCH        = '~text-primary">1[.]</span>\s*<a.href="\/title\/(tt\d{6,})\/(?:.*?)"(?:\s*)>(?:.*?)<\/a>~Ui';
     const IMDB_SEASONS       = '~episodes\?season=(?:\d+)">(\d+)<~Ui';
     const IMDB_SOUND_MIX     = '~<td[^>]*>\s*Sound\s*Mix\s*</td>\s*<td>(.+)</td>~Ui';
     const IMDB_TAGLINE       = '~<td[^>]*>\s*Taglines\s*</td>\s*<td>(.+)</td>~Ui';
@@ -165,6 +165,7 @@ class IMDB
                 'tv',
                 'episode',
                 'game',
+                'documentary',
                 'all',
             ]
         )) {
@@ -200,22 +201,33 @@ class IMDB
         } else {
             switch (strtolower($this->sSearchFor)) {
                 case 'movie':
-                    $sParameters = '&s=tt&ttype=ft';
+                    $sParameters = '&title_type=feature,tv_movie';
                     break;
                 case 'tv':
-                    $sParameters = '&s=tt&ttype=tv';
+                    $sParameters = '&title_type=tv_series,tv_special,tv_miniseries';
                     break;
                 case 'episode':
-                    $sParameters = '&s=tt&ttype=ep';
+                    $sParameters = '&title_type=tv_episode';
                     break;
                 case 'game':
-                    $sParameters = '&s=tt&ttype=vg';
+                    $sParameters = '&title_type=video_game';
+                    break;
+                case 'documentary':
+                    $sParameters = '&title_type=documentary';
+                    break;
+                case 'video':
+                    $sParameters = '&title_type=video';
                     break;
                 default:
-                    $sParameters = '&s=tt';
+                    $sParameters = '';
             }
-
-            $this->sUrl = 'https://www.imdb.com/find?q=' . rawurlencode(str_replace(' ', '+', $sSearch)) . $sParameters;
+            
+            if (preg_match('~([^0-9+])([0-9]{4})~', $sSearch, $fMatch)) {
+                $sParameters .= '&release_date=' . $fMatch[2] . '-01-01,' . $fMatch[2] . '-12-31';
+                $sSearch = preg_replace('~([^0-9+])([0-9]{4})~','', $sSearch);
+            }
+            
+            $this->sUrl = 'https://www.imdb.com/search/title/?title=' . rawurlencode(str_replace(' ', '+', $sSearch)) . $sParameters;
             $bSearch    = true;
 
             // Was this search already performed and cached?
