@@ -63,7 +63,8 @@ class IMDB
     const IMDB_MOVIE_DESC    = '~<div>\s+(.*)\s+</div>\s+<hr>\s+<div class="titlereference-overview-section">~Ui';
     const IMDB_SERIES_DESC   = '~<div>\s+(?:.*?</a>\s+</span>\s+</div>\s+<hr>\s+<div>\s+)(.*)\s+</div>\s+<hr>\s+<div class="titlereference-overview-section">~Ui';
     const IMDB_SERIESEP_DESC = '~All Episodes(?:.*?)</li>\s+(?:.*?)?</ul>\s+</span>\s+<hr>\s+</div>\s+<div>\s+(.*?)\s+</div>\s+<hr>~';
-    const IMDB_NOT_FOUND     = '~<span>No results.</span>~Ui';
+    const IMDB_NOT_FOUND_ADV = '~<span>No results.</span>~Ui';
+    const IMDB_NOT_FOUND_ORG = '~<h1 class="findHeader">No results found for ~Ui';
     const IMDB_PLOT          = '~<td[^>]*>\s*Plot\s*Summary\s*</td>\s*<td>\s*<p>\s*(.*)\s*<em~Ui';
     const IMDB_PLOT_KEYWORDS = '~<td[^>]*>Plot\s*Keywords</td>\s*<td>(.+)(?:<a\s*href="/title/[^>]*>[^<]*</a>\s*</li>\s*</ul>\s*)?</td>~Ui';
     const IMDB_POSTER        = '~<link\s*rel=\'image_src\'\s*href="(.*)">~Ui';
@@ -71,7 +72,8 @@ class IMDB
     const IMDB_RATING_COUNT  = '~class="ipl-rating-star__total-votes">\((.*)\)<~Ui';
     const IMDB_RELEASE_DATE  = '~href="/title/[t0-9]*/releaseinfo">(.*)<~Ui';
     const IMDB_RUNTIME       = '~<td[^>]*>\s*Runtime\s*</td>\s*<td>(.+)</td>~Ui';
-    const IMDB_SEARCH        = '~text-primary">1[.]</span>\s*<a.href="\/title\/(tt\d{6,})\/(?:.*?)"(?:\s*)>(?:.*?)<\/a>~Ui';
+    const IMDB_SEARCH_ADV    = '~text-primary">1[.]</span>\s*<a.href="\/title\/(tt\d{6,})\/(?:.*?)"(?:\s*)>(?:.*?)<\/a>~Ui';
+    const IMDB_SEARCH_ORG    = '~href="\/title\/(tt\d{6,})\/(?:.*?)"\s>(?!<img)(.*?)<\/a>\s(\(([0-9]{4})\))?\s(?:<br/>aka\s<i>"(.*?)"</i>)?~';
     const IMDB_SEASONS       = '~episodes\?season=(?:\d+)">(\d+)<~Ui';
     const IMDB_SOUND_MIX     = '~<td[^>]*>\s*Sound\s*Mix\s*</td>\s*<td>(.+)</td>~Ui';
     const IMDB_TAGLINE       = '~<td[^>]*>\s*Taglines\s*</td>\s*<td>(.+)</td>~Ui';
@@ -180,7 +182,29 @@ class IMDB
         if (null !== $iCache && (int) $iCache > 0) {
             $this->iCache = (int) $iCache;
         }
-        $this->fetchUrl($sSearch);
+        
+        // Try advanced title search
+        if ($this->fetchUrl($sSearch, false)) {
+            return true;
+        }
+
+        // Try the normal search engine
+        $sTemp = $this->sSearchFor;
+        if (strtolower($this->sSearchFor) === 'all') {
+
+            $this->sSearchFor = 'movie';
+            if ($this->fetchUrl($sSearch, true)) {
+                return true;
+            }
+
+            $this->sSearchFor = 'tv';
+            if ($this->fetchUrl($sSearch, true)) {
+                return true;
+            }
+
+        } else {
+            $this->fetchUrl($sSearch, true);
+        }
     }
 
     /**
@@ -188,7 +212,7 @@ class IMDB
      *
      * @return bool True on success, false on failure.
      */
-    private function fetchUrl($sSearch)
+    private function fetchUrl($sSearch, $orgSearch = false)
     {
         $sSearch = trim($sSearch);
 
@@ -199,35 +223,57 @@ class IMDB
             $this->sUrl = 'https://www.imdb.com/title/tt' . $this->iId . '/reference';
             $bSearch    = false;
         } else {
-            switch (strtolower($this->sSearchFor)) {
-                case 'movie':
-                    $sParameters = '&title_type=feature,tv_movie';
-                    break;
-                case 'tv':
-                    $sParameters = '&title_type=tv_series,tv_special,tv_miniseries';
-                    break;
-                case 'episode':
-                    $sParameters = '&title_type=tv_episode';
-                    break;
-                case 'game':
-                    $sParameters = '&title_type=video_game';
-                    break;
-                case 'documentary':
-                    $sParameters = '&title_type=documentary';
-                    break;
-                case 'video':
-                    $sParameters = '&title_type=video';
-                    break;
-                default:
-                    $sParameters = '';
+            if (!$orgSearch) {
+                switch (strtolower($this->sSearchFor)) {
+                    case 'movie':
+                        $sParameters = '&title_type=feature';
+                        break;
+                    case 'tv':
+                        $sParameters = '&title_type=tv_movie,tv_series,tv_special,tv_miniseries';
+                        break;
+                    case 'episode':
+                        $sParameters = '&title_type=tv_episode';
+                        break;
+                    case 'game':
+                        $sParameters = '&title_type=video_game';
+                        break;
+                    case 'documentary':
+                        $sParameters = '&title_type=documentary';
+                        break;
+                    case 'video':
+                        $sParameters = '&title_type=video';
+                        break;
+                    default:
+                        $sParameters = '';
+                }
+
+                if (preg_match('~([^0-9+])([0-9]{4})~', $sSearch, $fMatch)) {
+                    $sParameters .= '&release_date=' . $fMatch[2] . '-01-01,' . $fMatch[2] . '-12-31';
+                    $sSearch = preg_replace('~([^0-9+])([0-9]{4})~','', $sSearch);
+                }
+                
+                $this->sUrl = 'https://www.imdb.com/search/title/?title=' . rawurlencode(str_replace(' ', '+', $sSearch)) . $sParameters;               
+            } else {
+                switch (strtolower($this->sSearchFor)) {
+                    case 'movie':
+                        $sParameters = '&s=tt&ttype=ft';
+                        break;
+                    case 'tv':
+                        $sParameters = '&s=tt&ttype=tv';
+                        break;
+                    case 'episode':
+                        $sParameters = '&s=tt&ttype=ep';
+                        break;
+                    case 'game':
+                        $sParameters = '&s=tt&ttype=vg';
+                        break;
+                    default:
+                        $sParameters = '&s=tt';
+                }
+
+                $this->sUrl = 'https://www.imdb.com/find?q=' . rawurlencode(str_replace(' ', '+', $sSearch)) . $sParameters;                
             }
             
-            if (preg_match('~([^0-9+])([0-9]{4})~', $sSearch, $fMatch)) {
-                $sParameters .= '&release_date=' . $fMatch[2] . '-01-01,' . $fMatch[2] . '-12-31';
-                $sSearch = preg_replace('~([^0-9+])([0-9]{4})~','', $sSearch);
-            }
-            
-            $this->sUrl = 'https://www.imdb.com/search/title/?title=' . rawurlencode(str_replace(' ', '+', $sSearch)) . $sParameters;
             $bSearch    = true;
 
             // Was this search already performed and cached?
@@ -274,23 +320,88 @@ class IMDB
             return false;
         }
 
-        // Was the movie found?
-        $sMatch = IMDBHelper::matchRegex($sSource, self::IMDB_SEARCH, 1);
-        if (false !== $sMatch) {
-            $sUrl = 'https://www.imdb.com/title/' . $sMatch . '/reference';
-            if (true === self::IMDB_DEBUG) {
-                echo '<pre><b>New redirect saved:</b> ' . basename($sRedirectFile) . ' => ' . $sUrl . '</pre>';
-            }
-            file_put_contents($sRedirectFile, $sUrl);
-            $this->sSource = null;
-            self::fetchUrl($sUrl);
+        if (!$orgSearch) {
+            // Was the movie found?
+            $sMatch = IMDBHelper::matchRegex($sSource, self::IMDB_SEARCH_ADV, 1);
+            if (false !== $sMatch) {
+                $sUrl = 'https://www.imdb.com/title/' . $sMatch . '/reference';
+                if (true === self::IMDB_DEBUG) {
+                    echo '<pre><b>New redirect saved:</b> ' . basename($sRedirectFile) . ' => ' . $sUrl . '</pre>';
+                }
+                file_put_contents($sRedirectFile, $sUrl);
+                $this->sSource = null;
+                self::fetchUrl($sUrl);
 
-            return true;
-        }
-        $sMatch = IMDBHelper::matchRegex($sSource, self::IMDB_NOT_FOUND, 0);
-        if (false !== $sMatch) {
-            if (true === self::IMDB_DEBUG) {
-                echo '<pre><b>Movie not found:</b> ' . $sSearch . '</pre>';
+                return true;
+            }
+            $sMatch = IMDBHelper::matchRegex($sSource, self::IMDB_NOT_FOUND_ADV, 0);
+            if (false !== $sMatch) {
+                if (true === self::IMDB_DEBUG) {
+                    echo '<pre><b>Movie not found:</b> ' . $sSearch . '</pre>';
+                }
+
+                return false;
+            }
+        } else {
+            $aReturned = IMDBHelper::matchRegex($sSource, self::IMDB_SEARCH_ORG);
+
+            if ($aReturned) {
+                $fTempPercent = 0.00;
+                $iTempId = "";
+                $sYear = 0;
+
+                if (preg_match('~([^0-9+])([0-9]{4})~', $sSearch, $fMatch)) {
+                    $sYear = $fMatch[2];
+                    $sTempSearch = preg_replace('~([^0-9+])([0-9]{4})~','', $sSearch);
+                    if (true === self::IMDB_DEBUG) {
+                        echo '<pre><b>YEAR:</b> ' . $sTempSearch . ' =>  ' . $sYear . '</pre>';
+                    }
+                }
+
+                foreach ($aReturned[1] as $i => $value) {
+                    $sTitle = $aReturned[2][$i];
+                    $perc = 0.00;
+
+                    if ($sYear === 0) {
+                        $sim = similar_text($sSearch, $sTitle, $perc);
+                    } else {
+                        if ($sYear != $aReturned[4][$i]) {
+                            continue;
+                        }
+                        $sim = similar_text($sTempSearch, $sTitle, $perc); 
+                    }
+
+                    if (round($perc, 3) > round($fTempPercent, 3)) {
+                        $iTempId = $value;
+                        $fTempPercent = $perc;
+                        if (true === self::IMDB_DEBUG) {
+                            echo '<pre><b>Set Result:</b> ' . $sSearch . ' =>  ' . $sTitle . ' (' . $perc . '%) </pre>';
+                        }
+                    }
+
+                }
+
+                if ((round($fTempPercent, 0) > 85)) {
+                    $sUrl = 'https://www.imdb.com/title/' . $iTempId . '/reference';
+                    if (true === self::IMDB_DEBUG) {
+                        echo '<pre><b>Percentage:</b> ' . $iTempId . ' =>  ' . $fTempPercent . '% </pre>';
+                        echo '<pre><b>New redirect saved:</b> ' . basename($sRedirectFile) . ' => ' . $sUrl . '</pre>';
+                    }
+                    file_put_contents($sRedirectFile, $sUrl);
+                    $this->sSource = null;
+                    self::fetchUrl($sUrl);
+
+                    return true;                   
+                }
+            }
+
+            $sMatch = IMDBHelper::matchRegex($sSource, self::IMDB_NOT_FOUND_ORG, 0);
+            if (false !== $sMatch) {
+                if (true === self::IMDB_DEBUG) {
+                    echo '<pre><b>Movie not found:</b> ' . $sSearch . '</pre>';
+                }
+
+                return false;
             }
 
             return false;
