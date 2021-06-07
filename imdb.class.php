@@ -454,6 +454,7 @@ class IMDB
     public function getAka()
     {
         if (true === $this->isReady) {
+            $aReturn = [];
             $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_AKA, 1);
             if (false !== $sMatch) {
                 $aReturn[] = explode('|', IMDBHelper::cleanString($sMatch));
