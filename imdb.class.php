@@ -454,13 +454,16 @@ class IMDB
     public function getAka()
     {
         if (true === $this->isReady) {
+            $aReturn = [];
             $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_AKA, 1);
             if (false !== $sMatch) {
-                return IMDBHelper::cleanString($sMatch);
+                $aReturn[] = explode('|', IMDBHelper::cleanString($sMatch));
+                
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
             }
         }
 
-        return self::$sNotFound;
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound);
     }
 
     /**
@@ -920,13 +923,16 @@ class IMDB
     public function getCertification()
     {
         if (true === $this->isReady) {
+            $aReturn = [];
             $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_CERTIFICATION, 1);
             if (false !== $sMatch) {
-                return IMDBHelper::cleanString($sMatch);
+                $aReturn[] = explode('|', IMDBHelper::cleanString($sMatch));
+                
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
             }
         }
 
-        return self::$sNotFound;
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound);
     }
 
     /**
