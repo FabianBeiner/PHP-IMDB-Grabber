@@ -26,7 +26,12 @@ class IMDB
      * Set the preferred language for the User Agent.
      */
     const IMDB_LANG = 'en-US,en;q=0.9';
-
+    
+    /**
+     * Set the sensitivity for search results in percentage.
+     */
+    const IMDB_SENSITIVITY = 85;
+    
     /**
      * Define the timeout for cURL requests.
      */
@@ -381,7 +386,7 @@ class IMDB
 
                 }
 
-                if ((round($fTempPercent, 0) > 85)) {
+                if ((round($fTempPercent, 0) > self::IMDB_SENSITIVITY)) {
                     $sUrl = 'https://www.imdb.com/title/' . $iTempId . '/reference';
                     if (true === self::IMDB_DEBUG) {
                         echo '<pre><b>Percentage:</b> ' . $iTempId . ' =>  ' . $fTempPercent . '% </pre>';
