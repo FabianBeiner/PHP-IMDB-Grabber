@@ -26,6 +26,12 @@ class IMDB
      * Set the preferred language for the User Agent.
      */
     const IMDB_LANG = 'en-US,en;q=0.9';
+   
+     /**
+     * Set this to true if you want to start with normal search and
+     * if you get no result, it will use the advanced method
+     */
+    const IMDB_SEARCH_ORIGINAL = true;
     
     /**
      * Set the sensitivity for search results in percentage.
@@ -188,28 +194,15 @@ class IMDB
             $this->iCache = (int) $iCache;
         }
         
-        // Try advanced title search
-        if ($this->fetchUrl($sSearch, false)) {
+        if ($this->fetchUrl($sSearch, self::IMDB_SEARCH_ORIGINAL)) {
             return true;
         }
 
-        // Try the normal search engine
-        $sTemp = $this->sSearchFor;
-        if (strtolower($this->sSearchFor) === 'all') {
-
-            $this->sSearchFor = 'movie';
-            if ($this->fetchUrl($sSearch, true)) {
-                return true;
-            }
-
-            $this->sSearchFor = 'tv';
-            if ($this->fetchUrl($sSearch, true)) {
-                return true;
-            }
-
-        } else {
-            $this->fetchUrl($sSearch, true);
+        if ($this->fetchUrl($sSearch, !self::IMDB_SEARCH_ORIGINAL)) {
+            return true;
         }
+
+
     }
 
     /**
@@ -252,9 +245,9 @@ class IMDB
                         $sParameters = '';
                 }
 
-                if (preg_match('~([^0-9+])([0-9]{4})~', $sSearch, $fMatch)) {
+                if (preg_match('~([^0-9+])\(?([0-9]{4})\)?~', $sSearch, $fMatch)) {
                     $sParameters .= '&release_date=' . $fMatch[2] . '-01-01,' . $fMatch[2] . '-12-31';
-                    $sSearch = preg_replace('~([^0-9+])([0-9]{4})~','', $sSearch);
+                    $sSearch = preg_replace('~([^0-9+])\(?([0-9]{4})\)?~','', $sSearch);
                 }
                 
                 $this->sUrl = 'https://www.imdb.com/search/title/?title=' . rawurlencode(str_replace(' ', '+', $sSearch)) . $sParameters;               
@@ -275,7 +268,13 @@ class IMDB
                     default:
                         $sParameters = '&s=tt';
                 }
-
+                
+                if (preg_match('~([^0-9+])\(?([0-9]{4})\)?~', $sSearch, $fMatch)) {
+                    $sYear = $fMatch[2];
+                    $sTempSearch = preg_replace('~([^0-9+])\(?([0-9]{4})\)?~','', $sSearch);
+                    $sSearch = $sTempSearch . ' (' . $sYear . ')';
+                }
+                
                 $this->sUrl = 'https://www.imdb.com/find?q=' . rawurlencode(str_replace(' ', '+', $sSearch)) . $sParameters;                
             }
             
@@ -355,9 +354,9 @@ class IMDB
                 $iTempId = "";
                 $sYear = 0;
 
-                if (preg_match('~([^0-9+])([0-9]{4})~', $sSearch, $fMatch)) {
+                if (preg_match('~([^0-9+])\(?([0-9]{4})\)?~', $sSearch, $fMatch)) {
                     $sYear = $fMatch[2];
-                    $sTempSearch = preg_replace('~([^0-9+])([0-9]{4})~','', $sSearch);
+                    $sTempSearch = preg_replace('~([^0-9+])\(?([0-9]{4})\)?~','', $sSearch);
                     if (true === self::IMDB_DEBUG) {
                         echo '<pre><b>YEAR:</b> ' . $sTempSearch . ' =>  ' . $sYear . '</pre>';
                     }
