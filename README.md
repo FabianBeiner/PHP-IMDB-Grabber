@@ -166,6 +166,14 @@ if ($IMDB->isReady) {
 
 `getMetaScore()` - returns the average score and number of votes based on metacritic.
 
+**Music Composer**
+
+`getMusic()`
+
+**Music Composer (with links)**
+
+`getMusicAsUrl($sTarget = '')` - `$sTarget` defines a target
+
 **Plot**
 
 `getPlot($iLimit = 0)` - `$iLimit` defines the maximum characters returned
