@@ -70,6 +70,7 @@ class IMDB
     const IMDB_LOCATION      = '~href="\/search\/title\?locations=(.*)">(.*)<\/a>~Ui';
     const IMDB_LOCATIONS     = '~href="\/search\/title\?locations=[^>]*>\s?(.*)\s?<\/a>[^"]*<dd>\s?(.*)\s<\/dd>~Ui';
     const IMDB_MPAA          = '~<li class="ipl-inline-list__item">(?:\s+)(TV-Y|TV-Y7|TV-G|TV-PG|TV-14|TV-MA|G|PG|PG-13|R|NC-17|NR|UR)(?:\s+)<\/li>~Ui';
+    const IMDB_MUSIC         = '~Music by\s*<\/h4>.*<table class=.*>(.*)</table>~Us';
     const IMDB_NAME          = '~href="/name/(.+)/?(?:\?[^"]*)?"[^>]*>(.+)</a>~Ui';
     const IMDB_MOVIE_DESC    = '~<div>\s+(.*)\s+</div>\s+<hr>\s+<div class="titlereference-overview-section">~Ui';
     const IMDB_SERIES_DESC   = '~<div>\s+(?:.*?</a>\s+</span>\s+</div>\s+<hr>\s+<div>\s+)(.*)\s+</div>\s+<hr>\s+<div class="titlereference-overview-section">~Ui';
@@ -1455,7 +1456,49 @@ class IMDB
 
         return self::$sNotFound;
     }
+    
+    /**
+     * @return string A list with the music composers or $sNotFound.
+     */
+    public function getMusic()
+    {
+        if (true === $this->isReady) {
+            $sMatch = $this->getMusicAsUrl();
+            if (self::$sNotFound !== $sMatch) {
+                return IMDBHelper::cleanString($sMatch);
+            }
+        }
 
+        return self::$sNotFound;
+    }
+
+    /**
+     * @param string $sTarget Add a target to the links?
+     *
+     * @return string A list with the linked music composers or $sNotFound.
+     */
+    public function getMusicAsUrl($sTarget = '')
+    {
+        if (true === $this->isReady) {
+            $sMatch  = IMDBHelper::matchRegex($this->sSource, self::IMDB_MUSIC, 1);
+            $aMatch  = IMDBHelper::matchRegex($sMatch, self::IMDB_NAME);
+            $aReturn = [];
+            if (count($aMatch[2])) {
+                foreach ($aMatch[2] as $i => $sName) {
+                    $aReturn[] = '<a href="https://www.imdb.com/name/' . IMDBHelper::cleanString(
+                            $aMatch[1][$i]
+                        ) . '/"' . ($sTarget ? ' target="' . $sTarget . '"' : '') . '>' . IMDBHelper::cleanString(
+                            $sName
+                        ) . '</a>';
+                }
+
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
+            }
+        }
+
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound);
+    }
+    
     /**
      * @return string A list with the plot keywords or $sNotFound.
      */
