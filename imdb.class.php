@@ -1509,6 +1509,111 @@ class IMDB
     }
     
     /**
+     * @param int    $iLimit    How many photo images should be returned?
+     * @param bool   $bMore     Add … if there are more cast members than printed.
+     * @param string $sSize     small or big images
+     *
+     * @return array Array with title and url.
+     */
+    public function getPhotos($iLimit = 0, $bMore = true, $sSize = 'small')
+    {
+        if (true === $this->isReady) {
+            // Does a cache of this movie exist?
+            $sCacheFile = $this->sRoot . '/cache/' . sha1($this->iId) . '_gallery.cache';
+            $bUseCache  = false;
+
+            if (is_readable($sCacheFile)) {
+                $iDiff = round(abs(time() - filemtime($sCacheFile)) / 60);
+                if ($iDiff < $this->iCache || false) {
+                    $bUseCache = true;
+                }
+            }
+
+            if ($bUseCache) {
+                $aRawReturn = file_get_contents($sCacheFile);
+                $aReturn    = unserialize($aRawReturn);
+                $anReturn   = [];
+                foreach ($aReturn as $i => $sAreturn) {
+                    if (0 !== $iLimit && $i >= $iLimit) {
+                        break;
+                    }
+                    $title = $sAreturn['title'];
+                    $url = $sAreturn['url'];
+
+                    if ('big' === strtolower($sSize) && false !== strstr($url, '._')) {
+                        $url = substr($url, 0, strpos($url, '._')) . '.jpg';
+                    }
+
+                    $anReturn[] = [
+                        'title'   => $title,
+                        'url' => $url,
+                    ];
+                }
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $anReturn);
+
+            } else {
+                $isPage = true;
+                $aReturn = [];
+                $page = 1;
+                while ($isPage) {
+                    $fullPhotos  = sprintf('https://www.imdb.com/title/tt%s/mediaindex?page=%d', $this->iId, $page);
+                    $aCurlInfo = IMDBHelper::runCurl($fullPhotos);
+                    $sSource   = $aCurlInfo['contents'];
+
+                    if (false === $sSource) {
+                        if (true === self::IMDB_DEBUG) {
+                            echo '<pre><b>cURL error:</b> ' . var_dump($aCurlInfo) . '</pre>';
+                        }
+
+                        return false;
+                    }
+
+                    $aReturned = IMDBHelper::matchRegex($sSource, '~title="(.*?)"\s+><img(?:.*)\s+src="(.*?)"\s+\/>~');
+
+                    if ($aReturned) {
+                        
+                        foreach ($aReturned[1] as $i => $strName) {
+                            $aReturn[] = [
+                                'title'   => IMDBHelper::cleanString($strName),
+                                'url' => IMDBHelper::cleanString($aReturned[2][$i]),
+                            ];
+                        }
+                    }
+
+                    file_put_contents($sCacheFile, serialize($aReturn));
+                    if (!preg_match('~class="prevnext"\s>Next~', $sSource)) {
+                        $isPage = false;
+                    }
+
+                    $page++;          
+                }
+
+                $anReturn   = [];
+                foreach ($aReturn as $i => $sAreturn) {
+                    if (0 !== $iLimit && $i >= $iLimit) {
+                        break;
+                    }
+                    $title = $sAreturn['title'];
+                    $url = $sAreturn['url'];
+
+                    if ('big' === strtolower($sSize) && false !== strstr($url, '._')) {
+                        $url = substr($url, 0, strpos($url, '._')) . '.jpg';
+                    }
+
+                    $anReturn[] = [
+                        'title'   => $title,
+                        'url' => $url,
+                    ];
+                }
+
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $anReturn);
+            }
+        }
+
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound);
+    }
+    
+    /**
      * @return string A list with the plot keywords or $sNotFound.
      */
     public function getPlotKeywords()
