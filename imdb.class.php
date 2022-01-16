@@ -93,6 +93,7 @@ class IMDB
     const IMDB_TITLE         = '~itemprop="name">(.*)(<\/h3>|<span)~Ui';
     const IMDB_TITLE_EP      = '~titlereference-watch-ribbon"(?:.*)itemprop="name">(.*?)\s+<span\sclass="titlereference-title-year">~Ui';
     const IMDB_TITLE_ORIG    = '~</h3>(?:\s+)(.*)(?:\s+)<span class=\"titlereference-original-title-label~Ui';
+    const IMDB_TOP250        = '~href="/chart/top(?:tv)?".class(?:.*?)#([0-9]{1,})</a>~Ui';
     const IMDB_TRAILER       = '~href="videoplayer/(vi[0-9]*)"~Ui';
     const IMDB_TYPE          = '~href="/genre/(?:[a-zA-Z_-]*)/?">(?:[a-zA-Z_ -]*)</a>\s+</li>\s+(?:.*item">)\s+(?:<a href="(?:.*)</a>\s+</li>\s+(?:.*item">)\s+)?([a-zA-Z_ -]*)\s+</li>~Ui';
     const IMDB_URL           = '~https?://(?:.*\.|.*)imdb.com/(?:t|T)itle(?:\?|/)(..\d+)~i';
@@ -1922,6 +1923,21 @@ class IMDB
         return self::$sNotFound;
     }
 
+    /**
+     * @return string returns the given position at top-250 or $sNotFound.
+     */
+    public function getTop250()
+    {
+        if (true === $this->isReady) {
+            $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_TOP250, 1);
+            if (false !== $sMatch) {
+                return IMDBHelper::cleanString($sMatch);
+            }
+        }
+
+        return self::$sNotFound;
+    }
+    
     /**
      * @param bool $bEmbed Link to player directly?
      *
