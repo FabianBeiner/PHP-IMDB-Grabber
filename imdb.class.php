@@ -94,7 +94,7 @@ class IMDB
     const IMDB_TITLE_EP      = '~titlereference-watch-ribbon"(?:.*)itemprop="name">(.*?)\s+<span\sclass="titlereference-title-year">~Ui';
     const IMDB_TITLE_ORIG    = '~</h3>(?:\s+)(.*)(?:\s+)<span class=\"titlereference-original-title-label~Ui';
     const IMDB_TOP250        = '~href="/chart/top(?:tv)?".class(?:.*?)#([0-9]{1,})</a>~Ui';
-    const IMDB_TRAILER       = '~href="videoplayer/(vi[0-9]*)"~Ui';
+    const IMDB_TRAILER       = '~href="/title/(?:tt\d+)/videoplayer/(vi[0-9]*)"~Ui';
     const IMDB_TYPE          = '~href="/genre/(?:[a-zA-Z_-]*)/?">(?:[a-zA-Z_ -]*)</a>\s+</li>\s+(?:.*item">)\s+(?:<a href="(?:.*)</a>\s+</li>\s+(?:.*item">)\s+)?([a-zA-Z_ -]*)\s+</li>~Ui';
     const IMDB_URL           = '~https?://(?:.*\.|.*)imdb.com/(?:t|T)itle(?:\?|/)(..\d+)~i';
     const IMDB_USER_REVIEW   = '~href="/title/[t0-9]*/reviews"[^>]*>([^<]*)\s*User~Ui';
@@ -1939,18 +1939,22 @@ class IMDB
 
         return self::$sNotFound;
     }
-    
+
     /**
      * @param bool $bEmbed Link to player directly?
      *
      * @return string The URL to the trailer of the movie or $sNotFound.
      */
-    public function getTrailerAsUrl($bEmbed = false)
+    public function getTrailerAsUrl($bEmbed = true)
     {
         if (true === $this->isReady) {
             $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_TRAILER, 1);
             if (false !== $sMatch) {
-                $sUrl = 'https://www.imdb.com/video/imdb/' . $sMatch . '/' . ($bEmbed ? 'player' : '');
+                if ($bEmbed) {
+                    $sUrl = 'https://www.imdb.com/video/imdb/' . $sMatch . '/imdb/embed';
+                } else {
+                    $sUrl = 'https://www.imdb.com/video/' . $sMatch;
+                }
 
                 return IMDBHelper::cleanString($sUrl);
             }
