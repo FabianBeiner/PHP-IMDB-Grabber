@@ -1945,7 +1945,7 @@ class IMDB
      *
      * @return string The URL to the trailer of the movie or $sNotFound.
      */
-    public function getTrailerAsUrl($bEmbed = true)
+    public function getTrailerAsUrl($bEmbed = false)
     {
         if (true === $this->isReady) {
             $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_TRAILER, 1);
