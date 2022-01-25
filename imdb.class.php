@@ -297,17 +297,19 @@ class IMDB
         }
 
         // Does a cache of this movie exist?
-        $sCacheFile = $this->sRoot . '/cache/' . sha1($this->iId) . '.cache';
-        if (is_readable($sCacheFile)) {
-            $iDiff = round(abs(time() - filemtime($sCacheFile)) / 60);
-            if ($iDiff < $this->iCache) {
-                if (true === self::IMDB_DEBUG) {
-                    echo '<pre><b>Using cache:</b> ' . basename($sCacheFile) . '</pre>';
-                }
-                $this->sSource = file_get_contents($sCacheFile);
-                $this->isReady = true;
+        if (! is_null($this->iId)) {
+            $sCacheFile = $this->sRoot . '/cache/' . sha1($this->iId) . '.cache';
+            if (is_readable($sCacheFile)) {
+                $iDiff = round(abs(time() - filemtime($sCacheFile)) / 60);
+                if ($iDiff < $this->iCache) {
+                    if (true === self::IMDB_DEBUG) {
+                        echo '<pre><b>Using cache:</b> ' . basename($sCacheFile) . '</pre>';
+                    }
+                    $this->sSource = file_get_contents($sCacheFile);
+                    $this->isReady = true;
 
-                return true;
+                    return true;
+                }
             }
         }
 
