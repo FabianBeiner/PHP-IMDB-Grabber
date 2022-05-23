@@ -13,7 +13,7 @@
  * @author  Fabian Beiner <fb@fabianbeiner.de>
  * @license https://opensource.org/licenses/MIT The MIT License
  * @link    https://github.com/FabianBeiner/PHP-IMDB-Grabber/ GitHub Repository
- * @version 6.1.7
+ * @version 6.1.8
  */
 class IMDB
 {
@@ -78,7 +78,7 @@ class IMDB
     const IMDB_NOT_FOUND_ADV = '~<span>No results.</span>~Ui';
     const IMDB_NOT_FOUND_DES = 'Know what this is about';
     const IMDB_NOT_FOUND_ORG = '~<h1 class="findHeader">No results found for ~Ui';
-    const IMDB_PLOT          = '~<td[^>]*>\s*Plot\s*Summary\s*</td>\s*<td>\s*<p>\s*(.*)\s*<em~Ui';
+    const IMDB_PLOT          = '~<td[^>]*>\s*Plot\s*Summary\s*</td>\s*<td>\s*<p>\s*(.*)\s*</p>~Ui';
     const IMDB_PLOT_KEYWORDS = '~<td[^>]*>Plot\s*Keywords</td>\s*<td>(.+)(?:<a\s*href="/title/[^>]*>[^<]*</a>\s*</li>\s*</ul>\s*)?</td>~Ui';
     const IMDB_POSTER        = '~<link\s*rel=\'image_src\'\s*href="(.*)">~Ui';
     const IMDB_RATING        = '~class="ipl-rating-star__rating">(.*)<~Ui';

@@ -1,9 +1,14 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [6.1.8] - 2022-05-23
+### Changed
+- Fixed `getPlot()` method. *Thanks, @phyozawtun!*
+
+
 ## [6.1.7] - 2020-02-19
 ### Changed
-- Improved `getPoster()` method. You can now get different image smaller sizes (`xxs, xs, s`). *Thanks, @phyozawtun!*
+- Improved `getPoster()` method. You can now get different image smaller sizes (`xxs, xs, s`). *Thanks, @Apollo2000!*
 
 ## [6.1.6] - 2018-11-03
 ### Changed
@@ -122,4 +127,5 @@ All notable changes to this project will be documented in this file.
 [6.1.5]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.4...v6.1.5
 [6.1.6]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.5...v6.1.6
 [6.1.7]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.6...v6.1.7
+[6.1.8]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.7...v6.1.8
 [Unreleased]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.7...HEAD
