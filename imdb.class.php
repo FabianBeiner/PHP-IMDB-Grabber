@@ -1665,17 +1665,17 @@ class IMDB
         if (true === $this->isReady) {
             $sMatch = IMDBHelper::matchRegex($this->sSource, self::IMDB_POSTER, 1);
             if (false !== $sMatch) {
-                if ('big' === strtolower($sSize) && false !== strstr($sMatch, '@._')) {
-                    $sMatch = substr($sMatch, 0, strpos($sMatch, '@._')) . '@.jpg';
+                if ('big' === strtolower($sSize) && false !== strstr($sMatch, '._')) {
+                    $sMatch = substr($sMatch, 0, strpos($sMatch, '._')) . '.jpg';
                 }
-                if ('xxs' === strtolower($sSize) && false !== strstr($sMatch, '@._')) {
-                    $sMatch = substr($sMatch, 0, strpos($sMatch, '@._')) . '@._V1_UY67_CR0,0,45,67_AL_.jpg';
+                if ('xxs' === strtolower($sSize) && false !== strstr($sMatch, '._')) {
+                    $sMatch = substr($sMatch, 0, strpos($sMatch, '._')) . '._V1_UY67_CR0,0,45,67_AL_.jpg';
                 }
-                if ('xs' === strtolower($sSize) && false !== strstr($sMatch, '@._')) {
-                    $sMatch = substr($sMatch, 0, strpos($sMatch, '@._')) . '@._V1_UY113_CR0,0,76,113_AL_.jpg';
+                if ('xs' === strtolower($sSize) && false !== strstr($sMatch, '._')) {
+                    $sMatch = substr($sMatch, 0, strpos($sMatch, '._')) . '._V1_UY113_CR0,0,76,113_AL_.jpg';
                 }
-                if ('s' === strtolower($sSize) && false !== strstr($sMatch, '@._')) {
-                    $sMatch = substr($sMatch, 0, strpos($sMatch, '@._')) . '@._V1_UX182_CR0,0,182,268_AL_.jpg';
+                if ('s' === strtolower($sSize) && false !== strstr($sMatch, '._')) {
+                    $sMatch = substr($sMatch, 0, strpos($sMatch, '._')) . '._V1_UX182_CR0,0,182,268_AL_.jpg';
                 }
                 if (false === $bDownload) {
                     return IMDBHelper::cleanString($sMatch);
