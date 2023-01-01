@@ -32,7 +32,17 @@ class IMDB
      * if you get no result, it will use the advanced method
      */
     const IMDB_SEARCH_ORIGINAL = true;
-    
+
+    /**
+     * Set this to true if you want to search for exact titles
+     */
+    const IMDB_EXACT_SEARCH = true;
+
+    /**
+     * Set the this to false if you want to use highest score of result.
+     */
+    const IMDB_USE_SENSITIVITY = false;
+
     /**
      * Set the sensitivity for search results in percentage.
      */
@@ -86,7 +96,7 @@ class IMDB
     const IMDB_RELEASE_DATE  = '~href="/title/[t0-9]*/releaseinfo">(.*)<~Ui';
     const IMDB_RUNTIME       = '~<td[^>]*>\s*Runtime\s*</td>\s*<td>(.+)</td>~Ui';
     const IMDB_SEARCH_ADV    = '~text-primary">1[.]</span>\s*<a.href="\/title\/(tt\d{6,})\/(?:.*?)"(?:\s*)>(?:.*?)<\/a>~Ui';
-    const IMDB_SEARCH_ORG    = '~href="\/title\/(tt\d{6,})\/(?:.*?)"\s>(?!<img)(.*?)<\/a>\s(\(([0-9]{4})\))?\s(?:<br/>aka\s<i>"(.*?)"</i>)?~';
+    const IMDB_SEARCH_ORG    = '~find-title-result">(?:.*?)alt="(.*?)"(?:.*?)href="\/title\/(tt\d{6,})\/(?:.*?)">(.*?)<\/a>~';
     const IMDB_SEASONS       = '~episodes\?season=(?:\d+)">(\d+)<~Ui';
     const IMDB_SOUND_MIX     = '~<td[^>]*>\s*Sound\s*Mix\s*</td>\s*<td>(.+)</td>~Ui';
     const IMDB_TAGLINE       = '~<td[^>]*>\s*Taglines\s*</td>\s*<td>(.+)</td>~Ui';
@@ -278,7 +288,10 @@ class IMDB
                     $sSearch = $sTempSearch . ' (' . $sYear . ')';
                 }
                 
-                $this->sUrl = 'https://www.imdb.com/find?q=' . rawurlencode(str_replace(' ', '+', $sSearch)) . $sParameters;                
+                if (true === self::IMDB_EXACT_SEARCH) {
+                    $sParameters .= '&exact=true';
+                }
+                $this->sUrl = 'https://www.imdb.com/find/?q=' . rawurlencode(str_replace(' ', ' ', $sSearch)) . $sParameters;                
             }
             
             $bSearch    = true;
@@ -355,6 +368,7 @@ class IMDB
             $aReturned = IMDBHelper::matchRegex($sSource, self::IMDB_SEARCH_ORG);
 
             if ($aReturned) {
+                $rData = [];
                 $fTempPercent = 0.00;
                 $iTempId = "";
                 $sYear = 0;
@@ -368,32 +382,63 @@ class IMDB
                 }
 
                 foreach ($aReturned[1] as $i => $value) {
-                    $sTitle = $aReturned[2][$i];
+                    $sId = $aReturned[2][$i];
+                    $sTitle = $aReturned[3][$i];
                     $perc = 0.00;
+                    $year = 0;
 
                     if ($sYear === 0) {
                         $sim = similar_text($sSearch, $sTitle, $perc);
                     } else {
-                        if ($sYear != $aReturned[4][$i]) {
+                        $sMatch = IMDBHelper::matchRegex($aReturned[1][$i], '~\(?([0-9]{4})\)?~', 1);
+                        if (false !== $sMatch) {
+                            $year = $sMatch;
+                        }
+
+                        if ($sYear != $year) {
                             continue;
                         }
+
                         $sim = similar_text($sTempSearch, $sTitle, $perc); 
                     }
 
-                    if (round($perc, 3) > round($fTempPercent, 3)) {
-                        $iTempId = $value;
-                        $fTempPercent = $perc;
-                        if (true === self::IMDB_DEBUG) {
-                            echo '<pre><b>Set Result:</b> ' . $sSearch . ' =>  ' . $sTitle . ' (' . $perc . '%) </pre>';
-                        }
-                    }
+                    $rData[] = [
+                        'id'	=> $sId,
+                        'title' => $sTitle,
+                        'year' 	=> $year,
+                        'match' => floatval($perc)
+                    ];
+        
 
                 }
 
-                if ((round($fTempPercent, 0) > self::IMDB_SENSITIVITY)) {
-                    $sUrl = 'https://www.imdb.com/title/' . $iTempId . '/reference';
+                if (sizeof($rData) === 0) {
+                    return false;
+                }
+
+                if (true === self::IMDB_DEBUG) {
+                    foreach ($rData as $sArray) {
+                        echo '<pre><b>Found results:</b> ' . $sArray['id'] . ' =>  ' . $sArray['title'] . ' (' . $sArray['match']. '%) </pre>';
+                    }
+                }
+                
+                //get highest match of search results
+                $matches = array_column($rData, 'match');
+                $maxv = max($matches);
+        
+                $marray = array_filter($rData, function($item) use ($maxv) {
+                    return $item['match'] == $maxv;
+                });
+    
+
+                if (sizeof($marray) > 0) {
+                    if (self::IMDB_USE_SENSITIVITY && round($marray[0]['match'], 0) < self::IMDB_SENSITIVITY) {
+                        return false;
+                    }
+                    
+                    $sUrl = 'https://www.imdb.com/title/' . $marray[0]['id'] . '/reference';
                     if (true === self::IMDB_DEBUG) {
-                        echo '<pre><b>Percentage:</b> ' . $iTempId . ' =>  ' . $fTempPercent . '% </pre>';
+                        echo '<pre><b>Percentage:</b> ' . $marray[0]['id'] . ' =>  ' . $marray[0]['match'] . '% </pre>';
                         echo '<pre><b>New redirect saved:</b> ' . basename($sRedirectFile) . ' => ' . $sUrl . '</pre>';
                     }
                     file_put_contents($sRedirectFile, $sUrl);
