@@ -35,13 +35,9 @@ class IMDB
 
     /**
      * Set this to true if you want to search for exact titles
+     * it falls back to false if theres no result
      */
     const IMDB_EXACT_SEARCH = true;
-
-    /**
-     * Set the this to false if you want to use highest score of result.
-     */
-    const IMDB_USE_SENSITIVITY = false;
 
     /**
      * Set the sensitivity for search results in percentage.
@@ -207,6 +203,12 @@ class IMDB
             $this->iCache = (int) $iCache;
         }
         
+        if (self::IMDB_EXACT_SEARCH) {
+            if ($this->fetchUrl($sSearch, self::IMDB_SEARCH_ORIGINAL, true)) {
+                return true;
+            }
+        }
+
         if ($this->fetchUrl($sSearch, self::IMDB_SEARCH_ORIGINAL)) {
             return true;
         }
@@ -223,7 +225,7 @@ class IMDB
      *
      * @return bool True on success, false on failure.
      */
-    private function fetchUrl($sSearch, $orgSearch = false)
+    private function fetchUrl($sSearch, $orgSearch = false, $exactSearch = false)
     {
         $sSearch = trim($sSearch);
 
@@ -288,7 +290,7 @@ class IMDB
                     $sSearch = $sTempSearch . ' (' . $sYear . ')';
                 }
                 
-                if (true === self::IMDB_EXACT_SEARCH) {
+                if ($exactSearch) {
                     $sParameters .= '&exact=true';
                 }
                 $this->sUrl = 'https://www.imdb.com/find/?q=' . rawurlencode(str_replace(' ', ' ', $sSearch)) . $sParameters;                
@@ -430,15 +432,17 @@ class IMDB
                     return $item['match'] == $maxv;
                 });
     
+                $marray = reset($marray);
 
                 if (sizeof($marray) > 0) {
-                    if (self::IMDB_USE_SENSITIVITY && round($marray[0]['match'], 0) < self::IMDB_SENSITIVITY) {
+                    if (!$exactSearch && round($marray['match'], 0) < self::IMDB_SENSITIVITY) {
+                        echo '<pre><b>Bad sensitivity:</b> ' . $marray['id'] . ' =>  ' . $marray['title'] . ' (' . $marray['match']. '%) </pre>';
                         return false;
                     }
                     
-                    $sUrl = 'https://www.imdb.com/title/' . $marray[0]['id'] . '/reference';
+                    $sUrl = 'https://www.imdb.com/title/' . $marray['id'] . '/reference';
                     if (true === self::IMDB_DEBUG) {
-                        echo '<pre><b>Percentage:</b> ' . $marray[0]['id'] . ' =>  ' . $marray[0]['match'] . '% </pre>';
+                        echo '<pre><b>Get best result:</b> ' . $marray['title'] . ' ' . $marray['id'] . ' =>  ' . $marray['match'] . '% </pre>';
                         echo '<pre><b>New redirect saved:</b> ' . basename($sRedirectFile) . ' => ' . $sUrl . '</pre>';
                     }
                     file_put_contents($sRedirectFile, $sUrl);
