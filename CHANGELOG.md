@@ -1,10 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [6.1.9] - 2023-01-01
+### Changed
+- Fixed original search. *Thanks, @bla0r!*
+
 ## [6.1.8] - 2022-05-23
 ### Changed
 - Fixed `getPlot()` method. *Thanks, @phyozawtun!*
-
 
 ## [6.1.7] - 2020-02-19
 ### Changed
