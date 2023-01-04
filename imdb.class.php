@@ -2094,9 +2094,6 @@ class IMDB
                         }
                     }
                     
-
-
-
                     file_put_contents($sCacheFile, serialize($aReturn));
                     if (!preg_match('~id="load_next_episodes"~', $sSource)) {
                         $isPage = false;
