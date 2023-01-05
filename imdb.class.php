@@ -2013,6 +2013,127 @@ class IMDB
     }
 
     /**
+     * @return array Array with season, episode, title, rating, votes, airdate, plot, id.
+     */
+    public function getTVInfo()
+    {
+        if (true === $this->isReady) {
+            // Does a cache of this movie exist?
+            $sCacheFile = $this->sRoot . '/cache/' . sha1($this->iId) . '_tv.cache';
+            $bUseCache  = false;
+
+            if (is_readable($sCacheFile)) {
+                $iDiff = round(abs(time() - filemtime($sCacheFile)) / 60);
+                if ($iDiff < $this->iCache || false) {
+                    $bUseCache = true;
+                }
+            }
+
+            if ($bUseCache) {
+                $aRawReturn = file_get_contents($sCacheFile);
+                $aReturn    = unserialize($aRawReturn);
+                $anReturn   = [];
+                foreach ($aReturn as $i => $sAreturn) {
+                    $season = $sAreturn['season'];
+                    $episode = $sAreturn['episode'];
+                    $title = $sAreturn['title'];
+                    $rating = $sAreturn['rating'];
+                    $votes = $sAreturn['votes'];
+                    $airdate = $sAreturn['airdate'];
+                    $plot = $sAreturn['plot'];
+                    $id = $sAreturn['id'];
+
+                    $anReturn[] = [
+                        'season'    => $season,
+                        'episode'   => $episode,
+                        'title'     => $title,
+                        'rating'    => $rating,
+                        'votes'     => $votes,
+                        'airdate'   => $airdate,
+                        'plot'      => $plot,
+                        'id'        => $id
+                    ];
+                }
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $anReturn);
+
+            } else {
+                $isPage = true;
+                $aReturn = [];
+                $page = 1;
+                while ($isPage) {
+                    $fullEpisodes  = sprintf('https://www.imdb.com/title/tt%s/episodes?season=%d', $this->iId, $page);
+                    $aCurlInfo = IMDBHelper::runCurl($fullEpisodes);
+                    $sSource   = $aCurlInfo['contents'];
+
+                    if (false === $sSource) {
+                        if (true === self::IMDB_DEBUG) {
+                            echo '<pre><b>cURL error:</b> ' . var_dump($aCurlInfo) . '</pre>';
+                        }
+
+                        return false;
+                    }
+
+                    $aSplit = IMDBHelper::matchRegex($sSource, '~<meta itemprop="episodeNumber"(.*?)<div class="wtw-option-standalone".data-tconst="(.*?)".data-watchtype="minibar".data-baseref="ttep">~s');
+                    if ($aSplit) {
+                        foreach ($aSplit[1] as $i => $text) {
+                            $aReturned = IMDBHelper::matchRegex($aSplit[1][$i], '~content="(.*?)"(?:.*)"airdate">\s+(.*?)\s+<\/div>(?:.*)<strong><a.href="\/title\/(tt\d{6,})(?:.*?)"\s+?title="(.*?)".itemprop="name">(?:.*)"ipl-rating-star__rating">(.*?)<\/span>\s+<span.class="ipl-rating-star__total-votes">\((.*?)\)<\/span>(?:.*)itemprop="description">(.*?)<\/div>~s');                            
+				            if ($aReturned) {
+                                foreach ($aReturned[1] as $n => $episode) {
+                                    $aReturn[] = [
+                                        'season'    => $page,
+                                        'episode'   => IMDBHelper::cleanString($aReturned[1][$n]),
+                                        'title'     => IMDBHelper::cleanString($aReturned[4][$n]),
+                                        'rating'    => IMDBHelper::cleanString($aReturned[5][$n]),
+                                        'votes'     => IMDBHelper::cleanString($aReturned[6][$n]),
+                                        'airdate'   => IMDBHelper::cleanString($aReturned[2][$n]),
+                                        'plot'      => IMDBHelper::cleanString($aReturned[7][$n]),
+                                        'id'        => IMDBHelper::cleanString($aReturned[3][$n]),
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                    
+                    file_put_contents($sCacheFile, serialize($aReturn));
+                    if (!preg_match('~id="load_next_episodes"~', $sSource)) {
+                        $isPage = false;
+                    }
+
+                    $page++;       
+                }
+
+                $anReturn   = [];
+                foreach ($aReturn as $i => $sAreturn) {
+                    $season = $sAreturn['season'];
+                    $episode = $sAreturn['episode'];
+                    $title = $sAreturn['title'];
+                    $rating = $sAreturn['rating'];
+                    $votes = $sAreturn['votes'];
+                    $airdate = $sAreturn['airdate'];
+                    $plot = $sAreturn['plot'];
+                    $id = $sAreturn['id'];
+
+                    $anReturn[] = [
+                        'season'    => $season,
+                        'episode'   => $episode,
+                        'title'     => $title,
+                        'rating'    => $rating,
+                        'votes'     => $votes,
+                        'airdate'   => $airdate,
+                        'plot'      => $plot,
+                        'id'        => $id
+                    ];
+                }
+
+                return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $anReturn);
+            }
+        }
+
+        return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound);
+    }
+
+
+    /**
      *
      * @return string type of the title or $sNotFound.
      */

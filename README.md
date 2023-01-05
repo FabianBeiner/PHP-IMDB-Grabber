@@ -226,6 +226,10 @@ if ($IMDB->isReady) {
 
 `getTrailerAsUrl($bEmbed = false)` - `$bEmbed` defines if you want to link to player directly or not.
 
+**TVInfo**
+
+`getTVInfo()` - returns an array of all season/episodes of a tv show (includes plot/rating/votes/airdate).
+
 **Type**
 
 `getType()` - returns the type of the title (movie, tv episode, tv series)
