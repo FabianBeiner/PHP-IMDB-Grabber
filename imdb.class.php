@@ -2095,8 +2095,8 @@ class IMDB
                     }
                     
                     file_put_contents($sCacheFile, serialize($aReturn));
-                    if (!preg_match('~id="load_next_episodes"~', $sSource)) {
-                        $isPage = false;
+                    if (preg_match('~href="\?season=-1~s', $sSource) || !preg_match('~id="load_next_episodes"~', $sSource)) {
+                        break;
                     }
 
                     $page++;       
