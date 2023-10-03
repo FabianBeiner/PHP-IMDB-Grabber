@@ -13,7 +13,7 @@
  * @author  Fabian Beiner <fb@fabianbeiner.de>
  * @license https://opensource.org/licenses/MIT The MIT License
  * @link    https://github.com/FabianBeiner/PHP-IMDB-Grabber/ GitHub Repository
- * @version 6.2.0
+ * @version 6.2.1
  */
 class IMDB
 {
@@ -334,7 +334,7 @@ class IMDB
         }
 
         $aCurlInfo = IMDBHelper::runCurl($this->sUrl);
-        $sSource   = $aCurlInfo['contents'];
+        $sSource = is_bool($aCurlInfo) ? $aCurlInfo : $aCurlInfo['contents'];
 
         if (false === $sSource) {
             if (true === self::IMDB_DEBUG) {
@@ -549,9 +549,9 @@ class IMDB
 
                 return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
             } else {
-                $fullAkas  = sprintf('https://www.imdb.com/title/tt%s/releaseinfo', $this->iId);
+                $fullAkas  = sprintf('https://www.imdb.com/title/tt%s/releaseinfo/', $this->iId);
                 $aCurlInfo = IMDBHelper::runCurl($fullAkas);
-                $sSource   = $aCurlInfo['contents'] ?? false;
+                $sSource = is_bool($aCurlInfo) ? $aCurlInfo : $aCurlInfo['contents'];
 
                 if (false === $sSource) {
                     if (true === self::IMDB_DEBUG) {
@@ -610,9 +610,9 @@ class IMDB
 
                 return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
             } else {
-                $fullCritics  = sprintf('https://www.imdb.com/title/tt%s/criticreviews', $this->iId);
+                $fullCritics  = sprintf('https://www.imdb.com/title/tt%s/criticreviews/', $this->iId);
                 $aCurlInfo = IMDBHelper::runCurl($fullCritics);
-                $sSource   = $aCurlInfo['contents'] ?? false;
+                $sSource = is_bool($aCurlInfo) ? $aCurlInfo : $aCurlInfo['contents'];
 
                 if (false === $sSource) {
                     if (true === self::IMDB_DEBUG) {
@@ -627,8 +627,7 @@ class IMDB
                     '~metascore_wrap(?:.*)\s+(?:.*)\s+(?:.*)ratingValue\">([0-9]+)<\/span>(?:\s+(?:.*)){4}ratingCount\">([0-9]+)~'
                 );
 
-                if ($aReturned) {
-                    $aReturn = [];                        
+                if (count($aReturned[1])) {
                     $aReturn[] = [
                         'metascore' => IMDBHelper::cleanString($aReturned[1][0]),
                         'reviews' => IMDBHelper::cleanString($aReturned[2][0]),
@@ -674,9 +673,9 @@ class IMDB
 
                 return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
             } else {
-                $fullCritics  = sprintf('https://www.imdb.com/title/tt%s/criticreviews', $this->iId);
+                $fullCritics  = sprintf('https://www.imdb.com/title/tt%s/criticreviews/', $this->iId);
                 $aCurlInfo = IMDBHelper::runCurl($fullCritics);
-                $sSource   = $aCurlInfo['contents'] ?? false;
+                $sSource = is_bool($aCurlInfo) ? $aCurlInfo : $aCurlInfo['contents'];
 
                 if (false === $sSource) {
                     if (true === self::IMDB_DEBUG) {
@@ -1464,7 +1463,7 @@ class IMDB
 
                 return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
             } else {
-                $fullLocations = sprintf('https://www.imdb.com/title/tt%s/locations', $this->iId);
+                $fullLocations = sprintf('https://www.imdb.com/title/tt%s/locations/', $this->iId);
                 $aCurlInfo     = IMDBHelper::runCurl($fullLocations);
                 $sSource       = $aCurlInfo['contents'] ?? false;
 
@@ -1610,7 +1609,7 @@ class IMDB
                 while ($isPage) {
                     $fullPhotos  = sprintf('https://www.imdb.com/title/tt%s/mediaindex?page=%d', $this->iId, $page);
                     $aCurlInfo = IMDBHelper::runCurl($fullPhotos);
-                    $sSource   = $aCurlInfo['contents'];
+                    $sSource = is_bool($aCurlInfo) ? $aCurlInfo : $aCurlInfo['contents'];
 
                     if (false === $sSource) {
                         if (true === self::IMDB_DEBUG) {
@@ -1829,9 +1828,9 @@ class IMDB
 
                 return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
             } else {
-                $fullAkas  = sprintf('https://www.imdb.com/title/tt%s/releaseinfo', $this->iId);
+                $fullAkas  = sprintf('https://www.imdb.com/title/tt%s/releaseinfo/', $this->iId);
                 $aCurlInfo = IMDBHelper::runCurl($fullAkas);
-                $sSource   = $aCurlInfo['contents'] ?? false;
+                $sSource = is_bool($aCurlInfo) ? $aCurlInfo : $aCurlInfo['contents'];
 
                 if (false === $sSource) {
                     if (true === self::IMDB_DEBUG) {
@@ -2064,7 +2063,7 @@ class IMDB
                     $fullEpisodes  = sprintf('https://www.imdb.com/title/tt%s/episodes/?season=%d', $this->iId, $page);
 
                     $aCurlInfo = IMDBHelper::runCurl($fullEpisodes);
-                    $sSource   = $aCurlInfo['contents'];
+                    $sSource = is_bool($aCurlInfo) ? $aCurlInfo : $aCurlInfo['contents'];
 
                     if (false === $sSource) {
                         if (true === self::IMDB_DEBUG) {

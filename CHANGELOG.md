@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [6.2.1] - 2023-10-03
+### Changed
+- Added some fix by @sajjadef98.
+- Added some slashes to URLs. Yep, this also fixes stuff.
+
 ## [6.2.0] - 2023-10-03
 ### Changed
 - Requiring PHP 8.1+.
@@ -139,4 +144,5 @@ All notable changes to this project will be documented in this file.
 [6.1.8]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.7...v6.1.8
 [6.1.9]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.8...v6.1.9
 [6.2.0]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.9...v6.2.0
+[6.2.1]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.2.0...v6.2.1
 [Unreleased]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.7...HEAD
