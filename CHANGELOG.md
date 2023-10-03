@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [6.2.0] - 2023-10-03
+### Changed
+- Requiring PHP 8.1+.
+- Fixed getTV (and probably some other stuff as well). *Thanks, @FLIKI!*
+- Added some small fixes I applied a while ago, but never pushed.
+
 ## [6.1.9] - 2023-01-01
 ### Changed
 - Fixed original search. *Thanks, @bla0r!*
@@ -131,4 +137,6 @@ All notable changes to this project will be documented in this file.
 [6.1.6]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.5...v6.1.6
 [6.1.7]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.6...v6.1.7
 [6.1.8]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.7...v6.1.8
+[6.1.9]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.8...v6.1.9
+[6.2.0]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.9...v6.2.0
 [Unreleased]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.7...HEAD
