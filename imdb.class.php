@@ -13,7 +13,7 @@
  * @author  Fabian Beiner <fb@fabianbeiner.de>
  * @license https://opensource.org/licenses/MIT The MIT License
  * @link    https://github.com/FabianBeiner/PHP-IMDB-Grabber/ GitHub Repository
- * @version 6.1.9
+ * @version 6.2.0
  */
 class IMDB
 {
@@ -551,7 +551,7 @@ class IMDB
             } else {
                 $fullAkas  = sprintf('https://www.imdb.com/title/tt%s/releaseinfo', $this->iId);
                 $aCurlInfo = IMDBHelper::runCurl($fullAkas);
-                $sSource   = $aCurlInfo['contents'];
+                $sSource   = $aCurlInfo['contents'] ?? false;
 
                 if (false === $sSource) {
                     if (true === self::IMDB_DEBUG) {
@@ -565,7 +565,7 @@ class IMDB
 
                 if ($aReturned) {
                     $aReturn = [];
-                    foreach ($aReturned[1] as $i => $strName) {
+                    foreach ($aReturned[1] ?? [] as $i => $strName) {
                         if (strpos($strName, '(') === false) {
                             $aReturn[] = [
                                 'title'   => IMDBHelper::cleanString($aReturned[2][$i]),
@@ -612,7 +612,7 @@ class IMDB
             } else {
                 $fullCritics  = sprintf('https://www.imdb.com/title/tt%s/criticreviews', $this->iId);
                 $aCurlInfo = IMDBHelper::runCurl($fullCritics);
-                $sSource   = $aCurlInfo['contents'];
+                $sSource   = $aCurlInfo['contents'] ?? false;
 
                 if (false === $sSource) {
                     if (true === self::IMDB_DEBUG) {
@@ -676,7 +676,7 @@ class IMDB
             } else {
                 $fullCritics  = sprintf('https://www.imdb.com/title/tt%s/criticreviews', $this->iId);
                 $aCurlInfo = IMDBHelper::runCurl($fullCritics);
-                $sSource   = $aCurlInfo['contents'];
+                $sSource   = $aCurlInfo['contents'] ?? false;
 
                 if (false === $sSource) {
                     if (true === self::IMDB_DEBUG) {
@@ -1466,7 +1466,7 @@ class IMDB
             } else {
                 $fullLocations = sprintf('https://www.imdb.com/title/tt%s/locations', $this->iId);
                 $aCurlInfo     = IMDBHelper::runCurl($fullLocations);
-                $sSource       = $aCurlInfo['contents'];
+                $sSource       = $aCurlInfo['contents'] ?? false;
 
                 if (false === $sSource) {
                     if (true === self::IMDB_DEBUG) {
@@ -1831,7 +1831,7 @@ class IMDB
             } else {
                 $fullAkas  = sprintf('https://www.imdb.com/title/tt%s/releaseinfo', $this->iId);
                 $aCurlInfo = IMDBHelper::runCurl($fullAkas);
-                $sSource   = $aCurlInfo['contents'];
+                $sSource   = $aCurlInfo['contents'] ?? false;
 
                 if (false === $sSource) {
                     if (true === self::IMDB_DEBUG) {
@@ -2061,7 +2061,8 @@ class IMDB
                 $aReturn = [];
                 $page = 1;
                 while ($isPage) {
-                    $fullEpisodes  = sprintf('https://www.imdb.com/title/tt%s/episodes?season=%d', $this->iId, $page);
+                    $fullEpisodes  = sprintf('https://www.imdb.com/title/tt%s/episodes/?season=%d', $this->iId, $page);
+
                     $aCurlInfo = IMDBHelper::runCurl($fullEpisodes);
                     $sSource   = $aCurlInfo['contents'];
 
@@ -2073,21 +2074,22 @@ class IMDB
                         return false;
                     }
 
-                    $aSplit = IMDBHelper::matchRegex($sSource, '~<meta itemprop="episodeNumber"(.*?)<div class="wtw-option-standalone".data-tconst="(.*?)".data-watchtype="minibar".data-baseref="ttep">~s');
+                    $aSplit = IMDBHelper::matchRegex($sSource, '~<article class=.+?episode-item-wrapper(.+?)ipc-rating-star--rate">Rate</span>~s');
+
                     if ($aSplit) {
                         foreach ($aSplit[1] as $i => $text) {
-                            $aReturned = IMDBHelper::matchRegex($aSplit[1][$i], '~content="(.*?)"(?:.*)"airdate">\s+(.*?)\s+<\/div>(?:.*)<strong><a.href="\/title\/(tt\d{6,})(?:.*?)"\s+?title="(.*?)".itemprop="name">(?:.*)"ipl-rating-star__rating">(.*?)<\/span>\s+<span.class="ipl-rating-star__total-votes">\((.*?)\)<\/span>(?:.*)itemprop="description">(.*?)<\/div>~s');                            
-				            if ($aReturned) {
+                            $aReturned = IMDBHelper::matchRegex($aSplit[1][$i], '~h4.+/title/(tt\d+)/[?]ref_.+ttep_ep(\d+).+?S\d+\.E\d+ ∙ (.+)</a></h4><span class=".+?">(.+?)</span>.+?<div class="ipc-html-content-inner-div">(.+?)</div>.+?ratingGroup--imdb-rating.+?</svg>(.+?)<span.+?ipc-rating-star--voteCount">.+?>(.+?)<~s');
+                            if ($aReturned) {
                                 foreach ($aReturned[1] as $n => $episode) {
                                     $aReturn[] = [
                                         'season'    => $page,
-                                        'episode'   => IMDBHelper::cleanString($aReturned[1][$n]),
-                                        'title'     => IMDBHelper::cleanString($aReturned[4][$n]),
-                                        'rating'    => IMDBHelper::cleanString($aReturned[5][$n]),
-                                        'votes'     => IMDBHelper::cleanString($aReturned[6][$n]),
-                                        'airdate'   => IMDBHelper::cleanString($aReturned[2][$n]),
-                                        'plot'      => IMDBHelper::cleanString($aReturned[7][$n]),
-                                        'id'        => IMDBHelper::cleanString($aReturned[3][$n]),
+                                        'episode' => IMDBHelper::cleanString($aReturned[2][$n]),
+                                        'title'   => IMDBHelper::cleanString($aReturned[3][$n]),
+                                        'rating'  => IMDBHelper::cleanString($aReturned[6][$n]),
+                                        'votes'   => IMDBHelper::cleanString($aReturned[7][$n]),
+                                        'airdate' => IMDBHelper::cleanString($aReturned[4][$n]),
+                                        'plot'    => IMDBHelper::cleanString($aReturned[5][$n]),
+                                        'id'      => IMDBHelper::cleanString($aReturned[1][$n]),
                                     ];
                                 }
                             }
@@ -2279,7 +2281,7 @@ class IMDBHelper extends IMDB
      */
     public static function matchRegex($sContent, $sPattern, $iIndex = null)
     {
-        preg_match_all($sPattern, $sContent, $aMatches);
+        preg_match_all($sPattern, $sContent ?? '', $aMatches);
         if ($aMatches === false) {
             return false;
         }
@@ -2307,7 +2309,7 @@ class IMDBHelper extends IMDB
      */
     public static function arrayOutput($bArrayOutput, $sSeparator, $sNotFound, $aReturn = null, $bHaveMore = false)
     {
-        if ($bArrayOutput) {
+        if ($bArrayOutput ?? false) {
             if ($aReturn == null || ! is_array($aReturn)) {
                 return [];
             }
@@ -2359,16 +2361,16 @@ class IMDBHelper extends IMDB
             '',
             '',
         ];
-        $sInput   = str_replace('</li>', ' | ', $sInput);
-        $sInput   = strip_tags($sInput);
-        $sInput   = str_replace('&nbsp;', ' ', $sInput);
-        $sInput   = str_replace($aSearch, $aReplace, $sInput);
-        $sInput   = html_entity_decode($sInput, ENT_QUOTES | ENT_HTML5);
-        $sInput   = preg_replace('/\s+/', ' ', $sInput);
-        $sInput   = trim($sInput);
-        $sInput   = rtrim($sInput, ' |');
+        $sInput   = str_replace('</li>', ' | ', $sInput ?? '');
+        $sInput   = strip_tags($sInput ?? '');
+        $sInput   = str_replace('&nbsp;', ' ', $sInput ?? '');
+        $sInput   = str_replace($aSearch, $aReplace, $sInput ?? '');
+        $sInput   = html_entity_decode($sInput ?? '', ENT_QUOTES | ENT_HTML5);
+        $sInput   = preg_replace('/\s+/', ' ', $sInput ?? '');
+        $sInput   = trim($sInput ?? '');
+        $sInput   = rtrim($sInput ?? '', ' |');
 
-        return ($sInput ? trim($sInput) : self::$sNotFound);
+        return ($sInput ? trim($sInput ?? '') : self::$sNotFound);
     }
 
     /**
