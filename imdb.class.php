@@ -2078,7 +2078,7 @@ class IMDB
 
                     if ($aSplit) {
                         foreach ($aSplit[1] as $i => $text) {
-                            $aReturned = IMDBHelper::matchRegex($aSplit[1][$i], '~h4.+/title/(tt\d+)/[?]ref_.+ttep_ep(\d+).+?S\d+\.E\d+ ∙ (.+)</a></h4><span class=".+?">(.+?)</span>.+?<div class="ipc-html-content-inner-div">(.+?)</div>.+?ratingGroup--imdb-rating.+?</svg>(.+?)<span.+?ipc-rating-star--voteCount">.+?>(.+?)<~s');
+                            $aReturned = IMDBHelper::matchRegex($aSplit[1][$i], '~h4.+/title/(tt\d+)/[?]ref_.+ttep_ep(\d+).+?S\d+\.E\d+ ∙ (.+?)<\/div>.+?<span class=".+?">(.+?)</span>.+?<div class="ipc-html-content-inner-div">(.+?)</div>.+?ratingGroup--imdb-rating.+?</svg>(.+?)<span.+?ipc-rating-star--voteCount">.+?>(.+?)<~s');
                             if ($aReturned) {
                                 foreach ($aReturned[1] as $n => $episode) {
                                     $aReturn[] = [
