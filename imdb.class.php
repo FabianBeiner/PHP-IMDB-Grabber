@@ -81,7 +81,7 @@ class IMDB
     const IMDB_MOVIE_DESC    = '~<section class="titlereference-section-overview">\s+<div>\s+(.*)\s*?</div>\s+<hr>\s+<div class="titlereference-overview-section">~Ui';
     const IMDB_SERIES_DESC   = '~<div>\s+(?:.*?</a>\s+</span>\s+</div>\s+<hr>\s+<div>\s+)(.*)\s+</div>\s+<hr>\s+<div class="titlereference-overview-section">~Ui';
     const IMDB_SERIESEP_DESC = '~All Episodes(?:.*?)</li>\s+(?:.*?)?</ul>\s+</span>\s+<hr>\s+</div>\s+<div>\s+(.*?)\s+</div>\s+<hr>~';
-    const IMDB_NOT_FOUND_ADV = '~<span>No results.</span>~Ui';
+    const IMDB_NOT_FOUND_ADV = '~"results-section-empty-results-msg"~Ui';
     const IMDB_NOT_FOUND_DES = 'Know what this is about';
     const IMDB_NOT_FOUND_ORG = '~<h1 class="findHeader">No results found for ~Ui';
     const IMDB_PLOT          = '~<td[^>]*>\s*Plot\s*Summary\s*</td>\s*<td>\s*<p>\s*(.*)\s*</p>~Ui';
@@ -91,7 +91,7 @@ class IMDB
     const IMDB_RATING_COUNT  = '~class="ipl-rating-star__total-votes">\((.*)\)<~Ui';
     const IMDB_RELEASE_DATE  = '~href="/title/[t0-9]*/releaseinfo">(.*)<~Ui';
     const IMDB_RUNTIME       = '~<td[^>]*>\s*Runtime\s*</td>\s*<td>(.+)</td>~Ui';
-    const IMDB_SEARCH_ADV    = '~text-primary">1[.]</span>\s*<a.href="\/title\/(tt\d{6,})\/(?:.*?)"(?:\s*)>(?:.*?)<\/a>~Ui';
+    const IMDB_SEARCH_ADV    = '~<a href="/title/(tt\d+).*?ipc-title-link-wrapper~i';
     const IMDB_SEARCH_ORG    = '~find-title-result">(?:.*?)alt="(.*?)"(?:.*?)href="\/title\/(tt\d{6,})\/(?:.*?)">(.*?)<\/a>~';
     const IMDB_SEASONS       = '~episodes\?season=(?:\d+)">(\d+)<~Ui';
     const IMDB_SOUND_MIX     = '~<td[^>]*>\s*Sound\s*Mix\s*</td>\s*<td>(.+)</td>~Ui';
