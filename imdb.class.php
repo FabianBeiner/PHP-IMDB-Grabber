@@ -13,7 +13,7 @@
  * @author  Fabian Beiner <fb@fabianbeiner.de>
  * @license https://opensource.org/licenses/MIT The MIT License
  * @link    https://github.com/FabianBeiner/PHP-IMDB-Grabber/ GitHub Repository
- * @version 6.2.0
+ * @version 6.2.1
  */
 class IMDB
 {
@@ -334,7 +334,7 @@ class IMDB
         }
 
         $aCurlInfo = IMDBHelper::runCurl($this->sUrl);
-        $sSource   = $aCurlInfo['contents'];
+        $sSource   = isset($aCurlInfo['contents']) ? $aCurlInfo['contents'] : false;
 
         if (false === $sSource) {
             if (true === self::IMDB_DEBUG) {
@@ -1610,7 +1610,7 @@ class IMDB
                 while ($isPage) {
                     $fullPhotos  = sprintf('https://www.imdb.com/title/tt%s/mediaindex?page=%d', $this->iId, $page);
                     $aCurlInfo = IMDBHelper::runCurl($fullPhotos);
-                    $sSource   = $aCurlInfo['contents'];
+                    $sSource   = isset($aCurlInfo['contents']) ? $aCurlInfo['contents'] : false;
 
                     if (false === $sSource) {
                         if (true === self::IMDB_DEBUG) {
@@ -2064,7 +2064,7 @@ class IMDB
                     $fullEpisodes  = sprintf('https://www.imdb.com/title/tt%s/episodes/?season=%d', $this->iId, $page);
 
                     $aCurlInfo = IMDBHelper::runCurl($fullEpisodes);
-                    $sSource   = $aCurlInfo['contents'];
+                    $sSource   = isset($aCurlInfo['contents']) ? $aCurlInfo['contents'] : false;
 
                     if (false === $sSource) {
                         if (true === self::IMDB_DEBUG) {
