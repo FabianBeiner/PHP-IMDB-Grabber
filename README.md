@@ -114,6 +114,18 @@ if ($IMDB->isReady) {
 
 `getDirectorAsUrl($sTarget = '')` - `$sTarget` defines a target
 
+**Distributor**
+
+`getDistributor($iLimit = 0, $bMore = true)` - `$iLimit` defines the maximum amount of distributors returned, `$bMore` if "…" should be added to the string if needed
+
+**Distributor (with links)**
+
+`getDistributorAsUrl($sTarget = '')` - `$sTarget` defines a target
+
+**Episode**
+
+`getEpisodeTitle()` - returns the episode title of the tv show
+
 **Genre**
 
 `getGenre()`
@@ -145,6 +157,22 @@ if ($IMDB->isReady) {
 **MPAA**
 
 `getMpaa()`
+
+**Metacritics**
+
+`getMetaCritics()` - returns all critic reviews
+
+**Metascore**
+
+`getMetaScore()` - returns the average score and number of votes based on metacritic.
+
+**Music Composer**
+
+`getMusic()`
+
+**Music Composer (with links)**
+
+`getMusicAsUrl($sTarget = '')` - `$sTarget` defines a target
 
 **Plot**
 
@@ -197,6 +225,14 @@ if ($IMDB->isReady) {
 **Trailer**
 
 `getTrailerAsUrl($bEmbed = false)` - `$bEmbed` defines if you want to link to player directly or not.
+
+**TVInfo**
+
+`getTVInfo()` - returns an array of all season/episodes of a tv show (includes plot/rating/votes/airdate).
+
+**Type**
+
+`getType()` - returns the type of the title (movie, tv episode, tv series)
 
 **Url**
 

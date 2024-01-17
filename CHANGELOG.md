@@ -1,6 +1,32 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [6.2.2] - 2023-12-20
+### Changed
+- Fixed search. *Thanks, @FLIKI!*
+- Added some small fixes.
+
+## [6.2.1] - 2023-10-03
+### Changed
+- Fixed getTV (and probably some other stuff as well). *Thanks, @FLIKI!*
+- Added some small fixes I applied a while ago, but never pushed.
+
+## [6.2.0] - 2023-10-03
+### Changed
+- Requiring PHP 8.1+.
+
+## [6.1.9] - 2023-01-01
+### Changed
+- Fixed original search. *Thanks, @bla0r!*
+
+## [6.1.8] - 2022-05-23
+### Changed
+- Fixed `getPlot()` method. *Thanks, @phyozawtun!*
+
+## [6.1.7] - 2020-02-19
+### Changed
+- Improved `getPoster()` method. You can now get different image smaller sizes (`xxs, xs, s`). *Thanks, @Apollo2000!*
+
 ## [6.1.6] - 2018-11-03
 ### Changed
 - Added getLocations() method. *Thanks, @defro!*
@@ -117,4 +143,10 @@ All notable changes to this project will be documented in this file.
 [6.1.4]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.3...v6.1.4
 [6.1.5]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.4...v6.1.5
 [6.1.6]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.5...v6.1.6
-[Unreleased]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.6...HEAD
+[6.1.7]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.6...v6.1.7
+[6.1.8]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.7...v6.1.8
+[6.1.9]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.8...v6.1.9
+[6.2.0]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.1.9...v6.2.0
+[6.2.1]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.2.0...v6.2.1
+[6.2.2]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.2.1...v6.2.2
+[Unreleased]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.2.2...HEAD
