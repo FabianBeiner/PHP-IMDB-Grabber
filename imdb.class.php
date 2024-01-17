@@ -1441,8 +1441,7 @@ class IMDB
     /**
      * Returns all locations
      *
-     * @return string location
-     * @return string specification
+     * @return string|array locations
      */
     public function getLocations()
     {
