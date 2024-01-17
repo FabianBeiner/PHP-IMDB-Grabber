@@ -74,7 +74,7 @@ class IMDB
     const IMDB_ID            = '~((?:tt\d{6,})|(?:itle\?\d{6,}))~';
     const IMDB_LANGUAGE      = '~<a href="\/language\/(\w+)">(.*)<\/a>~Ui';
     const IMDB_LOCATION      = '~href="\/search\/title\?locations=(.*)">(.*)<\/a>~Ui';
-    const IMDB_LOCATIONS     = '~href="\/search\/title\?locations=[^>]*>\s?(.*)\s?<\/a>[^"]*<dd>\s?(.*)\s<\/dd>~Ui';
+    const IMDB_LOCATIONS     = '~href="(?<url>\/search\/title\/\?locations=[^>]*)">\s?(?<location>.*)\s?<\/a><p(.*)>\((?<specification>.*)\)<\/p>~Ui';
     const IMDB_MPAA          = '~<li class="ipl-inline-list__item">(?:\s+)(TV-Y|TV-Y7|TV-G|TV-PG|TV-14|TV-MA|G|PG|PG-13|R|NC-17|NR|UR)(?:\s+)<\/li>~Ui';
     const IMDB_MUSIC         = '~Music by\s*<\/h4>.*<table class=.*>(.*)</table>~Us';
     const IMDB_NAME          = '~href="/name/(.+)/?(?:\?[^"]*)?"[^>]*>(.+)</a>~Ui';
@@ -1464,7 +1464,7 @@ class IMDB
 
                 return IMDBHelper::arrayOutput($this->bArrayOutput, $this->sSeparator, self::$sNotFound, $aReturn);
             } else {
-                $fullLocations = sprintf('https://www.imdb.com/title/tt%s/locations', $this->iId);
+                $fullLocations = sprintf('https://www.imdb.com/title/tt%s/locations/', $this->iId);
                 $aCurlInfo     = IMDBHelper::runCurl($fullLocations);
                 $sSource       = $aCurlInfo['contents'] ?? false;
 
@@ -1480,15 +1480,12 @@ class IMDB
 
                 if ($aReturned) {
                     $aReturn = [];
-                    foreach ($aReturned[1] as $i => $strName) {
+                    foreach ($aReturned['url'] as $i => $strName) {
                         if (strpos($strName, '(') === false) {
                             $aReturn[] = [
-                                'location' => IMDBHelper::cleanString($strName),
-                            ];
-                        }
-                        if (strpos($aReturned[2][$i], '(') !== false) {
-                            $aReturn[] = [
-                                'specification' => IMDBHelper::cleanString($aReturned[2][$i]),
+                                'url' => IMDBHelper::cleanString($aReturned['url'][$i]),
+                                'location' => IMDBHelper::cleanString($aReturned['location'][$i]),
+                                'specification' => IMDBHelper::cleanString($aReturned['specification'][$i]),
                             ];
                         }
                     }
