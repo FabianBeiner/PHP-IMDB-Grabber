@@ -2066,38 +2066,91 @@ class IMDB
                         if (true === self::IMDB_DEBUG) {
                             echo '<pre><b>cURL error:</b> ' . var_dump($aCurlInfo) . '</pre>';
                         }
-
                         return false;
                     }
 
-                    $aSplit = IMDBHelper::matchRegex($sSource, '~<article class=.+?episode-item-wrapper(.+?)ipc-rating-star--rate">Rate</span>~s');
-
-                    if ($aSplit) {
-                        foreach ($aSplit[1] as $i => $text) {
-                            $aReturned = IMDBHelper::matchRegex($aSplit[1][$i], '~h4.+/title/(tt\d+)/[?]ref_.+ttep_ep(\d+).+?S\d+\.E\d+ ∙ (.+?)<\/div>.+?<span class=".+?">(.+?)</span>.+?<div class="ipc-html-content-inner-div">(.+?)</div>.+?ratingGroup--imdb-rating.+?</svg>(.+?)<span.+?ipc-rating-star--voteCount">.+?>(.+?)<~s');
-                            if ($aReturned) {
-                                foreach ($aReturned[1] as $n => $episode) {
-                                    $aReturn[] = [
-                                        'season'    => $page,
-                                        'episode' => IMDBHelper::cleanString($aReturned[2][$n]),
-                                        'title'   => IMDBHelper::cleanString($aReturned[3][$n]),
-                                        'rating'  => IMDBHelper::cleanString($aReturned[6][$n]),
-                                        'votes'   => IMDBHelper::cleanString($aReturned[7][$n]),
-                                        'airdate' => IMDBHelper::cleanString($aReturned[4][$n]),
-                                        'plot'    => IMDBHelper::cleanString($aReturned[5][$n]),
-                                        'id'      => IMDBHelper::cleanString($aReturned[1][$n]),
-                                    ];
-                                }
-                            }
+                    $aSeasons_links = IMDBHelper::matchRegex($sSource, '~tab-season-entry" href="/title/tt\d+/episodes/\?season=(\d)"~s');
+                    $aFound_seasons = [];
+                    if ($aSeasons_links) {
+                        foreach ($aSeasons_links[1] as $i => $season_number) {
+                            $aFound_seasons[] = $season_number;
                         }
+
                     }
-                    
-                    file_put_contents($sCacheFile, serialize($aReturn));
-                    if (preg_match('~href="\?season=-1~s', $sSource) || !preg_match('~id="load_next_episodes"~', $sSource)) {
+
+                    if (!in_array($page, $aFound_seasons)) {
                         break;
                     }
 
-                    $page++;       
+                    $aSplit = IMDBHelper::matchRegex($sSource, '~<article class=.+?episode-item-wrapper(.+?)ipc-rating-star--rate">Rate</span>~s');
+                    
+                    if ($aSplit) {
+                        foreach ($aSplit[1] as $i => $text) {
+                            
+                            # Set default values
+                            $d_episode = 'n/A';
+                            $d_title = 'n/A';
+                            $d_rating = 'n/A';
+                            $d_votes = 'n/A';
+                            $d_airdate = 'n/A';
+                            $d_plot = 'n/A';
+                            $d_id = 'n/A';
+
+                            # Find values
+                            $f_id = IMDBHelper::matchRegex($aSplit[1][$i], '~h4.+/title/(tt\d+)~s');
+                            $f_episode = IMDBHelper::matchRegex($aSplit[1][$i], '~ref_=ttep_ep(\d+)~s');
+                            $f_title = IMDBHelper::matchRegex($aSplit[1][$i], '~S\d+\.E\d+ ∙ (.+?)<\/div>~s');
+                            $f_airdate = IMDBHelper::matchRegex($aSplit[1][$i], '~<span class="sc-ccd6e31b-10 fVspdm">(.+?)<\/span>~s');
+                            $f_plot = IMDBHelper::matchRegex($aSplit[1][$i], '~"ipc-html-content-inner-div" role="presentation">(.+?)<\/div>~s');
+                            $f_raiting = IMDBHelper::matchRegex($aSplit[1][$i], '~IMDb rating: (\d\.\d)~s');
+                            $f_votes = IMDBHelper::matchRegex($aSplit[1][$i], '~voteCount.+?-->(.+?)<~s');
+
+                            # Update values if not empty
+                            if (!empty($f_id[1][0])) {
+                                $d_id = IMDBHelper::cleanString($f_id[1][0]);
+                            }
+
+                            if (!empty($f_episode[1][0])) {
+                                $d_episode = IMDBHelper::cleanString($f_episode[1][0]);
+                            }
+
+                            if (!empty($f_title[1][0])) {
+                                $d_title = IMDBHelper::cleanString($f_title[1][0]);
+                            }
+
+                            if (!empty($f_raiting[1][0])) {
+                                $d_rating = IMDBHelper::cleanString($f_raiting[1][0]);
+                            }
+
+                            if (!empty($f_votes[1][0])) {
+                                $d_votes = IMDBHelper::cleanString($f_votes[1][0]);
+                            }
+
+                            if (!empty($f_airdate[1][0])) {
+                                $d_airdate = IMDBHelper::cleanString($f_airdate[1][0]);
+                            }
+
+                            if (!empty($f_plot[1][0])) {
+                                $d_plot = IMDBHelper::cleanString($f_plot[1][0]);
+                            }
+
+
+                            $aReturn[] = [
+                                'season'    => $page,
+                                'episode' => $d_episode,
+                                'title'   => $d_title,
+                                'rating'  => $d_rating,
+                                'votes'   => $d_votes,
+                                'airdate' => $d_airdate,
+                                'plot'    => $d_plot,
+                                'id'      => $d_id,
+                            ];
+                        }
+                    }
+
+                    file_put_contents($sCacheFile, serialize($aReturn));
+
+                    $page++;
                 }
 
                 $anReturn   = [];
