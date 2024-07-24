@@ -2069,16 +2069,16 @@ class IMDB
                         return false;
                     }
 
-                    $aSeasons_links = IMDBHelper::matchRegex($sSource, '~tab-season-entry" href="/title/tt\d+/episodes/\?season=(\d)"~s');
-                    $aFound_seasons = [];
-                    if ($aSeasons_links) {
-                        foreach ($aSeasons_links[1] as $i => $season_number) {
-                            $aFound_seasons[] = $season_number;
+                    $aSeasonsLinks = IMDBHelper::matchRegex($sSource, '~tab-season-entry" href="/title/tt\d+/episodes/\?season=(\d)"~s');
+                    $aFoundSeasons = [];
+                    if ($aSeasonsLinks) {
+                        foreach ($aSeasonsLinks[1] as $i => $aSeasonNumber) {
+                            $aFoundSeasons[] = $aSeasonNumber;
                         }
 
                     }
 
-                    if (!in_array($page, $aFound_seasons)) {
+                    if (!in_array($page, $aFoundSeasons)) {
                         break;
                     }
 
@@ -2088,63 +2088,64 @@ class IMDB
                         foreach ($aSplit[1] as $i => $text) {
                             
                             # Set default values
-                            $d_episode = 'n/A';
-                            $d_title = 'n/A';
-                            $d_rating = 'n/A';
-                            $d_votes = 'n/A';
-                            $d_airdate = 'n/A';
-                            $d_plot = 'n/A';
-                            $d_id = 'n/A';
+                            $dEpisode = self::$sNotFound;
+                            $dTitle = self::$sNotFound;
+                            $dRating = self::$sNotFound;
+                            $dVotes = self::$sNotFound;
+                            $dAirdate = self::$sNotFound;
+                            $dPlot = self::$sNotFound;
+                            $dId = self::$sNotFound;
 
                             # Find values
-                            $f_id = IMDBHelper::matchRegex($aSplit[1][$i], '~h4.+/title/(tt\d+)~s');
-                            $f_episode = IMDBHelper::matchRegex($aSplit[1][$i], '~ref_=ttep_ep(\d+)~s');
-                            $f_title = IMDBHelper::matchRegex($aSplit[1][$i], '~S\d+\.E\d+ ∙ (.+?)<\/div>~s');
-                            $f_airdate = IMDBHelper::matchRegex($aSplit[1][$i], '~<span class="sc-ccd6e31b-10 fVspdm">(.+?)<\/span>~s');
-                            $f_plot = IMDBHelper::matchRegex($aSplit[1][$i], '~"ipc-html-content-inner-div" role="presentation">(.+?)<\/div>~s');
-                            $f_raiting = IMDBHelper::matchRegex($aSplit[1][$i], '~IMDb rating: (\d\.\d)~s');
-                            $f_votes = IMDBHelper::matchRegex($aSplit[1][$i], '~voteCount.+?-->(.+?)<~s');
+                            $fId = IMDBHelper::matchRegex($aSplit[1][$i], '~h4.+/title/(tt\d+)~s');
+                            $fEpisode = IMDBHelper::matchRegex($aSplit[1][$i], '~ref_=ttep_ep(\d+)~s');
+                            $fTitle = IMDBHelper::matchRegex($aSplit[1][$i], '~S\d+\.E\d+ ∙ (.+?)<\/div>~s');
+                            $fAirdate = IMDBHelper::matchRegex($aSplit[1][$i], '~<span class="sc-ccd6e31b-10 fVspdm">(.+?)<\/span>~s');
+                            $fPlot = IMDBHelper::matchRegex($aSplit[1][$i], '~"ipc-html-content-inner-div" role="presentation">(.+?)<\/div>~s');
+                            $fRaiting = IMDBHelper::matchRegex($aSplit[1][$i], '~IMDb rating: (\d\.\d)~s');
+                            $fVotes = IMDBHelper::matchRegex($aSplit[1][$i], '~voteCount.+?-->(.+?)<~s');
 
                             # Update values if not empty
-                            if (!empty($f_id[1][0])) {
-                                $d_id = IMDBHelper::cleanString($f_id[1][0]);
+                            if (!empty($fId[1][0])) {
+                                $dId = IMDBHelper::cleanString($fId[1][0]);
                             }
 
-                            if (!empty($f_episode[1][0])) {
-                                $d_episode = IMDBHelper::cleanString($f_episode[1][0]);
+                            if (!empty($fEpisode[1][0])) {
+                                $dEpisode = IMDBHelper::cleanString($fEpisode[1][0]);
                             }
 
-                            if (!empty($f_title[1][0])) {
-                                $d_title = IMDBHelper::cleanString($f_title[1][0]);
+                            if (!empty($fTitle[1][0])) {
+                                $dTitle = IMDBHelper::cleanString($fTitle[1][0]);
                             }
 
-                            if (!empty($f_raiting[1][0])) {
-                                $d_rating = IMDBHelper::cleanString($f_raiting[1][0]);
+                            if (!empty($fRaiting[1][0])) {
+                                $dRating = IMDBHelper::cleanString($fRaiting[1][0]);
                             }
 
-                            if (!empty($f_votes[1][0])) {
-                                $d_votes = IMDBHelper::cleanString($f_votes[1][0]);
+                            if (!empty($fVotes[1][0])) {
+                                $dVotes = IMDBHelper::cleanString($fVotes[1][0]);
                             }
 
-                            if (!empty($f_airdate[1][0])) {
-                                $d_airdate = IMDBHelper::cleanString($f_airdate[1][0]);
+                            if (!empty($fAirdate[1][0])) {
+                                $dAirdate = IMDBHelper::cleanString($fAirdate[1][0]);
                             }
 
-                            if (!empty($f_plot[1][0])) {
-                                $d_plot = IMDBHelper::cleanString($f_plot[1][0]);
+                            if (!empty($fPlot[1][0])) {
+                                $dPlot = IMDBHelper::cleanString($fPlot[1][0]);
                             }
 
 
                             $aReturn[] = [
-                                'season'    => $page,
-                                'episode' => $d_episode,
-                                'title'   => $d_title,
-                                'rating'  => $d_rating,
-                                'votes'   => $d_votes,
-                                'airdate' => $d_airdate,
-                                'plot'    => $d_plot,
-                                'id'      => $d_id,
+                                'season'  => $page,
+                                'episode' => $dEpisode,
+                                'title'   => $dTitle,
+                                'rating'  => $dRating,
+                                'votes'   => $dVotes,
+                                'airdate' => $dAirdate,
+                                'plot'    => $dPlot,
+                                'id'      => $dId,
                             ];
+
                         }
                     }
 
