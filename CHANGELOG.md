@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [6.2.3] - 2024-09-28
+## [6.2.4] - 2024-09-28
 ### Changed
 - Fixed "getReleaseDate() does not contain releasedate only". (closes #200)
 - Updated `getYear()` method to return a range if given. (closes #128)
@@ -159,4 +159,5 @@ All notable changes to this project will be documented in this file.
 [6.2.1]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.2.0...v6.2.1
 [6.2.2]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.2.1...v6.2.2
 [6.2.3]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.2.2...v6.2.3
+[6.2.4]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.2.3...v6.2.4
 [Unreleased]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.2.2...HEAD
