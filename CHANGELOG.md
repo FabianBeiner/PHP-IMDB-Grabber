@@ -1,9 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [6.2.5] - 2025-06-28
+## [6.2.6] - 2025-06-28
 ### Changed
-- Hotfix for all the broken regex. A rewrite is coming, which will also introduce some breaking changes...
+- Hotfix for all those broken changes. *Not heavily tested, see #205* 
+
+## [6.2.5] - 2025-02-13
+### Changed
+- Fixed "getTVInfo()".  *Thanks, @WoodenHouse27!* (closes #204)
 
 ## [6.2.4] - 2024-09-28
 ### Changed
@@ -164,5 +168,6 @@ All notable changes to this project will be documented in this file.
 [6.2.2]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.2.1...v6.2.2
 [6.2.3]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.2.2...v6.2.3
 [6.2.4]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.2.3...v6.2.4
-[6.2.4]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.2.4...v6.2.5
-[Unreleased]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.2.5...HEAD
+[6.2.5]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.2.4...v6.2.5
+[6.2.6]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.2.5...v6.2.6
+[Unreleased]: https://github.com/FabianBeiner/PHP-IMDB-Grabber/compare/v6.2.6...HEAD

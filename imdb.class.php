@@ -13,14 +13,14 @@
  * @author  Fabian Beiner <fb@fabianbeiner.de>
  * @license https://opensource.org/licenses/MIT The MIT License
  * @link    https://github.com/FabianBeiner/PHP-IMDB-Grabber/ GitHub Repository
- * @version 6.2.5
+ * @version 6.2.6
  */
 class IMDB
 {
     /**
      * Set this to true if you run into problems.
      */
-    const IMDB_DEBUG = true;
+    const IMDB_DEBUG = false;
 
     /**
      * Set the preferred language for the User Agent.
@@ -2072,7 +2072,7 @@ class IMDB
                         return IMDB::$sNotFound;
                     }
 
-                    $aSeasonsLinks = IMDBHelper::matchRegex($sSource, '~tab-season-entry" href="/title/tt\d+/episodes/\?season=(\d)"~s');
+                    $aSeasonsLinks = IMDBHelper::matchRegex($sSource, '~tab-season-entry" href="/title/tt\d+/episodes/\?season=(\d)~s');
                     $aFoundSeasons = [];
                     if ($aSeasonsLinks) {
                         foreach ($aSeasonsLinks[1] as $i => $aSeasonNumber) {
@@ -2101,7 +2101,7 @@ class IMDB
 
                             # Find values
                             $fId = IMDBHelper::matchRegex($aSplit[1][$i], '~h4.+/title/(tt\d+)~s');
-                            $fEpisode = IMDBHelper::matchRegex($aSplit[1][$i], '~ref_=ttep_ep(\d+)~s');
+                            $fEpisode = IMDBHelper::matchRegex($aSplit[1][$i], '~ref_=ttep_ep_(\d+)~s');
                             $fTitle = IMDBHelper::matchRegex($aSplit[1][$i], '~S\d+\.E\d+ ∙ (.+?)<\/div>~s');
                             $fAirdate = IMDBHelper::matchRegex($aSplit[1][$i], '~<span class="sc-ccd6e31b-10 fVspdm">(.+?)<\/span>~s');
                             $fPlot = IMDBHelper::matchRegex($aSplit[1][$i], '~"ipc-html-content-inner-div" role="presentation">(.+?)<\/div>~s');
