@@ -97,8 +97,13 @@ if ($oIMDB->isReady) {
          '</p>';
     echo '<h2>Cast</h2>';
     $castImages = $oIMDB->getCastImages(5, false, 'small');
+    if (!is_array($castImages)) {
+        $castImages = [];
+    }
+
     foreach (explode(' / ', $oIMDB->getCast(5, false)) as $name) {
-        echo '<img src="' . $castImages[$name] . '" alt="' . $name . '">' . $name . '<br>';
+        $image = $castImages[$name] ?? '';
+        echo '<img src="' . $image . '" alt="' . htmlspecialchars($name) . '">' . htmlspecialchars($name) . '<br>';
     }
 } else {
     echo '<p>Movie not found!</p>';

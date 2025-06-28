@@ -20,7 +20,7 @@ class IMDB
     /**
      * Set this to true if you run into problems.
      */
-    const IMDB_DEBUG = false;
+    const IMDB_DEBUG = true;
 
     /**
      * Set the preferred language for the User Agent.
@@ -53,30 +53,30 @@ class IMDB
      * These are the regular expressions used to extract the data.
      * If you don’t know what you’re doing, you shouldn’t touch them.
      */
-    const IMDB_AKA           = '~<td[^>]*>\s*Also\s*Known\s*As\s*</td>\s*<td>(.+)</td>~Uis';
-    const IMDB_ASPECT_RATIO  = '~<td[^>]*>Aspect\s*Ratio</td>\s*<td>(.+)</td>~Uis';
-    const IMDB_AWARDS        = '~<div\s*class="titlereference-overview-section">\s*Awards:(.+)</div>~Uis';
-    const IMDB_BUDGET        = '~<td[^>]*>Budget<\/td>\s*<td>\s*(.*)(?:\(estimated\))\s*<\/td>~Ui';
-    const IMDB_CAST          = '~<td[^>]*itemprop="actor"[^>]*>\s*<a\s*href="/name/([^/]*)/\?[^"]*"[^>]*>\s*<span.+>(.+)</span~Ui';
+    const IMDB_AKA           = '~=ttrv_dt_aka.*<span[^>]+>(.*)</span>~Ui';
+    const IMDB_ASPECT_RATIO  = '~aspect ratio.*<span.*>(.*)</span>~Uis';
+    const IMDB_AWARDS        = '~Awards</a>.*span\sclass.*>(.*)</div>~Uis';
+    const IMDB_BUDGET        = '~budget</span>.*<span.*>\s*(.*)(?:\s*\(estimated\))\s*</span>~Ui';
+    const IMDB_CAST          = '~<\/div><a class="ipc-lockup-overlay ipc-focusable" href="\/name\/([^\/]*)\/.*href.*>(.*)<\/a>~Ui';
     const IMDB_CAST_IMAGE    = '~(loadlate="(.*)"[^>]*><\/a>\s+<\/td>\s+)?<td[^>]*itemprop="actor"[^>]*>\s*<a\s*href="\/name\/([^/]*)\/\?[^"]*"[^>]*>\s*<span.+>(.+)<\/span+~Uis';
-    const IMDB_CERTIFICATION = '~<td[^>]*>\s*Certification\s*</td>\s*<td>(.+)</td>~Ui';
-    const IMDB_CHAR          = '~<td class="character">(?:\s+)<div>(.*)(?:\s+)(?: /| \(.*\)|<\/div>)~Ui';
-    const IMDB_COLOR         = '~<a href="\/search\/title\?colors=(?:.*)">(.*)<\/a>~Ui';
-    const IMDB_COMPANIES     = '~production_companies&ref_=(?:.*)">Edit</a>\s+</header>\s+<ul class="simpleList">(.*)Distributors</h4>~Uis';
-    const IMDB_COMPANY       = '~<li>\s+<a href="\/company\/(co[0-9]+)\/">(.*?)</a>~';
-    const IMDB_COUNTRY       = '~<a href="/country/(\w+)">(.*)</a>~Ui';
-    const IMDB_CREATOR       = '~<div[^>]*>\s*(?:Creator|Creators)\s*:\s*<ul[^>]*>(.+)</ul>~Uxsi';
-    const IMDB_DISTRIBUTOR   = '@href="[^"]*update=[t0-9]+:distributors[^"]*">Edit</a>\s*</header>\s*<ul\s*class="simpleList">(.*):special_effects_companies@Uis';
-    const IMDB_DISTRIBUTORS  = '@\/company\/(co[0-9]+)\/">(.*?)<\/a>\s+(?:\(([0-9]+)\))?\s+(?:\((.*?)\))?\s+(?:\((.*?)\))?\s+(?:\((?:.*?)\))?\s+</li>@';
-    const IMDB_DIRECTOR      = '~<div[^>]*>\s*(?:Director|Directors)\s*:\s*<ul[^>]*>(.+)</ul>~Uxsi';
-    const IMDB_GENRE         = '~href="/genre/([a-zA-Z_-]*)/?">([a-zA-Z_ -]*)</a>~Ui';
+    const IMDB_CERTIFICATION = '~\?certificates=.*ref_=ttrv_stry">(.+)(?:</span></li></ul></div>|<a\sclass[^>]+\/parentalguide\/[^>]+>)~Ui';
+    const IMDB_CHAR          = '~\/characters\/nm\d+\/.*>(.*)<\/a>~Ui';
+    const IMDB_COLOR         = '~href="/search/title/\?colors(?:.*)">(.*)<\/a>~Ui';
+    const IMDB_COMPANIES     = '~id="production">[\w\s]*?(.*)</section>~Ui';
+    const IMDB_COMPANY       = '~href="/company/(co\d+)/\?ref_=ttrv_cmpy_\d">([^<svg].*?)</a><div~';
+    const IMDB_COUNTRY       = '~country_of_origin=(.*)&amp;ref_=ttrv_dt_cnt">(.*)<\/a~Ui';
+    const IMDB_CREATOR       = '~>\s*(?:Creator|Creators|Producer|Producers).*<ul[^>]*>(.+)</ul>~Uxsi';
+    const IMDB_DISTRIBUTOR   = '@<span\sid="distribution".*<ul\sclass[^>]+>(.*)</section>@Uis';
+    const IMDB_DISTRIBUTORS  = '@<li.*\/company\/(.*)\/[^>]+>(.*)<.*\((.*),\s*([\d-]+?).*\((.*)\).*</li>@Uis';
+    const IMDB_DIRECTOR      = '~id="director".*<ul[^>]*>(.+)</section>~Uxsi';
+    const IMDB_GENRE         = '~genres=([a-zA-Z_-]*)&amp;.*<span class="ipc-chip__text">([a-zA-Z_ -]*)<\/span><\/a~Ui';
     const IMDB_GROSS         = '~pl-zebra-list__label">Cumulative Worldwide Gross<\/td>\s*<td>\s*(.*?)\s*<\/td>~i';
-    const IMDB_ID            = '~((?:tt\d{6,})|(?:itle\?\d{6,}))~';
+    const IMDB_ID            = '~((?:tt\d+)|(?:itle\?\d+))~';
     const IMDB_LANGUAGE      = '~<a href="\/language\/(\w+)">(.*)<\/a>~Ui';
-    const IMDB_LOCATION      = '~href="\/search\/title\?locations=(.*)">(.*)<\/a>~Ui';
+    const IMDB_LOCATION      = '~href="/search/title/\?locations=(.*)&amp.*">(.*)<\/a>~Ui';
     const IMDB_LOCATIONS     = '~href="(?<url>\/search\/title\/\?locations=[^>]*)">\s?(?<location>.*)\s?<\/a><p(.*)>\((?<specification>.*)\)<\/p>~Ui';
     const IMDB_MPAA          = '~<li class="ipl-inline-list__item">(?:\s+)(TV-Y|TV-Y7|TV-Y7-FV|TV-G|TV-PG|TV-14|TV-MA|TV-MA-L|TV-MA-S|TV-MA-V|G|PG|PG-13|R|NC-17|NR|UR|M|X)(?:\s+)<\/li>~Ui';
-    const IMDB_MUSIC         = '~Music by\s*<\/h4>.*<table class=.*>(.*)</table>~Us';
+    const IMDB_MUSIC         = '~id="composer">.*<ul\sclass[^>]+>(.*)</section>~Uxsi';
     const IMDB_NAME          = '~href="/name/(.+)/?(?:\?[^"]*)?"[^>]*>(.+)</a>~Ui';
     const IMDB_MOVIE_DESC    = '~<section class="titlereference-section-overview">\s+<div>\s+(.*)\s*?</div>\s+<hr>\s+<div class="titlereference-overview-section">~Ui';
     const IMDB_SERIES_DESC   = '~<div>\s+(?:.*?</a>\s+</span>\s+</div>\s+<hr>\s+<div>\s+)(.*)\s+</div>\s+<hr>\s+<div class="titlereference-overview-section">~Ui';
@@ -84,29 +84,29 @@ class IMDB
     const IMDB_NOT_FOUND_ADV = '~"results-section-empty-results-msg"~Ui';
     const IMDB_NOT_FOUND_DES = 'Know what this is about';
     const IMDB_NOT_FOUND_ORG = '~<h1 class="findHeader">No results found for ~Ui';
-    const IMDB_PLOT          = '~<td[^>]*>\s*Plot\s*Summary\s*</td>\s*<td>\s*<p>\s*(.*)\s*</p>~Ui';
-    const IMDB_PLOT_KEYWORDS = '~<td[^>]*>Plot\s*Keywords</td>\s*<td>(.+)(?:<a\s*href="/title/[^>]*>[^<]*</a>\s*</li>\s*</ul>\s*)?</td>~Ui';
-    const IMDB_POSTER        = '~<link\s*rel=\'image_src\'\s*href="(.*)">~Ui';
-    const IMDB_RATING        = '~class="ipl-rating-star__rating">(.*)<~Ui';
-    const IMDB_RATING_COUNT  = '~class="ipl-rating-star__total-votes">\((.*)\)<~Ui';
-    const IMDB_RELEASE_DATE  = '~href="/title/tt\d+/releaseinfo">\s*(.*?)(?:\s*\([^)]*\))?\s*</a~i';
-    const IMDB_RUNTIME       = '~<td[^>]*>\s*Runtime\s*</td>\s*<td>(.+)</td>~Ui';
+    const IMDB_PLOT          = '~data-testid="plot-l".*>(.*)<\/span>~Ui';
+    const IMDB_PLOT_KEYWORDS = '~explore=keywords.*<span class="ipc-chip__text">(.*)<\/span>~Ui';
+    const IMDB_POSTER        = '~<meta property="og:image" content="(.*)"\/>~Ui';
+    const IMDB_RATING        = '~"ratingsSummary":{"aggregateRating":(.*),.*}~Ui';
+    const IMDB_RATING_COUNT  = '~"ratingsSummary":{.*"voteCount":(\d+),.*}~Ui';
+    const IMDB_RELEASE_DATE  = '~\/title\/tt\d+\/releaseinfo\/\?ref_=ttrv_ov_rdat">(.*)</a>~Ui';
+    const IMDB_RUNTIME       = '~id="runtime".*<ul[^>]+>(.*)</ul>~Ui';
     const IMDB_SEARCH_ADV    = '~<a href="/title/(tt\d+).*?ipc-title-link-wrapper~i';
     const IMDB_SEARCH_ORG    = '~find-title-result">(?:.*?)alt="(.*?)"(?:.*?)href="\/title\/(tt\d{6,})\/(?:.*?)">(.*?)<\/a>~';
-    const IMDB_SEASONS       = '~episodes\?season=(?:\d+)">(\d+)<~Ui';
-    const IMDB_SOUND_MIX     = '~<td[^>]*>\s*Sound\s*Mix\s*</td>\s*<td>(.+)</td>~Ui';
-    const IMDB_TAGLINE       = '~<td[^>]*>\s*Taglines\s*</td>\s*<td>(.+)</td>~Ui';
-    const IMDB_TITLE         = '~itemprop="name">(.*)(<\/h3>|<span)~Ui';
+    const IMDB_SEASONS       = '~episodes/\?season=[^>]+>(\d+)<~Ui';
+    const IMDB_SOUND_MIX     = '~/search/title/\?sound_mixes.*ref_=spec_2">(.*)</a>~Ui';
+    const IMDB_TAGLINE       = '~"taglines":{"edges":\[{"node":{"text":"(.*)","__typename":"Tagline"}~Ui';
+    const IMDB_TITLE         = '~<title>(.*)\s*\(.*\)\s*-\sReference\s*view \s*-\s*IMDb</title>~Ui';
     const IMDB_TITLE_EP      = '~titlereference-watch-ribbon"(?:.*)itemprop="name">(.*?)\s+<span\sclass="titlereference-title-year">~Ui';
-    const IMDB_TITLE_ORIG    = '~</h3>(?:\s+)(.*)(?:\s+)<span class=\"titlereference-original-title-label~Ui';
+    const IMDB_TITLE_ORIG    = '~hero__pageTitle.*hero__primary-text">(.*)</span>~Ui';
     const IMDB_TOP250        = '~href="/chart/top(?:tv)?".class(?:.*?)#([0-9]{1,})</a>~Ui';
     const IMDB_TRAILER       = '~href="/title/(?:tt\d+)/videoplayer/(vi[0-9]*)"~Ui';
-    const IMDB_TYPE          = '~href="/genre/(?:[a-zA-Z_-]*)/?">(?:[a-zA-Z_ -]*)</a>\s+</li>\s+(?:.*item">)\s+(?:<a href="(?:.*)</a>\s+</li>\s+(?:.*item">)\s+)?([a-zA-Z_ -]*)\s+</li>~Ui';
+    const IMDB_TYPE          = '~"titleType":.*"text":"(.*)",~Ui';
     const IMDB_URL           = '~https?://(?:.*\.|.*)imdb.com/(?:t|T)itle(?:\?|/)(..\d+)~i';
-    const IMDB_USER_REVIEW   = '~href="/title/[t0-9]*/reviews"[^>]*>([^<]*)\s*User~Ui';
-    const IMDB_VOTES         = '~"ipl-rating-star__total-votes">\s*\((.*)\)\s*<~Ui';
-    const IMDB_WRITER        = '~<div[^>]*>\s*(?:Writer|Writers)\s*:\s*<ul[^>]*>(.+)</ul>~Ui';
-    const IMDB_YEAR          = '~:title\' content="[^"]+ \((?:[^()]+ )?(\d{4}(?:–\d{4})?)\)~';
+    const IMDB_USER_REVIEW   = '~href="/title/tt\d+/reviews/\?ref_=ttrv_ov_ururv">(.*)</a>~Ui';
+    const IMDB_VOTES         = '~"ratingsSummary":{.*"voteCount":(\d+),.*}~Ui';
+    const IMDB_WRITER        = '~>\s*(?:Writer|Writers).*<ul[^>]*>(.+)</ul>~Uxsi';
+    const IMDB_YEAR          = '~<title>.*\s*\((?:[^()]+ )?(\d{4}(?:–\d{4})?)\)\s*-\sReference\s*view \s*-\s*IMDb</title>~iU';
 
     /**
      * @var string The string returned, if nothing is found.
@@ -915,7 +915,8 @@ class IMDB
                     if (0 !== $iLimit && $i >= $iLimit) {
                         break;
                     }
-                    $sChar = str_replace(' / ', ' and ', $aMatchChar[1][$i]);
+                    $sCharRaw = $aMatchChar[1][$i] ?? 'Unknown';
+                    $sChar = str_replace(' / ', ' and ', $sCharRaw);
                     $aReturn[] = '<a href="https://www.imdb.com/name/' . IMDBHelper::cleanString(
                             $aMatch[1][$i]
                         ) . '/"' . ($sTarget ? ' target="' . $sTarget . '"' : '') . '>' . IMDBHelper::cleanString(
@@ -956,7 +957,9 @@ class IMDB
                     if (0 !== $iLimit && $i >= $iLimit) {
                         break;
                     }
-                    $sChar = str_replace(' / ', ' and ', $aMatchChar[1][$i]);
+                    $sCharRaw = $aMatchChar[1][$i] ?? 'Unknown';
+                    $sChar = str_replace(' / ', ' and ', $sCharRaw);
+
                     $aReturn[] = IMDBHelper::cleanString($sName) . ' as ' . IMDBHelper::cleanString($sChar);
                 }
 
@@ -2069,7 +2072,7 @@ class IMDB
                         return IMDB::$sNotFound;
                     }
 
-                    $aSeasonsLinks = IMDBHelper::matchRegex($sSource, '~tab-season-entry" href="/title/tt\d+/episodes/\?season=(\d)~s');
+                    $aSeasonsLinks = IMDBHelper::matchRegex($sSource, '~tab-season-entry" href="/title/tt\d+/episodes/\?season=(\d)"~s');
                     $aFoundSeasons = [];
                     if ($aSeasonsLinks) {
                         foreach ($aSeasonsLinks[1] as $i => $aSeasonNumber) {
@@ -2098,7 +2101,7 @@ class IMDB
 
                             # Find values
                             $fId = IMDBHelper::matchRegex($aSplit[1][$i], '~h4.+/title/(tt\d+)~s');
-                            $fEpisode = IMDBHelper::matchRegex($aSplit[1][$i], '~ref_=ttep_ep_(\d+)~s');
+                            $fEpisode = IMDBHelper::matchRegex($aSplit[1][$i], '~ref_=ttep_ep(\d+)~s');
                             $fTitle = IMDBHelper::matchRegex($aSplit[1][$i], '~S\d+\.E\d+ ∙ (.+?)<\/div>~s');
                             $fAirdate = IMDBHelper::matchRegex($aSplit[1][$i], '~<span class="sc-ccd6e31b-10 fVspdm">(.+?)<\/span>~s');
                             $fPlot = IMDBHelper::matchRegex($aSplit[1][$i], '~"ipc-html-content-inner-div" role="presentation">(.+?)<\/div>~s');
