@@ -13,7 +13,7 @@
  * @author  Fabian Beiner <fb@fabianbeiner.de>
  * @license https://opensource.org/licenses/MIT The MIT License
  * @link    https://github.com/FabianBeiner/PHP-IMDB-Grabber/ GitHub Repository
- * @version 6.2.6
+ * @version 6.2.7
  */
 class IMDB
 {
@@ -58,7 +58,7 @@ class IMDB
     const IMDB_AWARDS        = '~Awards</a>.*span\sclass.*>(.*)</div>~Uis';
     const IMDB_BUDGET        = '~budget</span>.*<span.*>\s*(.*)(?:\s*\(estimated\))\s*</span>~Ui';
     const IMDB_CAST          = '~<\/div><a class="ipc-lockup-overlay ipc-focusable" href="\/name\/([^\/]*)\/.*href.*>(.*)<\/a>~Ui';
-    const IMDB_CAST_IMAGE    = '~(loadlate="(.*)"[^>]*><\/a>\s+<\/td>\s+)?<td[^>]*itemprop="actor"[^>]*>\s*<a\s*href="\/name\/([^/]*)\/\?[^"]*"[^>]*>\s*<span.+>(.+)<\/span+~Uis';
+    const IMDB_CAST_IMAGE = '~<img\s+alt="([^"]+)"\s+class="ipc-image"\s+[^>]*src="([^"]+)"[^>]*srcset="([^"]+)"~is';
     const IMDB_CERTIFICATION = '~\?certificates=.*ref_=ttrv_stry">(.+)(?:</span></li></ul></div>|<a\sclass[^>]+\/parentalguide\/[^>]+>)~Ui';
     const IMDB_CHAR          = '~\/characters\/nm\d+\/.*>(.*)<\/a>~Ui';
     const IMDB_COLOR         = '~href="/search/title/\?colors(?:.*)">(.*)<\/a>~Ui';
@@ -228,6 +228,7 @@ class IMDB
     private function fetchUrl($sSearch, $orgSearch = false, $exactSearch = false)
     {
         $sSearch = trim($sSearch);
+        $sRedirectFile = null;
 
         // Try to find a valid URL.
         $sId = IMDBHelper::matchRegex($sSearch, self::IMDB_ID, 1);
@@ -826,59 +827,101 @@ class IMDB
      *
      * @return array Array with cast name as key, and image as value.
      */
-    public function getCastImages($iLimit = 0, $bMore = true, $sSize = 'small', $bDownload = false)
-    {
+    public function getCastImages($iLimit = 0, $bMore = true, $sSize = 'small', $bDownload = false) {
         if (true === $this->isReady) {
             $aMatch  = IMDBHelper::matchRegex($this->sSource, self::IMDB_CAST_IMAGE);
             $aReturn = [];
-            if (count($aMatch[4])) {
-                foreach ($aMatch[4] as $i => $sName) {
+
+            if (count($aMatch[1])) {
+                foreach ($aMatch[1] as $i => $sName) {
                     if (0 !== $iLimit && $i >= $iLimit) {
                         break;
                     }
-                    $sMatch = $aMatch[2][$i];
 
-                    if ('big' === strtolower($sSize) && false !== strstr($aMatch[2][$i], '@._')) {
-                        $sMatch = substr($aMatch[2][$i], 0, strpos($aMatch[2][$i], '@._')) . '@.jpg';
-                    } elseif ('mid' === strtolower($sSize) && false !== strstr($aMatch[2][$i], '@._')) {
-                        $sMatch = substr($aMatch[2][$i], 0, strpos($aMatch[2][$i], '@._')) . '@._V1_UX214_AL_.jpg';
+                    // Parse srcset to get different image sizes
+                    $sSrcset      = $aMatch[3][$i];
+                    $aSrcsetParts = explode(',', $sSrcset);
+
+                    $sMatch = $aMatch[2][$i]; // default to src
+
+                    // Extract image URLs from srcset based on size preference
+                    if ('big' === strtolower($sSize)) {
+                        // Get the largest image (280w)
+                        foreach ($aSrcsetParts as $sPart) {
+                            if (strpos($sPart, '280w') !== false) {
+                                preg_match('~(https?://[^\s]+)~', $sPart, $aUrl);
+                                if ( ! empty($aUrl[1])) {
+                                    $sMatch = $aUrl[1];
+                                }
+                            }
+                        }
+                    }
+                    elseif ('mid' === strtolower($sSize)) {
+                        // Get the medium image (210w)
+                        foreach ($aSrcsetParts as $sPart) {
+                            if (strpos($sPart, '210w') !== false) {
+                                preg_match('~(https?://[^\s]+)~', $sPart, $aUrl);
+                                if ( ! empty($aUrl[1])) {
+                                    $sMatch = $aUrl[1];
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        // Small - use the 140w image or default src
+                        foreach ($aSrcsetParts as $sPart) {
+                            if (strpos($sPart, '140w') !== false) {
+                                preg_match('~(https?://[^\s]+)~', $sPart, $aUrl);
+                                if ( ! empty($aUrl[1])) {
+                                    $sMatch = $aUrl[1];
+                                }
+                            }
+                        }
                     }
 
                     if (false === $bDownload) {
                         $sMatch = IMDBHelper::cleanString($sMatch);
-                    } else {
-                        $sLocal = IMDBHelper::saveImageCast($sMatch, $aMatch[3][$i]);
+                    }
+                    else {
+                        // Create a sanitized filename using hash
+                        $sFileHash  = md5($sMatch);
+                        $sExtension = '.jpg'; // IMDB images are typically JPG
+
+                        // Sanitize actor name for use in filename (optional, can use hash only)
+                        $sSafeName = preg_replace('/[^a-z0-9_-]/i', '_', $sName);
+                        $sSafeName = substr($sSafeName, 0, 50); // Limit length
+
+                        // Option 1: Use hash only
+                        $sFilename = $sFileHash . $sExtension;
+
+                        // Option 2: Use sanitized name + hash (uncomment to use this instead)
+                        // $sFilename = $sSafeName . '_' . substr($sFileHash, 0, 8) . $sExtension;
+
+                        $sLocal = IMDBHelper::saveImageCast($sMatch, $sFilename);
+
                         if (file_exists(dirname(__FILE__) . '/' . $sLocal)) {
                             $sMatch = $sLocal;
-                        } else {
-                            //the 'big' image isn't available, try the 'mid' one (vice versa)
-                            if ('big' === strtolower($sSize) && false !== strstr($aMatch[2][$i], '@._')) {
-                                //trying the 'mid' one
-                                $sMatch = substr(
-                                        $aMatch[2][$i],
-                                        0,
-                                        strpos($aMatch[2][$i], '@._')
-                                    ) . '@._V1_UX214_AL_.jpg';
-                            } else {
-                                //trying the 'big' one
-                                $sMatch = substr($aMatch[2][$i], 0, strpos($aMatch[2][$i], '@._')) . '@.jpg';
-                            }
+                        }
+                        else {
+                            // Fallback to default src if download fails
+                            $sFileHash = md5($aMatch[2][$i]);
+                            $sFilename = $sFileHash . $sExtension;
 
-                            $sLocal = IMDBHelper::saveImageCast($sMatch, $aMatch[3][$i]);
+                            $sLocal = IMDBHelper::saveImageCast($aMatch[2][$i], $sFilename);
                             if (file_exists(dirname(__FILE__) . '/' . $sLocal)) {
                                 $sMatch = $sLocal;
-                            } else {
+                            }
+                            else {
                                 $sMatch = IMDBHelper::cleanString($aMatch[2][$i]);
                             }
                         }
                     }
 
-                    $aReturn[IMDBHelper::cleanString($aMatch[4][$i])] = $sMatch;
+                    $aReturn[IMDBHelper::cleanString($sName)] = $sMatch;
                 }
 
-                $bMore = (0 !== $iLimit && $bMore && (count($aMatch[4]) > $iLimit) ? '…' : '');
-
-                $bHaveMore = ($bMore && (count($aMatch[4]) > $iLimit));
+                $bMore     = (0 !== $iLimit && $bMore && (count($aMatch[1]) > $iLimit) ? '…' : '');
+                $bHaveMore = ($bMore && (count($aMatch[1]) > $iLimit));
 
                 $aReturn = array_replace(
                     $aReturn,

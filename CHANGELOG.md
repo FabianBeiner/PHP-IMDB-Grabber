@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [6.2.7] - 2025-10-04
+### Changed
+- Added empty variable (fixed #208)
+- Fixed `getCastImages` (fixed #209)
+
 ## [6.2.6] - 2025-06-28
 ### Changed
 - Hotfix for all those broken changes. *Not heavily tested, see #205* 
