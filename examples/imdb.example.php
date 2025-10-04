@@ -47,66 +47,83 @@
 <body>
 <?php
 include_once '../imdb.class.php';
-
-$oIMDB = new IMDB('http://us.imdb.com/Title?0144117');
-if ($oIMDB->isReady) {
-    echo '<p><a href="' .
-         $oIMDB->getUrl() .
-         '">' .
-         $oIMDB->getTitle() .
-         '</a> got rated ' .
-         $oIMDB->getRating() .
-         '.</p>';
-} else {
-    echo '<p>Movie not found!</p>';
-}
-?>
-
-<hr>
-
+//
+//$oIMDB = new IMDB('http://us.imdb.com/Title?0144117');
+//if ($oIMDB->isReady) {
+//    echo '<p><a href="' .
+//         $oIMDB->getUrl() .
+//         '">' .
+//         $oIMDB->getTitle() .
+//         '</a> got rated ' .
+//         $oIMDB->getRating() .
+//         '.</p>';
+//} else {
+//    echo '<p>Movie not found!</p>';
+//}
+//?>
+<!---->
+<!--<hr>-->
+<!---->
 <?php
-$oIMDB = new IMDB('New York, I Love You');
-if ($oIMDB->isReady) {
-    echo '<h1>' . $oIMDB->getTitle() . '</h1>';
-    foreach ($oIMDB->getAll() as $aItem) {
-        if ($oIMDB::$sNotFound !== $aItem['value']) {
-            echo '<p><b>' . $aItem['name'] . '</b>: ' . $aItem['value'] . '</p>';
-        }
-    }
-} else {
-    echo '<p>Movie not found!</p>';
-}
-?>
-
-<hr>
+//$oIMDB = new IMDB('New York, I Love You');
+//if ($oIMDB->isReady) {
+//    echo '<h1>' . $oIMDB->getTitle() . '</h1>';
+//    foreach ($oIMDB->getAll() as $aItem) {
+//        if ($oIMDB::$sNotFound !== $aItem['value']) {
+//            echo '<p><b>' . $aItem['name'] . '</b>: ' . $aItem['value'] . '</p>';
+//        }
+//    }
+//} else {
+//    echo '<p>Movie not found!</p>';
+//}
+//?>
+<!---->
+<!--<hr>-->
 
 <?php
 $oIMDB = new IMDB('http://www.imdb.com/title/tt1022603/');
 if ($oIMDB->isReady) {
-    echo '<p><a href="' .
-         $oIMDB->getUrl() .
-         '">' .
-         $oIMDB->getTitle() .
-         '</a> got rated ' .
-         $oIMDB->getRating() .
-         '.</p>';
-    echo '<p><img src="../' .
-         $oIMDB->getPoster('small', true) .
-         '" style="float:left;margin:4px 10px 10px 0;"> <b>About the movie:</b> ' .
-         $oIMDB->getPlot() .
-         '</p>';
-    echo '<h2>Cast</h2>';
-    $castImages = $oIMDB->getCastImages(5, false, 'small');
-    if (!is_array($castImages)) {
-        $castImages = [];
+  echo '<p><a href="' .
+      $oIMDB->getUrl() .
+      '">' .
+      $oIMDB->getTitle() .
+      '</a> got rated ' .
+      $oIMDB->getRating() .
+      '.</p>';
+  echo '<p><img src="../' .
+      $oIMDB->getPoster('small', true) .
+      '" style="float:left;margin:4px 10px 10px 0;"> <b>About the movie:</b> ' .
+      $oIMDB->getPlot() .
+      '</p>';
+
+  echo '<h2>Cast</h2>';
+
+  // Get cast images with hashed filenames
+  $castImages = $oIMDB->getCastImages(5, true, 'big', true);
+  if (!is_array($castImages)) {
+    $castImages = [];
+  }
+
+  // Display cast with images
+  echo '<div style="clear:both;">';
+  foreach ($castImages as $name => $image) {
+    echo '<div style="display:inline-block;margin:10px;text-align:center;width:150px;">';
+
+    // Check if image exists
+    if (!empty($image) && $image !== 'cast/not-found.jpg') {
+      echo '<img src="../' . htmlspecialchars($image) . '" alt="' . htmlspecialchars($name) . '" style="width:140px;height:140px;object-fit:cover;border-radius:50%;">';
+    } else {
+      // Fallback placeholder if image not found
+      echo '<div style="width:140px;height:140px;background:#ddd;border-radius:50%;display:flex;align-items:center;justify-content:center;">No Image</div>';
     }
 
-    foreach (explode(' / ', $oIMDB->getCast(5, false)) as $name) {
-        $image = $castImages[$name] ?? '';
-        echo '<img src="' . $image . '" alt="' . htmlspecialchars($name) . '">' . htmlspecialchars($name) . '<br>';
-    }
+    echo '<p style="margin-top:5px;font-size:14px;"><strong>' . htmlspecialchars($name) . '</strong></p>';
+    echo '</div>';
+  }
+  echo '</div>';
+
 } else {
-    echo '<p>Movie not found!</p>';
+  echo '<p>Movie not found!</p>';
 }
 ?>
 
