@@ -2543,7 +2543,8 @@ class IMDBHelper extends IMDB
                 CURLOPT_SSL_VERIFYHOST => 0,
                 CURLOPT_SSL_VERIFYPEER => 0,
                 CURLOPT_TIMEOUT        => self::IMDB_TIMEOUT,
-                CURLOPT_USERAGENT      => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
+                CURLOPT_USERAGENT      => 'Googlebot/2.1 (+http://www.google.com/bot.html)',
+                CURLOPT_REFERER        => 'https://google.com',
                 CURLOPT_VERBOSE        => 0,
             ]
         );
