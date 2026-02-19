@@ -2115,7 +2115,7 @@ class IMDB
                         return IMDB::$sNotFound;
                     }
 
-                    $aSeasonsLinks = IMDBHelper::matchRegex($sSource, '~tab-season-entry" href="/title/tt\d+/episodes/\?season=(\d)~s');
+                    $aSeasonsLinks = IMDBHelper::matchRegex($sSource, '~tab-season-entry" href="/title/tt\d+/episodes/\?season=(\d+)~s');
                     $aFoundSeasons = [];
                     if ($aSeasonsLinks) {
                         foreach ($aSeasonsLinks[1] as $i => $aSeasonNumber) {
